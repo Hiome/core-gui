@@ -1,4 +1,5 @@
 const { Client } = require('pg')
+const mqtt = require('mqtt')
 
 function index(req, res, next) {
   const client = new Client()
@@ -21,17 +22,28 @@ function create(req, res, next) {
     `, [req.body.id, req.body.name, req.body.occupancy_count])
       .then(r => res.send(r.rows[0]))
       .catch(next)
-      .then(() => client.end())
+      .then(() => {
+        if (process.env.NODE_ENV === 'production') {
+          mqtt.connect('mqtt://localhost:1883').publish('hiome/1/gui/cmd',
+            `{"val": "updated", "id": "${req.body.id}", "type": "room"}`).end()
+        }
+        client.end()
+      })
 }
 
 function del(req, res, next) {
   const client = new Client()
   client.connect()
-  const roomId = parseInt(req.params.id);
-  client.query('delete from rooms id = $1 returning *', [roomId])
+  client.query('delete from rooms id = $1 returning *', [req.params.id])
     .then(r => res.send(r.rows[0]))
     .catch(next)
-    .then(() => client.end())
+    .then(() => {
+      if (process.env.NODE_ENV === 'production') {
+        mqtt.connect('mqtt://localhost:1883').publish('hiome/1/gui/cmd',
+          `{"val": "deleted", "id": "${req.params.id}", "type": "room"}`).end()
+      }
+      client.end()
+    })
 }
 
 module.exports = { index, create, del }
