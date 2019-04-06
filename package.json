@@ -1,0 +1,21 @@
+{
+  "name": "hiome-gui",
+  "version": "0.1.0",
+  "description": "Hiome Core API",
+  "author": "Hiome Inc",
+  "license": "All rights reserved",
+  "main": "app.js",
+  "scripts": {
+    "build": "gatsby build",
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "express": "^4.16.4",
+    "pg": "^7.9.0",
+    "@sentry/node": "^5.0.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://gitlab.com/hiome/core-gui"
+  }
+}
