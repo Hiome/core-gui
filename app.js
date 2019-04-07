@@ -1,5 +1,5 @@
-const Sentry = require('@sentry/node');
-Sentry.init();
+const Sentry = require('@sentry/node')
+Sentry.init()
 
 const express = require('express')
 const app = express()
@@ -25,7 +25,7 @@ app.use(function (req, res, next) {
 })
 
 app.use(function (err, req, res, next) {
-  Sentry.captureException(err);
+  Sentry.captureException(err)
   console.error(err.stack)
   if (res.headersSent) {
     return next(err)
