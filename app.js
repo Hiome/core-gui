@@ -17,8 +17,8 @@ if (process.env.NODE_ENV !== 'production') {
 const index = require('./api/routes')
 app.use('/api', index)
 
-// serve static files from ui/public (built by gatsby)
-app.use(express.static('ui/public'))
+// serve static files from public (built by gatsby)
+app.use(express.static('public'))
 
 app.use(function (req, res, next) {
   res.status(404).send('Sorry cant find that!')
