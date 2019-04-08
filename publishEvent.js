@@ -3,10 +3,8 @@ const mqtt = require('mqtt')
 
 function publishEvent(msg) {
   if (process.env.NODE_ENV === 'production') {
-    mqtt.
-      connect('mqtt://localhost:1883', {clientId: `gui:${MACHINEID}`}).
-      publish(`hiome/1/gui:${MACHINEID}/event`, msg).
-      end()
+    const client = mqtt.connect('mqtt://localhost:1883', {clientId: `gui:${MACHINEID}`})
+    client.on('connect', () => client.publish(`hiome/1/gui:${MACHINEID}/event`, msg, () => client.end()))
   }
 }
 
