@@ -1,4 +1,4 @@
-const { Client } = require('pg').native
+const { Client } = require('pg')
 const publishEvent = require('../publishEvent')
 
 function index(req, res, next) {
