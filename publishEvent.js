@@ -1,4 +1,4 @@
-const MACHINEID = process.env.NODE_ENV === 'production' ? require('fs').readFileSync('/sys/class/net/eth0/address', 'utf8') : 'local'
+const MACHINEID = process.env.NODE_ENV === 'production' ? require('fs').readFileSync('/sys/class/net/eth0/address', 'utf8').trim() : 'local'
 const mqtt = require('mqtt')
 
 function publishEvent(msg) {
