@@ -38,7 +38,7 @@ class IndexPage extends Component {
   render() {
     return (
       <Layout>
-        <SEO title="Hiome | Rooms" />
+        <SEO title="Rooms" />
         <h1 style={{textAlign: `center`}}>Rooms</h1>
         <div style={{margin: `0 auto`, textAlign: `center`}}>
           { this.renderRooms() }

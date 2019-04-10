@@ -134,7 +134,7 @@ class AddSensorPage extends Component {
   render() {
     return (
       <Layout>
-        <SEO title="Hiome | Rooms" />
+        <SEO title="Add Sensor" />
         <h1 style={{textAlign: `center`}}>Add Sensor</h1>
         <div style={{margin: `0 auto`, textAlign: `center`}}>
           { this.renderRoomForm() }

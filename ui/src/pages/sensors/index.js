@@ -36,7 +36,7 @@ class SensorsPage extends Component {
   render() {
     return (
       <Layout>
-        <SEO title="Hiome | Sensors" />
+        <SEO title="Sensors" />
         <h1 style={{textAlign: `center`}}>Sensors</h1>
         <ul>
           { this.renderSensors() }
