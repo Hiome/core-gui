@@ -14,8 +14,8 @@ if (process.env.NODE_ENV !== 'production') {
   })
 }
 
-const index = require('./api/routes')
-app.use('/api', index)
+const index = require('./api/1/routes')
+app.use('/api/1', index)
 
 // serve static files from public (built by gatsby)
 app.use(express.static('public'))

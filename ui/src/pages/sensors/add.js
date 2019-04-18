@@ -17,7 +17,7 @@ class AddSensorPage extends Component {
   async componentDidMount() {
     const params = (new URL(document.location)).searchParams
     this.setState({id: params.get('id'), room1: params.get('r1'), room2: params.get('r2')})
-    const json = await fetch(`${process.env.API_URL}api/rooms`).then(resp => resp.json())
+    const json = await fetch(`${process.env.API_URL}api/1/rooms`).then(resp => resp.json())
     this.setState({rooms: json})
   }
 
@@ -33,7 +33,7 @@ class AddSensorPage extends Component {
       room_name = prompt("What is the name of this room?", "Living Room")
       if (!room_name) return
       room_id = Date.now() / 1000 | 0
-      fetch(`${process.env.API_URL}api/rooms`, {
+      fetch(`${process.env.API_URL}api/1/rooms`, {
         method: 'POST',
         headers: {
           'Accept': 'application/json',
@@ -62,7 +62,7 @@ class AddSensorPage extends Component {
       const room1_id = this.state.room1 === 'external' ? '' : this.state.room1
       const room2_id = this.state.room2 === 'external' ? '' : this.state.room2
 
-      await fetch(`${process.env.API_URL}api/sensors`, {
+      await fetch(`${process.env.API_URL}api/1/sensors`, {
         method: 'POST',
         headers: {
           'Accept': 'application/json',

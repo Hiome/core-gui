@@ -9,7 +9,7 @@ class SensorsPage extends Component {
   }
 
   async componentDidMount() {
-    const json = await fetch(`${process.env.API_URL}api/sensors`).then(resp => resp.json())
+    const json = await fetch(`${process.env.API_URL}api/1/sensors`).then(resp => resp.json())
     this.setState({sensors: json})
   }
 

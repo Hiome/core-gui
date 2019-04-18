@@ -9,7 +9,7 @@ class IndexPage extends Component {
   }
 
   async componentDidMount() {
-    const json = await fetch(`${process.env.API_URL}api/rooms`).then(resp => resp.json())
+    const json = await fetch(`${process.env.API_URL}api/1/rooms`).then(resp => resp.json())
     this.setState({rooms: json})
   }
 

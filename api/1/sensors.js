@@ -4,7 +4,7 @@ const publishEvent = require('../publishEvent')
 function index(req, res, next) {
   const client = new Client()
   client.connect()
-  client.query('select * from sensors order by name')
+  client.query('select id, room_id, name, type, battery, version from sensors order by name')
     .then(r => res.send(r.rows))
     .catch(next)
     .then(() => client.end())
@@ -19,7 +19,7 @@ function create(req, res, next) {
         room_id = excluded.room_id,
         name = excluded.name,
         type = excluded.type
-      returning *
+      returning id, room_id, name, type, battery, version
     `, [req.body.id, req.body.room_id, req.body.name, req.body.type])
       .then(r => res.send(r.rows[0]))
       .catch(next)
@@ -32,7 +32,7 @@ function create(req, res, next) {
 function del(req, res, next) {
   const client = new Client()
   client.connect()
-  client.query('delete from sensors id = $1 returning *', [req.params.id])
+  client.query('delete from sensors id = $1 returning id, room_id, name, type, battery, version', [req.params.id])
     .then(r => res.send(r.rows[0]))
     .catch(next)
     .then(() => {
