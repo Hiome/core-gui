@@ -1,5 +1,5 @@
 const { Client } = require('pg')
-const publishEvent = require('../publishEvent')
+const publishEvent = require('../../publishEvent')
 
 function index(req, res, next) {
   const client = new Client()
