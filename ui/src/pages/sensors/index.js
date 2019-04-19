@@ -16,7 +16,7 @@ class SensorsPage extends Component {
   row(sensor) {
     return (
       <li key={sensor.id }>
-        { sensor.name } ({ sensor.id }) is in { sensor.room_id } and was last seen { sensor.last_seen } with { sensor.battery || 'unknown' } volts of battery.
+        { sensor.name } ({ sensor.id }) is in { sensor.room_id } with { sensor.battery || 'unknown' } volts of battery.
       </li>
     )
   }
