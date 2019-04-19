@@ -23,14 +23,12 @@ You now have both a nodejs server and a gatsby server running.
 
 ## Deployment
 
-First, make sure `siteMetadata.apiRoot` value is blank in `ui/gatsby-config.js` before building prod site.
-
 ```console
 # generate static site locally
-cd ui && rm -rf public/ && gatsby build
+npm run build
 
 # push up the built assets into a release candidate branch
-cd .. && git checkout -b v1.0rc && git add . && git commit -m 'release candidate' && git push origin v1.0rc
+git checkout -b v1.0rc && git add . && git commit -m 'v1.0 release candidate' && git push origin v1.0rc
 ```
 
 Switch to a dedicated raspberry pi to build npm modules for ARM architecture and push up all code to our release branch:
