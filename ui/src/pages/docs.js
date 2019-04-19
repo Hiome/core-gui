@@ -1,5 +1,4 @@
 import React from 'react'
-import { Link } from 'gatsby'
 
 import Layout from '../components/layout'
 import SEO from '../components/seo'
@@ -18,7 +17,8 @@ const DocsPage = () => (
 
     <p>
       You can get a list of all rooms configured in your home by doing a HTTP GET request
-      to <Link to="/api/1/rooms">http://hiome.local/api/1/rooms</Link>. This returns a JSON response that looks like
+      to <a href="http://hiome.local/api/1/rooms">http://hiome.local/api/1/rooms</a>. This returns a JSON response
+      that looks like
     </p>
 
     <code><pre>
