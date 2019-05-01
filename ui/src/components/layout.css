@@ -623,6 +623,7 @@ pre tt:after {
 }
 
 body {
+  background-color: #6F3CD1;
   background: linear-gradient(45deg, #6F3CD1, #6F3CD1 50%, #5429A9);
   background-attachment: fixed;
 }

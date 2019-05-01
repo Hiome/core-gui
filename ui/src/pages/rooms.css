@@ -1,3 +1,20 @@
+.roomContainer {
+  margin: 0 auto;
+  width: 900px;
+}
+
+@media only screen and (max-width: 900px) {
+  .roomContainer {
+    width: 600px;
+  }
+}
+
+@media only screen and (max-width: 600px) {
+  .roomContainer {
+    width: 300px;
+  }
+}
+
 .room {
   font-weight: bold;
   font-size: 25px;

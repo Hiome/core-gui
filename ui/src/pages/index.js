@@ -50,7 +50,7 @@ class IndexPage extends Component {
   roomRow(room) {
     return (
       <div key={room.id} className={`room ${room.occupancy_count > 0 ? 'active' : ''}`}>
-        <span className={'clear_occ'} onClick={this.setOcc.bind(this, room)}>
+        <span className="clear_occ" onClick={this.setOcc.bind(this, room)}>
           <svg xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" version="1.1" x="0px" y="0px" viewBox="0 0 100 100" width="20" height="20"><g><path fill="#A17EDF" stroke="none" d=" M 84.25 24.25 Q 86.0037109375 22.4890625 86 20 86.0037109375 17.5109375 84.25 15.75 82.4890625 13.9962890625 80 14 77.5109375 13.9962890625 75.75 15.75 L 50 41.5 24.25 15.75 Q 22.4890625 13.9962890625 20 14 17.5109375 13.9962890625 15.75 15.75 13.9962890625 17.5109375 14 20 13.9962890625 22.4890625 15.75 24.25 L 41.5 50 15.75 75.75 Q 13.9962890625 77.5109375 14 80 13.9962890625 82.4890625 15.75 84.25 17.5109375 86.0037109375 20 86 22.4890625 86.0037109375 24.25 84.25 L 50 58.5 75.75 84.25 Q 77.5109375 86.0037109375 80 86 82.4890625 86.0037109375 84.25 84.25 86.0037109375 82.4890625 86 80 86.0037109375 77.5109375 84.25 75.75 L 58.5 50 84.25 24.25 Z"></path></g></svg>
         </span>
         <div style={{fontSize: `70px`, marginBottom: `40px`}}>{ room.occupancy_count }</div>
@@ -75,7 +75,7 @@ class IndexPage extends Component {
     return (
       <Layout>
         <SEO title="Rooms" />
-        <div style={{margin: `0 auto`}}>
+        <div className="roomContainer">
           { this.renderRooms() }
         </div>
       </Layout>
