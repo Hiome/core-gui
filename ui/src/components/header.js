@@ -27,7 +27,6 @@ const Header = ({ siteTitle }) => (
           {siteTitle}
         </Link>
         <Link style={{margin: `0 20px 0 50px`, fontSize: `0.5em`, color: `#fff`, textDecoration: `none`}} to="/">Rooms</Link>
-        <Link style={{margin: `0 20px`, fontSize: `0.5em`, color: `#fff`, textDecoration: `none`}} to="/sensors">Sensors</Link>
       </h1>
     </div>
   </header>

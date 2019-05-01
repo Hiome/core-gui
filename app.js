@@ -6,13 +6,11 @@ const app = express()
 
 app.use(express.json())
 
-if (process.env.NODE_ENV !== 'production') {
-  app.use(function(req, res, next) {
-    res.header('Access-Control-Allow-Origin', '*')
-    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept')
-    next()
-  })
-}
+app.use(function(req, res, next) {
+  res.header('Access-Control-Allow-Origin', '*')
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept')
+  next()
+})
 
 const index = require('./api/1/routes')
 app.use('/api/1', index)
