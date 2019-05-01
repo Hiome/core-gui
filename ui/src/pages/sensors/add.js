@@ -74,7 +74,7 @@ class AddSensorPage extends Component {
           name: `${this.state.room1_name} <-> ${this.state.room2_name}`,
           type: 'door'
         })
-      }).then(resp => window.location.href = '/sensors')
+      }).then(resp => window.location.href = '/')
     }
   }
 
