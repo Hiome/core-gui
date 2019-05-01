@@ -80,10 +80,10 @@ class AddSensorPage extends Component {
 
   formQuestion() {
     if (this.state.settingRoom1) {
-      return <label htmlFor="name">Which room is this sensor in?</label>
+      return <label htmlFor="name">Which room is this sensor going in?</label>
     }
 
-    return <label htmlFor="name">Now walk through the door. Which room are you in now?</label>
+    return <label htmlFor="name">Which room is on the other side of the door?</label>
   }
 
   renderButton() {
@@ -91,7 +91,7 @@ class AddSensorPage extends Component {
       return <button onClick={this.nextRoom}>Next</button>
     }
 
-    return <button onClick={this.saveSensor}>Save</button>
+    return <button onClick={this.saveSensor}>Finish</button>
   }
 
   renderRoomOptions() {
@@ -118,6 +118,7 @@ class AddSensorPage extends Component {
     return (
       <div>
         { this.formQuestion() }
+        <br/>
 
         <select onChange={this.updateRoom} value={this.state.settingRoom1 ? (this.state.room1 || "null") : (this.state.room2 || "null")}>
           <option value="null">Select a room...</option>
@@ -125,7 +126,7 @@ class AddSensorPage extends Component {
           { this.renderExternalOption() }
           <option value="new">Add New Room</option>
         </select>
-
+        <br/>
         { this.renderButton() }
       </div>
     )
@@ -135,7 +136,6 @@ class AddSensorPage extends Component {
     return (
       <Layout>
         <SEO title="Add Sensor" />
-        <h1 style={{textAlign: `center`}}>Add Sensor</h1>
         <div style={{margin: `0 auto`, textAlign: `center`}}>
           { this.renderRoomForm() }
         </div>
