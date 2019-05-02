@@ -11,14 +11,17 @@ import PropTypes from "prop-types"
 import Header from "./header"
 import "./layout.css"
 
-const Layout = ({ children }) => (
+const WhiteLayout = ({ children }) => (
   <>
     <Header />
     <div
       style={{
-        margin: `0 auto`,
+        margin: `0 auto 50px auto`,
         maxWidth: 960,
-        padding: `0px 0px 1.45rem`,
+        padding: `1.45rem`,
+        backgroundColor: `#fff`,
+        color: `#000008`,
+        boxShadow: `0 0 10px rgba(0, 0, 0, 0.2)`,
       }}
     >
       <main>{children}</main>
@@ -26,8 +29,8 @@ const Layout = ({ children }) => (
   </>
 )
 
-Layout.propTypes = {
+WhiteLayout.propTypes = {
   children: PropTypes.node.isRequired,
 }
 
-export default Layout
+export default WhiteLayout

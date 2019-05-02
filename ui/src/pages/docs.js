@@ -1,10 +1,10 @@
 import React from 'react'
 
-import Layout from '../components/layout'
+import WhiteLayout from '../components/whitelayout'
 import SEO from '../components/seo'
 
 const DocsPage = () => (
-  <Layout>
+  <WhiteLayout>
     <SEO title="Documentation" />
     <h1>Hiome API Documentation</h1>
 
@@ -92,7 +92,7 @@ const DocsPage = () => (
       Of course, Hiome Core is in beta and this documentation is subject to change. This page will always reflect your
       Hiome Core's API.
     </p>
-  </Layout>
+  </WhiteLayout>
 )
 
 export default DocsPage
