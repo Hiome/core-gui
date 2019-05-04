@@ -16,8 +16,8 @@ function create(req, res, next) {
   client.query(`
     insert into rooms(id, name, occupancy_count) values($1, $2, $3)
       on conflict (id) do update set
-        name = excluded.name,
-        occupancy_count = excluded.occupancy_count
+        name = coalesce(excluded.name, rooms.name),
+        occupancy_count = coalesce(excluded.occupancy_count, rooms.occupancy_count)
       returning *
     `, [req.body.id, req.body.name, req.body.occupancy_count])
       .then(r => res.send(r.rows[0]))

@@ -16,9 +16,9 @@ function create(req, res, next) {
   client.query(`
     insert into sensors(id, room_id, name, type) values($1, $2, $3, $4)
       on conflict (id) do update set
-        room_id = excluded.room_id,
-        name = excluded.name,
-        type = excluded.type
+        room_id = coalesce(excluded.room_id, sensors.room_id),
+        name = coalesce(excluded.name, sensors.name),
+        type = coalesce(excluded.type, sensors.type)
       returning id, room_id, name, type, battery, version
     `, [req.body.id, req.body.room_id, req.body.name, req.body.type])
       .then(r => res.send(r.rows[0]))
