@@ -58,4 +58,4 @@ function del(req, res, next) {
     })
 }
 
-module.exports = { index, create, del }
+module.exports = { index, create, update del }
