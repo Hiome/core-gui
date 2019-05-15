@@ -24,7 +24,7 @@ function create(req, res, next) {
       .then(r => res.send(r.rows[0]))
       .catch(next)
       .then(() => {
-        publishEvent(`{"val": "updated", "id": "${req.body.id}", "type": "sensor"}`)
+        publishEvent(`{"val": "created", "id": "${req.body.id}", "type": "sensor"}`)
         client.end()
       })
 }

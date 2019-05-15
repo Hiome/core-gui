@@ -23,7 +23,25 @@ function create(req, res, next) {
       .then(r => res.send(r.rows[0]))
       .catch(next)
       .then(() => {
-        publishEvent(`{"val": "updated", "id": "${req.body.id}", "type": "room"}`)
+        publishEvent(`{"val": "created", "id": "${req.body.id}", "type": "room"}`)
+        client.end()
+      })
+}
+
+function update(req, res, next) {
+  const client = new Client()
+  client.connect()
+  client.query(`
+    update rooms set
+      name = coalesce($2, rooms.name),
+      occupancy_count = coalesce($3, rooms.occupancy_count)
+    where id = $1
+    returning *
+    `, [req.params.id, req.body.name, req.body.occupancy_count])
+      .then(r => res.send(r.rows[0]))
+      .catch(next)
+      .then(() => {
+        publishEvent(`{"val": "updated", "id": "${req.params.id}", "type": "room"}`)
         client.end()
       })
 }

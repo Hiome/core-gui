@@ -28,13 +28,13 @@ class IndexPage extends Component {
       if (count > 100) count = 100
     }
 
-    const json = await fetch(`${process.env.API_URL}api/1/rooms`, {
-      method: 'POST',
+    const json = await fetch(`${process.env.API_URL}api/1/rooms/${room.id}`, {
+      method: 'PUT',
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({id: room.id, name: room.name, occupancy_count: count})
+      body: JSON.stringify({occupancy_count: count})
     }).then(resp => resp.json())
 
     const rooms = this.state.rooms
