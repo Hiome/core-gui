@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import { connect } from 'mqtt'
 
 import Layout from "../components/layout"
 import SEO from "../components/seo"
@@ -13,6 +14,21 @@ class IndexPage extends Component {
   async componentDidMount() {
     const json = await fetch(`${process.env.API_URL}api/1/rooms`).then(resp => resp.json())
     this.setState({rooms: json})
+    const client = connect('ws://'+window.location.host+':1884')
+    client.on('connect', () => client.subscribe('hiome/1/sensor/#', {qos: 1}))
+    client.on('message', function(t, m, p) {
+      const message = JSON.parse(m.toString())
+      if (message['meta']['type'] === 'occupancy' && message['meta']['source'] === 'gateway') {
+        const rooms = this.state.rooms
+        for (let r of rooms) {
+          if (r.id === message['meta']['room']) {
+            r.occupancy_count = message['val']
+            this.setState({rooms})
+            break
+          }
+        }
+      }
+    }.bind(this))
   }
 
   async setOcc(room) {
