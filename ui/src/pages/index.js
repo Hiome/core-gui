@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { connect } from 'mqtt'
+import { connect } from 'mqtt/dist/mqtt'
 
 import Layout from "../components/layout"
 import SEO from "../components/seo"
