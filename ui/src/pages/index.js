@@ -14,7 +14,7 @@ class IndexPage extends Component {
   async componentDidMount() {
     const json = await fetch(`${process.env.API_URL}api/1/rooms`).then(resp => resp.json())
     this.setState({rooms: json})
-    const client = connect('ws://'+window.location.host+':1884')
+    const client = connect(`ws://${window.location.host}:1884`)
     client.on('connect', () => client.subscribe('hiome/1/sensor/#', {qos: 1}))
     client.on('message', function(t, m, p) {
       const message = JSON.parse(m.toString())

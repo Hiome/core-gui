@@ -32,7 +32,7 @@ function create(req, res, next) {
 function del(req, res, next) {
   const client = new Client()
   client.connect()
-  client.query('delete from sensors id = $1 returning id, room_id, name, type, battery, version', [req.params.id])
+  client.query('delete from sensors where id = $1 returning id, room_id, name, type, battery, version', [req.params.id])
     .then(r => res.send(r.rows[0]))
     .catch(next)
     .then(() => {

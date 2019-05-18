@@ -49,7 +49,7 @@ function update(req, res, next) {
 function del(req, res, next) {
   const client = new Client()
   client.connect()
-  client.query('delete from rooms id = $1 returning *', [req.params.id])
+  client.query('delete from rooms where id = $1 returning *', [req.params.id])
     .then(r => res.send(r.rows[0]))
     .catch(next)
     .then(() => {
