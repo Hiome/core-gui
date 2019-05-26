@@ -6,7 +6,7 @@ function index(req, res, next) {
   client.connect()
   client.query(`
     select id, event_type, object_type, object_id, message, level, occurred_at
-      from logs where level IN ("info", "warning")
+      from logs where level IN ('info', 'warning')
       order by occurred_at desc
       limit $1 offset $2
     `, [req.query.size || 50, req.query.page || 0])
@@ -23,7 +23,7 @@ function show(req, res, next) {
       from logs where
         object_type = $1 AND
         object_id = $2 AND
-        level IN ("debug, "info", "warning")
+        level IN ('debug', 'info', 'warning')
       order by occurred_at desc
       limit $3 offset $4
     `, [req.params.type, req.params.id, req.query.size || 50, req.query.page || 0])
