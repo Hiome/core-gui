@@ -10,6 +10,22 @@ function index(req, res, next) {
     .then(() => client.end())
 }
 
+function show(req, res, next) {
+  const client = new Client()
+  client.connect()
+  client.query(`
+    select rooms.id, rooms.name, rooms.occupancy_count, count(sensors.id) as doors from rooms
+      inner join sensors on
+        sensors.type = 'door' and
+        (sensors.room_id like '$1::%' OR sensors.room_id like '%::$1')
+      where rooms.id = $1
+      group by rooms.id, rooms.name, rooms.occupancy_count
+    `, [req.params.id])
+    .then(r => res.send(r.rows[0]))
+    .catch(next)
+    .then(() => client.end())
+}
+
 function create(req, res, next) {
   const client = new Client()
   client.connect()
@@ -58,4 +74,4 @@ function del(req, res, next) {
     })
 }
 
-module.exports = { index, create, update, del }
+module.exports = { index, show, create, update, del }
