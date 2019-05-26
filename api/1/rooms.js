@@ -17,10 +17,10 @@ function show(req, res, next) {
     select rooms.id, rooms.name, rooms.occupancy_count, count(sensors.id) as doors from rooms
       inner join sensors on
         sensors.type = 'door' and
-        (sensors.room_id like '$1::%' OR sensors.room_id like '%::$1')
+        (sensors.room_id like $2 OR sensors.room_id like $3)
       where rooms.id = $1
       group by rooms.id, rooms.name, rooms.occupancy_count
-    `, [req.params.id])
+    `, [req.params.id, `${req.params.id}::%`, `%::${req.params.id}`])
     .then(r => res.send(r.rows[0]))
     .catch(next)
     .then(() => client.end())
