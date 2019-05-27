@@ -27,33 +27,18 @@
   color: #A17EDF;
   background-color: #5428AE;
   position: relative;
-  transition: background-color 1s ease-in-out, color 0.5s ease-in-out, box-shadow 0.5s ease-in-out;
+  text-decoration: none;
+  transition: background-color 0.5s ease-in-out, color 0.5s ease-in-out, box-shadow 0.5s ease-in-out;
+}
+
+.room:hover {
+  background-color: #0074B2;
+  color: #fff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 }
 
 .active {
   color: #fff;
   background-color: #5E2FB9;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-}
-
-.clear_occ {
-  position: absolute;
-  top: 0px;
-  right: 10px;
-  transform: rotate(45deg);
-  cursor: pointer;
-  padding: 15px;
-  transition: transform 0.2s ease-in-out;
-}
-
-.active .clear_occ {
-  transform: rotate(0);
-}
-
-.clear_occ path {
-  transition: fill 0.2s ease-in-out;
-}
-
-.clear_occ:hover path {
-  fill: #fff;
 }

@@ -11,13 +11,12 @@ import PropTypes from "prop-types"
 import Header from "./header"
 import "./layout.css"
 
-const Layout = ({ children }) => (
+const Layout = ({ children, goBack }) => (
   <>
-    <Header />
+    <Header goBack={goBack} />
     <div
       style={{
         margin: `0 auto`,
-        maxWidth: 960,
         padding: `0px 0px 1.45rem`,
       }}
     >
@@ -28,6 +27,11 @@ const Layout = ({ children }) => (
 
 Layout.propTypes = {
   children: PropTypes.node.isRequired,
+  goBack: PropTypes.bool,
+}
+
+Layout.defaultProps = {
+  goBack: false
 }
 
 export default Layout
