@@ -72,7 +72,7 @@ class IndexPage extends Component {
     let count = this.state.occupancy_count
     count = prompt(`How many people are in ${this.state.name}?`, count - 1)
     count = parseInt(count)
-    if (isNaN(count) || count <= 0) return
+    if (isNaN(count) || count < 0) return
     if (count > 100) count = 100
 
     fetch(`${process.env.API_URL}api/1/rooms/${this.state.id}`, {
