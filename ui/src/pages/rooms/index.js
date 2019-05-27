@@ -129,13 +129,13 @@ class IndexPage extends Component {
         <div className="headline">
           <h1>{ this.state.name }</h1>
           <p>
-            There { this.are() } <strong>{ this.state.occupancy_count }</strong> { this.people() } in here right now. <a href="#" onClick={this.setOcc}>Edit</a>
+            There { this.are() } <strong>{ this.state.occupancy_count }</strong> { this.people() } in here right now. <a href="#" onClick={this.setOcc} title="Change occupancy count">Edit</a>
           </p>
         </div>
         <div className="page">
           <h2>History</h2>
           { this.renderHistory() }
-          <a href="#" id="loadmore" onClick={this.loadHistory}>Load More...</a>
+          <a href="#" id="loadmore" onClick={this.loadHistory} title="See older history">Load More...</a>
         </div>
         <footer>&copy; Hiome Inc 2019</footer>
       </Layout>
