@@ -69,8 +69,9 @@ class IndexPage extends Component {
   setOcc = (e) => {
     e.preventDefault()
 
-    let count = this.state.occupancy_count
-    count = prompt(`How many people are in ${this.state.name}?`, count - 1)
+    let count = this.state.occupancy_count - 1
+    if (count < 0) count = 1
+    count = prompt(`How many people are in ${this.state.name}?`, count)
     count = parseInt(count)
     if (isNaN(count) || count < 0) return
     if (count > 100) count = 100
