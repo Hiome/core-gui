@@ -34,7 +34,10 @@ class IndexPage extends Component {
 
   roomRow(room) {
     return (
-      <Link key={room.id} to={`/rooms?id=${room.id}`} className={`room ${room.occupancy_count > 0 ? 'active' : ''}`}>
+      <Link key={room.id} to={`/rooms?id=${room.id}`}
+        className={`room ${room.occupancy_count > 0 ? 'active' : ''}`}
+        title={room.name}
+      >
         <div style={{fontSize: `70px`, marginBottom: `40px`}}>{ room.occupancy_count }</div>
         { room.name }
       </Link>

@@ -29,6 +29,9 @@
   position: relative;
   text-decoration: none;
   transition: background-color 0.5s ease-in-out, color 0.5s ease-in-out, box-shadow 0.5s ease-in-out;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 .room:hover {
