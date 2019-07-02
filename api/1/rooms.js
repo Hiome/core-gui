@@ -61,8 +61,12 @@ function update(req, res, next) {
       .then(r => res.send(r.rows[0]))
       .catch(next)
       .then(() => {
-        publishEvent(`{"val": "updated", "id": "${req.params.id}", "type": "room"}`)
-        if (req.body.hidden) clearSensor(`${req.params.id}:occupancy`)
+        if (req.body.hidden) {
+          publishEvent(`{"val": "hidden", "id": "${req.params.id}", "type": "room"}`)
+          clearSensor(`${req.params.id}:occupancy`)
+        } else {
+          publishEvent(`{"val": "updated", "id": "${req.params.id}", "type": "room"}`)
+        }
         client.end()
       })
 }
