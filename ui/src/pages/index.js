@@ -63,6 +63,9 @@ class IndexPage extends Component {
         <div className="roomContainer">
           { this.renderRooms() }
         </div>
+        <div style={{textAlign: `center`, marginTop: `50px`}}>
+          <Link to="/settings">Settings</Link>
+        </div>
       </Layout>
     )
   }

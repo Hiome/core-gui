@@ -1,5 +1,4 @@
 const { Client } = require('pg')
-const publishEvent = require('../../publishEvent')
 
 function index(req, res, next) {
   const pageSize = req.query.size || 50

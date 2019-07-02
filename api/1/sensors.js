@@ -1,10 +1,10 @@
 const { Client } = require('pg')
-const publishEvent = require('../../publishEvent')
+const { publishEvent, clearSensor } = require('../../publishEvent')
 
 function index(req, res, next) {
   const client = new Client()
   client.connect()
-  client.query('select id, room_id, name, type, battery, version from sensors order by name')
+  client.query('select id, room_id, name, type, battery, version from sensors order by id')
     .then(r => res.send(r.rows))
     .catch(next)
     .then(() => client.end())
@@ -37,6 +37,7 @@ function del(req, res, next) {
     .catch(next)
     .then(() => {
       publishEvent(`{"val": "deleted", "id": "${req.params.id}", "type": "sensor"}`)
+      clearSensor(req.params.id)
       client.end()
     })
 }

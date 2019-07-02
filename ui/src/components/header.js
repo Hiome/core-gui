@@ -5,10 +5,16 @@ import PropTypes from "prop-types"
 import './header.css'
 
 class Header extends Component {
+  goBack(e) {
+    e.preventDefault()
+    window.history.go(-1)
+    return false
+  }
+
   renderGoBack() {
     if (this.props.goBack) {
       return (
-        <Link to="/" id="goBack" title="Back to Dashboard" style={{
+        <Link to="/" onClick={this.goBack} id="goBack" title="Back to Dashboard" style={{
           float: `left`,
           padding: `1.45rem 1rem 0.5rem 1rem`
         }}>

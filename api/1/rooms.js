@@ -1,10 +1,13 @@
 const { Client } = require('pg')
-const publishEvent = require('../../publishEvent')
+const { publishEvent, clearSensor } = require('../../publishEvent')
 
 function index(req, res, next) {
   const client = new Client()
   client.connect()
-  client.query('select * from rooms order by name')
+  const query = req.query.include_hidden === 'true' ?
+      'select * from rooms order by name' :
+      'select * from rooms where hidden is not true order by name'
+  client.query(query)
     .then(r => res.send(r.rows))
     .catch(next)
     .then(() => client.end())
@@ -14,8 +17,8 @@ function show(req, res, next) {
   const client = new Client()
   client.connect()
   client.query(`
-    select rooms.id, rooms.name, rooms.occupancy_count, count(sensors.id) as doors from rooms
-      inner join sensors on
+    select rooms.id, rooms.name, rooms.occupancy_count, rooms.hidden, count(sensors.id) as doors from rooms
+      left outer join sensors on
         sensors.type = 'door' and
         (sensors.room_id like $2 OR sensors.room_id like $3)
       where rooms.id = $1
@@ -50,10 +53,11 @@ function update(req, res, next) {
   client.query(`
     update rooms set
       name = coalesce($2, rooms.name),
-      occupancy_count = coalesce($3, rooms.occupancy_count)
+      occupancy_count = coalesce($3, rooms.occupancy_count),
+      hidden = coalesce($4, rooms.hidden)
     where id = $1
     returning *
-    `, [req.params.id, req.body.name, req.body.occupancy_count])
+    `, [req.params.id, req.body.name, req.body.occupancy_count, req.body.hidden])
       .then(r => res.send(r.rows[0]))
       .catch(next)
       .then(() => {
@@ -70,6 +74,7 @@ function del(req, res, next) {
     .catch(next)
     .then(() => {
       publishEvent(`{"val": "deleted", "id": "${req.params.id}", "type": "room"}`)
+      clearSensor(`${req.params.id}:occupancy`)
       client.end()
     })
 }

@@ -17,7 +17,7 @@ class AddSensorPage extends Component {
   async componentDidMount() {
     const params = (new URL(document.location)).searchParams
     this.setState({id: params.get('id'), room1: params.get('r1'), room2: params.get('r2')})
-    const json = await fetch(`${process.env.API_URL}api/1/rooms`).then(resp => resp.json())
+    const json = await fetch(`${process.env.API_URL}api/1/rooms?include_hidden=true`).then(resp => resp.json())
     this.setState({rooms: json})
   }
 
