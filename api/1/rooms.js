@@ -33,12 +33,13 @@ function create(req, res, next) {
   const client = new Client()
   client.connect()
   client.query(`
-    insert into rooms(id, name, occupancy_count) values($1, $2, $3)
+    insert into rooms(id, name, occupancy_count, hidden) values($1, $2, $3, $4)
       on conflict (id) do update set
         name = coalesce(excluded.name, rooms.name),
-        occupancy_count = coalesce(excluded.occupancy_count, rooms.occupancy_count)
+        occupancy_count = coalesce(excluded.occupancy_count, rooms.occupancy_count),
+        hidden = coalesce(excluded.hidden, rooms.hidden)
       returning *
-    `, [req.body.id, req.body.name, req.body.occupancy_count])
+    `, [req.body.id, req.body.name, req.body.occupancy_count, req.body.hidden])
       .then(r => res.send(r.rows[0]))
       .catch(next)
       .then(() => {
