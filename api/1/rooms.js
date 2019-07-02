@@ -62,6 +62,7 @@ function update(req, res, next) {
       .catch(next)
       .then(() => {
         publishEvent(`{"val": "updated", "id": "${req.params.id}", "type": "room"}`)
+        if (req.body.hidden) clearSensor(`${req.params.id}:occupancy`)
         client.end()
       })
 }

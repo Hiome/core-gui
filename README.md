@@ -17,7 +17,7 @@ In second tab:
 
 1. `cd ui`
 2. `npm install`
-3. `gatsby develop`
+3. `npm run develop`
 
 You now have both a nodejs server and a gatsby server running.
 

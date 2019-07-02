@@ -16,6 +16,13 @@ class DevicesSettingsPage extends Component {
     this.setState({sensors: json})
   }
 
+  renderDoorLink(sensor) {
+    if (sensor.type === 'door')
+      return (
+        <Link to={`/sensors/add?id=${sensor.id}`}>Reconfigure</Link>
+      )
+  }
+
   renderVersion(sensor) {
     if (sensor.version)
       return (
@@ -23,25 +30,15 @@ class DevicesSettingsPage extends Component {
       )
   }
 
-  renderText(sensor) {
-    if (sensor.type === 'door') {
-      return (
-        <strong>{ sensor.name } { sensor.type }</strong> { this.renderVersion(sensor) } <Link to={`/sensors/add?id=${sensor.id}`}>Reconfigure</Link>
-      )
-    } else if (sensor.type === 'gateway') {
-      return (
-        <strong>Hiome Core gateway</strong> { this.renderVersion(sensor) }
-      )
-    } else {
-      return (
-        <strong>{ sensor.name } { sensor.type }</strong> { this.renderVersion(sensor) }
-      )
-    }
+  renderName(sensor) {
+    return sensor.type === 'gateway' ? 'Hiome Core' : sensor.name
   }
 
   row(sensor) {
     return (
-      <p key={sensor.id }>{ this.renderText(sensor) }</p>
+      <p key={sensor.id }>
+        <strong>{ this.renderName(sensor) } { sensor.type }</strong> { this.renderVersion(sensor) } { this.renderDoorLink(sensor) }
+      </p>
     )
   }
 
