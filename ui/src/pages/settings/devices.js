@@ -6,7 +6,7 @@ import SEO from "../../components/seo"
 
 import "./settings.css"
 
-class SensorsSettingsPage extends Component {
+class DevicesSettingsPage extends Component {
   state = {
     sensors: [],
   }
@@ -16,13 +16,6 @@ class SensorsSettingsPage extends Component {
     this.setState({sensors: json})
   }
 
-  renderDoorLink(sensor) {
-    if (sensor.type === 'door')
-      return (
-        <Link to={`/sensors/add?id=${sensor.id}`}>Reconfigure</Link>
-      )
-  }
-
   renderVersion(sensor) {
     if (sensor.version)
       return (
@@ -30,11 +23,25 @@ class SensorsSettingsPage extends Component {
       )
   }
 
+  renderText(sensor) {
+    if (sensor.type === 'door') {
+      return (
+        <strong>{ sensor.name } { sensor.type }</strong> { this.renderVersion(sensor) } <Link to={`/sensors/add?id=${sensor.id}`}>Reconfigure</Link>
+      )
+    } else if (sensor.type === 'gateway') {
+      return (
+        <strong>Hiome Core gateway</strong> { this.renderVersion(sensor) }
+      )
+    } else {
+      return (
+        <strong>{ sensor.name } { sensor.type }</strong> { this.renderVersion(sensor) }
+      )
+    }
+  }
+
   row(sensor) {
     return (
-      <p key={sensor.id }>
-        <strong>{ sensor.name } { sensor.type }</strong> { this.renderVersion(sensor) } { this.renderDoorLink(sensor) }
-      </p>
+      <p key={sensor.id }>{ this.renderText(sensor) }</p>
     )
   }
 
@@ -53,9 +60,9 @@ class SensorsSettingsPage extends Component {
   render() {
     return (
       <Layout goBack={true}>
-        <SEO title="Manage Sensors" />
+        <SEO title="Manage Devices" />
         <div className="headline">
-          <h1>Manage Sensors</h1>
+          <h1>Manage Devices</h1>
         </div>
         <div className="page">
           { this.renderSensors() }
@@ -66,4 +73,4 @@ class SensorsSettingsPage extends Component {
   }
 }
 
-export default SensorsSettingsPage
+export default DevicesSettingsPage

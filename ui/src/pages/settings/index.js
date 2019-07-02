@@ -16,7 +16,7 @@ class SettingsPage extends Component {
         </div>
         <div className="page">
           <Link to="/settings/rooms" className="settingsRow">Manage Rooms</Link>
-          <Link to="/settings/sensors" className="settingsRow">Manage Sensors</Link>
+          <Link to="/settings/devices" className="settingsRow">Manage Devices</Link>
         </div>
         <footer>&copy; Hiome Inc 2019</footer>
       </Layout>
