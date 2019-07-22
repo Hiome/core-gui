@@ -98,7 +98,7 @@ class AddSensorPage extends Component {
       return <button onClick={this.nextRoom}>Next</button>
     }
 
-    if (this.state.room2 === null || this.state.room2_hidden === null) return
+    if (this.state.room2 === null || (this.state.room2_hidden === null && this.state.room2 !== 'external')) return
     return <button onClick={this.saveSensor}>Finish</button>
   }
 
