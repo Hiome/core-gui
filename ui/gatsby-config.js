@@ -5,6 +5,7 @@ module.exports = {
     author: `Hiome Inc`,
   },
   plugins: [
+    `gatsby-plugin-antd`,
     `gatsby-plugin-react-helmet`,
     {
       resolve: `gatsby-source-filesystem`,
