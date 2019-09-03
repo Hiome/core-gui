@@ -17,14 +17,21 @@ function show(req, res, next) {
   const client = new Client()
   client.connect()
   client.query(`
-    select rooms.id, rooms.name, rooms.occupancy_count, rooms.hidden, count(sensors.id) as doors from rooms
-      left outer join sensors on
-        sensors.type = 'door' and
-        (sensors.room_id like $2 OR sensors.room_id like $3)
-      where rooms.id = $1
-      group by rooms.id, rooms.name, rooms.occupancy_count
-    `, [req.params.id, `${req.params.id}::%`, `%::${req.params.id}`])
+    select * from rooms where rooms.id = $1
+    `, [req.params.id])
     .then(r => res.send(r.rows[0]))
+    .catch(next)
+    .then(() => client.end())
+}
+
+function doors(req, res, next) {
+  const client = new Client()
+  client.connect()
+  client.query(`
+    select id, room_id, name, type, battery, version from sensors
+      where type = 'door' and (room_id like $1 OR room_id like $2)
+    `, [`${req.params.id}::%`, `%::${req.params.id}`])
+    .then(r => res.send(r.rows))
     .catch(next)
     .then(() => client.end())
 }
@@ -85,4 +92,4 @@ function del(req, res, next) {
     })
 }
 
-module.exports = { index, show, create, update, del }
+module.exports = { index, show, doors, create, update, del }

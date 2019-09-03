@@ -40,15 +40,7 @@ template {
   display: none;
 }
 a {
-  background-color: transparent;
-  -webkit-text-decoration-skip: objects;
-  color: #84DCC6;
   transition: color 0.2s ease-in-out;
-}
-a:active,
-a:hover {
-  outline-width: 0;
-  color: #DDF5EF;
 }
 abbr[title] {
   border-bottom: none;
@@ -66,6 +58,7 @@ dfn {
 h1 {
   font-size: 2em;
   margin: 0.67em 0;
+  text-align: center;
 }
 mark {
   background-color: #ff0;
@@ -508,36 +501,8 @@ dt {
 th {
   font-weight: bold;
 }
-li {
-  margin-bottom: calc(1.45rem / 2);
-}
-ol li {
-  padding-left: 0;
-}
-ul li {
-  padding-left: 0;
-}
-li > ol {
-  margin-left: 1.45rem;
-  margin-bottom: calc(1.45rem / 2);
-  margin-top: calc(1.45rem / 2);
-}
-li > ul {
-  margin-left: 1.45rem;
-  margin-bottom: calc(1.45rem / 2);
-  margin-top: calc(1.45rem / 2);
-}
 blockquote *:last-child {
   margin-bottom: 0;
-}
-li *:last-child {
-  margin-bottom: 0;
-}
-p *:last-child {
-  margin-bottom: 0;
-}
-li > p {
-  margin-bottom: calc(1.45rem / 2);
 }
 code {
   font-size: 0.85rem;
@@ -627,3 +592,35 @@ body {
   background-attachment: fixed;
 }
 
+header a:hover path {
+  fill: #fff;
+}
+
+#wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.page {
+  width: 100%;
+  flex-grow: 10;
+  background-color: #fff;
+  border-top-right-radius: 30px;
+  border-top-left-radius: 30px;
+  color: #0e0e0e;
+  padding: 50px;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
+}
+
+footer {
+  text-align: center;
+  font-size: 0.7em;
+  margin: 100px auto 0 auto;
+}
+
+ul.ant-menu-horizontal {
+  text-align: center;
+  margin: 20px auto 40px auto !important;
+}

@@ -19,7 +19,7 @@
   font-weight: bold;
   font-size: 25px;
   margin: 25px;
-  padding: 60px 25px 25px 25px;
+  padding: 25px;
   width: 250px;
   height: 200px;
   display: inline-block;
@@ -34,14 +34,23 @@
   white-space: nowrap;
 }
 
+.room.active {
+  color: #fff;
+  background-color: #5E2FB9;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
 .room:hover {
   background-color: #0074B2;
   color: #fff;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 }
 
-.active {
-  color: #fff;
-  background-color: #5E2FB9;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+.addNew {
+  background-color: #fff;
+  width: 80%;
+  min-width: 300px;
+  border-radius: 10px;
+  margin: 0 auto;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
 }

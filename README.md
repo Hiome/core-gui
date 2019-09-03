@@ -11,7 +11,7 @@ The API talks to a local postgres database to read/write to the hiome db. The UI
 In first tab:
 
 1. `npm install`
-2. `npm run start`
+2. `npm run develop`
 
 In second tab:
 

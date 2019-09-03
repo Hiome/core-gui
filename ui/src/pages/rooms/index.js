@@ -1,26 +1,31 @@
 import React, { Component } from 'react'
+import { navigate } from 'gatsby'
 import { connect } from 'mqtt/dist/mqtt'
+import { Button, Empty, Icon, Spin, Timeline } from 'antd'
 
-import Layout from "../../components/layout"
+import LayoutPage from "../../components/LayoutPage"
 import SEO from "../../components/seo"
-
-import "./logs.css"
 
 class IndexPage extends Component {
   state = {
     id: null,
     name: 'Loading...',
     occupancy_count: 0,
-    doors: 0,
     page: 0,
-    history: []
+    history: [],
+    loading: true,
+    disableLoadmore: true
   }
 
-  async componentDidMount() {
+  componentDidMount() {
     const params = (new URL(document.location)).searchParams
     const roomId = params.get('id')
-    const json = await fetch(`${process.env.API_URL}api/1/rooms/${roomId}`).then(resp => resp.json())
-    this.setState(json)
+    fetch(`${process.env.API_URL}api/1/rooms/${roomId}`)
+      .then(resp => resp.json())
+      .then(resp => {
+        this.setState(resp)
+        this.loadHistory()
+      })
 
     const client = connect(`ws://${window.location.host}:1884`)
     client.on('connect', () => {
@@ -28,9 +33,10 @@ class IndexPage extends Component {
       client.subscribe('hiome/1/log', {qos: 1})
     })
     client.on('message', function(t, m, p) {
+      if (m == null) return
       const message = JSON.parse(m.toString())
       if (t === `hiome/1/sensor/${roomId}:occupancy`) {
-        if (message['meta']['type'] === 'occupancy' && message['meta']['source'] === 'gateway') {
+        if (message['meta'] && message['meta']['type'] === 'occupancy' && message['meta']['source'] === 'gateway') {
           this.setState({occupancy_count: message['val']})
         }
       } else if (t === 'hiome/1/log' && message['device_type'] === 'room' && message['device_id'] === roomId) {
@@ -48,27 +54,21 @@ class IndexPage extends Component {
         this.setState({history})
       }
     }.bind(this))
-    this.loadHistory()
   }
 
-  loadHistory = (e) => {
-    if (e) e.preventDefault()
+  loadHistory = () => {
     const pageSize = 50
     const page = this.state.page
     const history = this.state.history
+    this.setState({loading: true})
     fetch(`${process.env.API_URL}api/1/logs/room/${this.state.id}?size=${pageSize}&page=${page}`)
       .then(resp => resp.json())
       .then(resp => {
-        this.setState({history: history.concat(resp), page: page+1})
-        return resp
+        this.setState({history: history.concat(resp), page: page+1, disableLoadmore: resp.length < pageSize, loading: false})
       })
-      .then(resp => { if (resp.length < pageSize) document.getElementById('loadmore').remove() })
-    return false
   }
 
-  setOcc = (e) => {
-    e.preventDefault()
-
+  setOcc = () => {
     let count = this.state.occupancy_count - 1
     if (count < 0) count = 1
     count = prompt(`How many people are in ${this.state.name}?`, count)
@@ -84,24 +84,27 @@ class IndexPage extends Component {
       },
       body: JSON.stringify({occupancy_count: count})
     }).then(resp => resp.json()).then(resp => this.setState({occupancy_count: resp.occupancy_count}))
-
-    return false
   }
 
-  people() {
-    return this.state.occupancy_count === 1 ? "person" : "people"
-  }
-
-  are() {
-    return this.state.occupancy_count === 1 ? "is" : "are"
+  dotColor(level) {
+    if (level === 'debug') return 'gray'
+    else if (level === 'info') return 'blue'
+    else if (level === 'data') return 'green'
+    return 'red'
   }
 
   historyRow(history) {
     return (
-      <div key={history.id} className={`historyRow ${history.level}`}>
-        <span className="time">{ this.strftime('%l:%M %p', new Date(history.occurred_at)) }</span>
-        <span className="message">{ history.message }</span>
-      </div>
+      <Timeline.Item key={history.id} color={this.dotColor(history.level)}>
+        <span style={{
+          width: `5rem`,
+          display: `inline-block`,
+          fontSize: `0.8rem`,
+          color: `#ccc`
+        }}>{ this.strftime('%l:%M %p', new Date(history.occurred_at)) }</span>
+        <span style={{
+        }}>{ history.message }</span>
+      </Timeline.Item>
     )
   }
 
@@ -113,33 +116,49 @@ class IndexPage extends Component {
         const formattedD = this.strftime('%A, %B %e%t', new Date(h.occurred_at))
         if (formattedD !== lastDate) {
           lastDate = formattedD
-          arr.push(<h3 key={formattedD}>{ formattedD }</h3>)
+          arr.push(
+            <Timeline.Item key={formattedD}
+              dot={<Icon type="clock-circle-o" style={{ fontSize: '20px', fontWeight: `bold`, color: `#000` }} />}>
+              <span style={{marginLeft: `5px`, fontSize: '16px', fontWeight: `bold`, lineHeight: `20px`}}>{ formattedD }</span>
+            </Timeline.Item>
+          )
         }
         arr.push(this.historyRow(h))
       }
       return arr
+    } else if (this.state.loading) {
+      return <div style={{textAlign: `center`}}><Spin size="large" /></div>
     } else {
-      return <h2 style={{textAlign: `center`, color: `#A17EDF`, margin: `100px`}}>No history found.</h2>
+      return <Empty description="No history yet. Walk through this door!" />
     }
+  }
+
+  renderLoadMore() {
+    if (this.state.disableLoadmore) return
+    return <Button icon="reload" onClick={this.loadHistory} type="primary" loading={this.state.loading}>Load More</Button>
+  }
+
+  headline() {
+    return (<>
+      <h1 style={{color: `#fff`, fontSize: `5em`}}>{ this.state.occupancy_count }</h1>
+      <h2 style={{color: `#fff`, textAlign: `center`, marginTop: `-20px`}}>{ this.state.name }</h2>
+      <div style={{textAlign: `center`, margin: `1em auto 5em auto`}}>
+        <Button icon="edit" shape="circle" size="small" ghost onClick={this.setOcc} />
+        <Button icon="setting" shape="circle" size="small" ghost
+          onClick={() => navigate(`/settings/room?id=${this.state.id}`)} style={{marginLeft: `10px`}} />
+      </div>
+    </>)
   }
 
   render() {
     return (
-      <Layout goBack={true}>
+      <LayoutPage goBack={true} headline={this.headline()}>
         <SEO title={this.state.name} />
-        <div className="headline">
-          <h1>{ this.state.name }</h1>
-          <p>
-            There { this.are() } <strong>{ this.state.occupancy_count }</strong> { this.people() } in here right now. <a href="#" onClick={this.setOcc} title="Change occupancy count">Edit</a>
-          </p>
-        </div>
-        <div className="page">
-          <h2>History</h2>
+        <Timeline>
           { this.renderHistory() }
-          <a href="#" id="loadmore" onClick={this.loadHistory} title="See older history">Load More...</a>
-        </div>
-        <footer>&copy; Hiome Inc 2019</footer>
-      </Layout>
+        </Timeline>
+        { this.renderLoadMore() }
+      </LayoutPage>
     )
   }
 

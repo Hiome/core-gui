@@ -20,7 +20,10 @@ app.use('/api/1', index)
 app.use(express.static('public'))
 
 app.use(function (req, res, next) {
-  res.status(404).send('Sorry cant find that!')
+  if (req.path.startsWith('/api/'))
+    res.status(404).send('Not found')
+  else
+    res.status(404).sendFile(`${__dirname}/public/404.html`)
 })
 
 app.use(function (err, req, res, next) {

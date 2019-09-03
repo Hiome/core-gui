@@ -8,7 +8,7 @@
   "scripts": {
     "build": "rm -rf public/ && cd ui && npm run build && mv public/ ../public",
     "start": "PGHOST=/var/run/postgresql node app.js",
-    "develop": "node app.js"
+    "develop": "PGHOST=localhost UID_FILE=./uid node app.js"
   },
   "dependencies": {
     "express": "^4.16.4",

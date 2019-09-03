@@ -1,14 +1,12 @@
 import React from 'react'
 
-import Layout from '../components/layout'
+import LayoutPage from '../components/LayoutPage'
 import SEO from '../components/seo'
 
-import './rooms/logs.css'
-
 const DocsPage = () => (
-  <Layout>
+  <LayoutPage>
     <SEO title="Documentation" />
-    <div className="page">
+    <div>
       <h1>Hiome API Documentation</h1>
 
       <p>
@@ -96,8 +94,7 @@ const DocsPage = () => (
         Hiome Core's API.
       </p>
     </div>
-    <footer>&copy; Hiome Inc 2019</footer>
-  </Layout>
+  </LayoutPage>
 )
 
 export default DocsPage
