@@ -15,6 +15,10 @@ class RoomsSettingsPage extends Component {
   componentDidMount() {
     if (this.props.location.state.justDeleted) {
       message.success(`${this.props.location.state.justDeleted} was successfully deleted.`)
+      // clear justDeleted state so we don't keep seeing it
+      let state = this.props.location.state
+      delete state.justDeleted
+      navigate(this.props.location.pathname, {state, replace: true})
     }
 
     this.setState({loading: true})
