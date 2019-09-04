@@ -27,7 +27,7 @@ class Header extends Component {
       return (
         <Link to="/" onClick={this.goBack} title="Go back" style={{
           float: `left`,
-          padding: `1.45rem 1rem 0.5rem 1rem`
+          padding: `1.45rem 1rem 1.5rem 1rem`
         }}>
           <svg width="50" height="40" xmlns="http://www.w3.org/2000/svg" version="1.1" x="0px" y="0px" viewBox="0 0 100 125"><g fill="#cbb9ec"><path d="M 31.9375 20.96875 A 2.0001996 2.0001996 0 0 0 30.5625 21.59375 L 4.5625 48.59375 A 2.0001996 2.0001996 0 0 0 4.5625 51.375 L 30.5625 78.375 A 2.0001996 2.0001996 0 1 0 33.4375 75.59375 L 10.71875 52 L 94 52 A 2.0001996 2.0001996 0 1 0 94 48 L 10.71875 48 L 33.4375 24.375 A 2.0001996 2.0001996 0 0 0 31.9375 20.96875 z "/></g></svg>
         </Link>
@@ -42,7 +42,10 @@ class Header extends Component {
 
   renderMenu() {
     const menu = (
-      <Menu onClick={this.menuClick}>
+      <Menu onClick={this.menuClick} style={{
+        marginTop: `-1.4rem`,
+        marginRight: `1.6rem`
+      }}>
         <Menu.Item key="settings">
           <Icon type="setting" /> Settings
         </Menu.Item>
@@ -57,8 +60,7 @@ class Header extends Component {
         fontSize: `2em`,
         color: `#cbb9ec`,
         float: `right`,
-        padding: `1.5rem 1rem 0 1rem`,
-        marginRight: `30px`,
+        padding: `1.5rem 2rem 1.5rem 1.5rem`,
         cursor: `pointer`
       }} />
     </Dropdown>
