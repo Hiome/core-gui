@@ -55,7 +55,7 @@ class Header extends Component {
       </Menu>
     )
 
-    return <Dropdown overlay={menu}>
+    return <Dropdown overlay={menu} placement="bottomRight" trigger="click">
       <Icon type="ellipsis" style={{
         fontSize: `2em`,
         color: `#cbb9ec`,
