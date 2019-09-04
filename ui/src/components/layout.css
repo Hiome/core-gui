@@ -620,11 +620,6 @@ footer {
   margin: 100px auto 0 auto;
 }
 
-ul.ant-menu-horizontal {
-  text-align: center;
-  margin: 20px auto 40px auto !important;
-}
-
 .helloScroller {
   position: fixed;
   bottom: 25px;
@@ -638,4 +633,16 @@ ul.ant-menu-horizontal {
   .helloScroller {
     display: none;
   }
+}
+
+
+/* ANTD DESIGN OVERRIDES */
+
+ul.ant-menu-horizontal {
+  text-align: center;
+  margin: 20px auto 40px auto !important;
+}
+
+.ant-result-extra > *, .ant-result-extra > *:last-child {
+  margin: 8px 4px;
 }

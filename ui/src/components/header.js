@@ -4,14 +4,6 @@ import PropTypes from "prop-types"
 import { Button, Menu, Dropdown, Icon, Modal, Result } from 'antd'
 
 class Header extends Component {
-  propTypes = {
-    goBack: PropTypes.bool
-  }
-
-  defaultProps = {
-    goBack: false
-  }
-
   state = {
     supportVisible: false
   }
@@ -20,6 +12,14 @@ class Header extends Component {
     e.preventDefault()
     window.history.go(-1)
     return false
+  }
+
+  componentDidMount() {
+    window.addEventListener('helpMe', this.openModal)
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('helpMe', this.openModal)
   }
 
   renderGoBack() {
@@ -35,9 +35,13 @@ class Header extends Component {
     }
   }
 
+  openModal = () => {
+    this.setState({supportVisible: true})
+  }
+
   menuClick = ({key}) => {
     if (key === 'settings') navigate('/settings')
-    else if (key === 'help') this.setState({supportVisible: true})
+    else if (key === 'help') this.openModal()
   }
 
   renderMenu() {
@@ -55,7 +59,7 @@ class Header extends Component {
       </Menu>
     )
 
-    return <Dropdown overlay={menu} placement="bottomRight" trigger="click">
+    return <Dropdown overlay={menu} placement="bottomRight" trigger={["click"]}>
       <Icon type="ellipsis" style={{
         fontSize: `2em`,
         color: `#cbb9ec`,
@@ -75,11 +79,10 @@ class Header extends Component {
       centered={true}
       onCancel={() => this.setState({supportVisible: false})}
     >
-      <Result icon={this.chatImg()} title="Need Help? Just Ask!" subTitle="You can reach us by SMS or email." extra={<>
-        <Button icon="message" type="primary" href="sms:+13126246245">Text (312) 624-6245</Button>
-        <br/><br/>
+      <Result icon={this.chatImg()} title="Need Help? Just Ask!" subTitle="You can reach us by SMS or email." extra={[
+        <Button icon="message" type="primary" href="sms:+13126246245">Text (312) 624-6245</Button>,
         <Button icon="mail" href="mailto:support@hiome.com">Email support@hiome.com</Button>
-      </>}/>
+      ]}/>
     </Modal>
   }
 
@@ -223,6 +226,14 @@ class Header extends Component {
       </header>
     )
   }
+}
+
+Header.propTypes = {
+  goBack: PropTypes.bool
+}
+
+Header.defaultProps = {
+  goBack: false
 }
 
 export default Header

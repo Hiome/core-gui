@@ -1,5 +1,6 @@
 import React from 'react'
-import { Link } from 'gatsby'
+import { navigate } from 'gatsby'
+import { Button } from 'antd'
 
 import LayoutPage from '../components/LayoutPage'
 import SEO from '../components/seo'
@@ -21,8 +22,11 @@ const NotFoundPage = () => (
     </object>
     <h1 style={{margin: `5%`}}>Well, this is awkward.</h1>
     <p style={{textAlign: `center`, lineHeight: `1.8em`}}>
-      We can't find the page you're looking for.<br/>
-      <Link to="/">Go to your dashboard</Link> or <Link to="mailto:support@hiome.com?subject=Something%20broke" title="Let us know what you were looking for">let us know what happened</Link>.</p>
+      We can't find the page you're looking for.</p>
+      <div className="ant-result-extra">
+        <Button onClick={() => window.dispatchEvent(new Event("helpMe"))}>Contact Support</Button>
+        <Button onClick={() => navigate('/')} type="primary">Go to Dashboard</Button>
+      </div>
   </LayoutPage>
 )
 

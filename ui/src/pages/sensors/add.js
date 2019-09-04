@@ -312,11 +312,12 @@ class AddSensorPage extends Component {
     return <Result status="warning" title="Multiple Possible Sensors Detected"
       subTitle="It looks like multiple doors are being used right now."
       extra={[
-        <Button key="contact" href="mailto:support@hiome.com">Contact Support</Button>,
+        <Button key="contact" onClick={this.openHelpModal}>Contact Support</Button>,
         <Button key="try_again" type="primary" onClick={() => window.location.reload()}>Try Again</Button>
       ]}>
-        <p><Icon type="check-circle" theme="twoTone" twoToneColor="#52c41a" /> Try disconnecting other Hiome Door sensors that haven't been configured yet.</p>
-        <p><Icon type="check-circle" theme="twoTone" twoToneColor="#52c41a" /> Make sure other people aren't walking around at the same time.</p>
+        <div><Icon type="check-circle" theme="twoTone" twoToneColor="#52c41a" /> Make sure other people aren't walking around at the same time.</div>
+        <br/>
+        <div><Icon type="check-circle" theme="twoTone" twoToneColor="#52c41a" /> Try unplugging other Hiome Door sensors that haven't been configured yet.</div>
       </Result>
   }
 
@@ -324,9 +325,13 @@ class AddSensorPage extends Component {
     return <Result status="warning" title="Something Went Wrong"
       subTitle="The entry and exit did not match up. Make sure you only walk through the door when instructed."
       extra={[
-        <Button key="contact" href="mailto:support@hiome.com">Contact Support</Button>,
+        <Button key="contact" onClick={this.openHelpModal}>Contact Support</Button>,
         <Button key="try_again" type="primary" onClick={() => window.location.reload()}>Try Again</Button>
       ]} />
+  }
+
+  openHelpModal() {
+    window.dispatchEvent(new Event("helpMe"))
   }
 
   renderStep() {
