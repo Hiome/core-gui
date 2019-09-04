@@ -592,7 +592,7 @@ body {
   background-attachment: fixed;
 }
 
-header a:hover path {
+header a:hover path, header .hoverable:hover path {
   fill: #fff;
 }
 

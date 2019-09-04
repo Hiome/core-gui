@@ -62,7 +62,7 @@ class Header extends Component {
         float: `right`,
         padding: `1.5rem 2rem 1.5rem 1.5rem`,
         cursor: `pointer`
-      }} />
+      }} className="hoverable" />
     </Dropdown>
   }
 
