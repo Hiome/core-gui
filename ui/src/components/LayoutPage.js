@@ -12,14 +12,7 @@ const LayoutPage = ({ children, headline, goBack }) => (
       {children}
       <footer>&copy; Hiome Inc 2019</footer>
     </main>
-    <div style={{
-      position: `fixed`,
-      bottom: `25px`,
-      zIndex: `-10`,
-      fontSize: `20px`,
-      textAlign: `center`,
-      width: `100%`
-    }}>
+    <div className="helloScroller">
       <span role="img" aria-hidden>👋</span>
     </div>
   </div>

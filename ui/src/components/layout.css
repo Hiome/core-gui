@@ -624,3 +624,18 @@ ul.ant-menu-horizontal {
   text-align: center;
   margin: 20px auto 40px auto !important;
 }
+
+.helloScroller {
+  position: fixed;
+  bottom: 25px;
+  z-index: -10;
+  font-size: 20px;
+  text-align: center;
+  width: 100%;
+}
+
+@media only screen and (max-height: 500px) {
+  .helloScroller {
+    display: none;
+  }
+}
