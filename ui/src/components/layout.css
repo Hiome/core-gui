@@ -611,7 +611,7 @@ header a:hover path, header .hoverable:hover path {
   border-top-left-radius: 30px;
   color: #0e0e0e;
   padding: 50px;
-  box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 0 30px 5px rgba(0, 0, 0, 0.2);
 }
 
 footer {
@@ -629,7 +629,7 @@ footer {
   width: 100%;
 }
 
-@media only screen and (max-height: 500px) {
+@media only screen and (max-height: 650px) {
   .helloScroller {
     display: none;
   }

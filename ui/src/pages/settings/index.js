@@ -94,7 +94,7 @@ class DevicesSettingsPage extends Component {
                     textOverflow: `ellipsis`, overflow: `hidden`, whiteSpace: `nowrap`
                   }}>
                     {sensor.name.split(" <-> ")[0]}
-                    <Divider style={{margin: `10px 0`}}><Icon type="swap" rotate={90}/></Divider>
+                    <Divider style={{margin: `10px 0`}}>to</Divider>
                     {sensor.name.split(" <-> ")[1]}
                   </div>
                 </Card>

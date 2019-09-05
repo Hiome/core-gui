@@ -9,7 +9,7 @@ import SEO from "../../components/seo"
 class IndexPage extends Component {
   state = {
     id: null,
-    name: 'Loading...',
+    name: 'this room',
     occupancy_count: 0,
     page: 0,
     history: [],
@@ -95,15 +95,16 @@ class IndexPage extends Component {
 
   historyRow(history) {
     return (
-      <Timeline.Item key={history.id} color={this.dotColor(history.level)}>
-        <span style={{
-          width: `5rem`,
+      <Timeline.Item key={history.id} color={this.dotColor(history.level)} style={{clear: `both`}}>
+        <div style={{
           display: `inline-block`,
+          width: `4.5rem`,
           fontSize: `0.8rem`,
           color: `#ccc`
-        }}>{ this.strftime('%l:%M %p', new Date(history.occurred_at)) }</span>
-        <span style={{
-        }}>{ history.message }</span>
+        }}>{ this.strftime('%l:%M %p', new Date(history.occurred_at)) }</div>
+        <div style={{
+          display: `inline-block`
+        }}>{ history.message }</div>
       </Timeline.Item>
     )
   }
@@ -140,12 +141,13 @@ class IndexPage extends Component {
 
   headline() {
     return (<>
-      <h1 style={{color: `#fff`, fontSize: `5em`}}>{ this.state.occupancy_count }</h1>
-      <h2 style={{color: `#fff`, textAlign: `center`, marginTop: `-20px`}}>{ this.state.name }</h2>
+      <h1 style={{color: `#fff`, fontSize: `5em`, padding: `20px`, fontWeight: `100`}}>
+        <span style={{fontWeight: `400`}}>{ this.state.occupancy_count }</span> {this.state.occupancy_count === 1 ? 'person' : 'people'} {this.state.occupancy_count === 1 ? 'is' : 'are'} in <span style={{fontWeight: `400`}}>{ this.state.name }</span>.
+      </h1>
       <div style={{textAlign: `center`, margin: `1em auto 5em auto`}}>
-        <Button icon="edit" shape="circle" size="small" ghost onClick={this.setOcc} />
-        <Button icon="setting" shape="circle" size="small" ghost
-          onClick={() => navigate(`/settings/room?id=${this.state.id}`)} style={{marginLeft: `10px`}} />
+        <Button icon="edit" shape="circle" ghost onClick={this.setOcc} />
+        <Button icon="setting" shape="circle" ghost
+          onClick={() => navigate(`/settings/room?id=${this.state.id}`)} style={{marginLeft: `20px`}} />
       </div>
     </>)
   }
