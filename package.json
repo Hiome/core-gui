@@ -11,6 +11,7 @@
     "develop": "PGHOST=localhost UID_FILE=./uid node app.js"
   },
   "dependencies": {
+    "huejay": "^1.9.0",
     "express": "^4.16.4",
     "mqtt": "^2.18.8",
     "pg": "^7.9.0",
