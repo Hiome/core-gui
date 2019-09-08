@@ -1,4 +1,4 @@
-import { Alert, Icon, Button, Result } from "antd"
+import { Icon, Button, Result } from "antd"
 import React, { Component } from 'react'
 import { connect } from 'mqtt/dist/mqtt'
 
@@ -29,6 +29,13 @@ class HueSettingsPage extends Component {
     this.setState({status: 'start'})
     const client = connect(`ws://${window.location.host}:1884`)
     client.on('connect', () => client.publish('_hiome/integrate/hue', 'connect'))
+  }
+
+  disconnectHue = () => {
+    this.setState({status: 'start'})
+    const client = connect(`ws://${window.location.host}:1884`)
+    client.on('connect', () => client.publish('_hiome/integrate/hue', 'disconnect'))
+    setTimeout(() => { client.publish('_hiome/integrate/hue', 'connect') }, 1000)
   }
 
   renderHueButton() {
@@ -93,6 +100,9 @@ class HueSettingsPage extends Component {
     return <Result
       status="success"
       title="Hiome is connected to Philips Hue!"
+      extra={[
+        <Button type="danger" onClick={this.disconnectHue} key="disconnect">Disconnect from Hue Bridge</Button>
+      ]}
     >
       <p><strong>Create a Hue group for each room with the same name.</strong></p>
       <p>When a room in Hiome is occupied after sunset, all devices in a Hue group with the same name will be turned on.
