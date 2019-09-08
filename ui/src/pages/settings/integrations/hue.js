@@ -15,7 +15,7 @@ class HueSettingsPage extends Component {
     const client = connect(`ws://${window.location.host}:1884`)
     client.on('connect', () => client.subscribe('_hiome/integrate/hue', {qos: 1}))
     client.on('message', function(t, m, p) {
-      if (m == null) return
+      if (m == null || m.toString() === 'connect' || m.toString() === 'disconnect') return
       const message = JSON.parse(m.toString())
       this.setState({status: message.status})
       if (message.status === 'no_link_pushed') {
