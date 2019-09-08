@@ -1,10 +1,12 @@
 const Sentry = require('@sentry/node')
 Sentry.init()
 
+const compression = require('compression')
 const express = require('express')
 const app = express()
 
 app.use(express.json())
+app.use(compression())
 
 app.use(function(req, res, next) {
   res.header('Access-Control-Allow-Origin', '*')
