@@ -19,7 +19,4 @@ router.get('/sensors/manifest', sensors.manifest)
 router.post('/sensors', sensors.create)
 router.delete('/sensors/:id', sensors.del)
 
-const hue = require('./hue')
-router.get('/hue/search', hue.search)
-
 module.exports = router
