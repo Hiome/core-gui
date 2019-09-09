@@ -1,4 +1,4 @@
-import { Icon, Button, Result } from "antd"
+import { Icon, Button, Result, Switch } from "antd"
 import React, { Component } from 'react'
 import { connect } from 'mqtt/dist/mqtt'
 
@@ -8,14 +8,24 @@ import SEO from "../../../components/seo"
 
 class HueSettingsPage extends Component {
   state = {
-    status: "start"
+    status: "start",
+    onlyControlAtNight: true
   }
 
   componentDidMount() {
     const client = connect(`ws://${window.location.host}:1884`)
-    client.on('connect', () => client.subscribe('_hiome/integrate/hue', {qos: 1}))
+    client.on('connect', () => {
+      client.subscribe('_hiome/integrate/hue', {qos: 1})
+      client.subscribe('_hiome/integrate/settings/onlyControlAtNight', {qos: 1})
+    })
     client.on('message', function(t, m, p) {
       if (m == null || m.toString() === 'connect' || m.toString() === 'disconnect') return
+
+      if (t === '_hiome/integrate/settings/onlyControlAtNight') {
+        this.setState({onlyControlAtNight: m.toString() === 'true'})
+        return
+      }
+
       const message = JSON.parse(m.toString())
       this.setState({status: message.status})
       if (message.status === 'no_link_pushed') {
@@ -36,6 +46,12 @@ class HueSettingsPage extends Component {
     const client = connect(`ws://${window.location.host}:1884`)
     client.on('connect', () => client.publish('_hiome/integrate/hue', 'disconnect'))
     setTimeout(() => { client.publish('_hiome/integrate/hue', 'connect') }, 1000)
+  }
+
+  controlAtNightToggle = (checked, e) => {
+    this.setState({onlyControlAtNight: checked})
+    const client = connect(`ws://${window.location.host}:1884`)
+    client.on('connect', () => client.publish('_hiome/integrate/settings/onlyControlAtNight', checked ? 'true' : 'false', {retain: true}))
   }
 
   renderHueButton() {
@@ -105,11 +121,18 @@ class HueSettingsPage extends Component {
       ]}
     >
       <p><strong>Create a Hue group for each room with the same name.</strong></p>
-      <p>When a room in Hiome is occupied after sunset, all devices in a Hue group with the same name will be turned on.
-          For example, if your Living Room is occupied, the "Living Room" group will be turned on.</p>
-      <p>If you want to turn on lights during the day too, create another group with the same room name + Daytime
-          ("Living Room Daytime" in our example).</p>
-      <p>When a room is no longer occupied, all devices in the Hue group will be turned off.</p>
+      <p>When a room in Hiome is occupied{this.state.onlyControlAtNight ? ' after sunset' : ''}, all devices in a Hue group
+          with the same name will be turned on. For example, if your Living Room is occupied, the "Living Room" group will be
+          turned on. When the room is no longer occupied, all devices in the Hue group will be turned off.</p>
+      <p style={{whiteSpace: `pre-wrap`}}>
+        <strong>Only turn on lights after sunset?</strong> {`  `}
+          <Switch
+              onChange={this.controlAtNightToggle}
+              checked={this.state.onlyControlAtNight}
+              checkedChildren="Yes"
+              unCheckedChildren="No" />
+      </p>
+      <p>{this.state.onlyControlAtNight ? 'Your lights will only turn on after sunset.' : 'Your lights will be controlled all day.'}</p>
     </Result>
   }
 
