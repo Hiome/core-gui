@@ -11,11 +11,26 @@ import "./rooms.css"
 class IndexPage extends Component {
   state = {
     rooms: [],
-    loading: true
+    loading: true,
+    missingSensors: 0
   }
 
   componentDidMount() {
     fetch(`${process.env.API_URL}api/1/rooms`).then(resp => resp.json()).then(resp => this.setState({rooms: resp, loading: false}))
+
+    let knownSensors = []
+    let manifestSensors = []
+    const f1 = fetch(`${process.env.API_URL}api/1/sensors/manifest`)
+      .then(resp => resp.json())
+      .then(resp => manifestSensors = Object.keys(resp).filter(id => resp[id].startsWith('door/')))
+    const f2 = fetch(`${process.env.API_URL}api/1/sensors?type=door`)
+      .then(resp => resp.json())
+      .then(resp => knownSensors = resp.map(s => s.id))
+
+    Promise.all([f1, f2]).then(() => {
+      const missingSensors = manifestSensors.filter(id => !knownSensors.includes(id))
+      this.setState({missingSensors: missingSensors.length})
+    })
 
     const client = connect(`ws://${window.location.host}:1884`)
     client.on('connect', () => client.subscribe('hiome/1/sensor/#', {qos: 1}))
@@ -47,6 +62,15 @@ class IndexPage extends Component {
     )
   }
 
+  addRoomRow() {
+    return (
+      <Link key='add_sensor' to='sensors/add' className='room active' title='Add New Sensor'>
+        <div style={{fontSize: `70px`, flexGrow: 2}}><Icon type="plus" /></div>
+        Add {this.state.missingSensors} Door{this.state.missingSensors === 1 ? '' : 's'}
+      </Link>
+    )
+  }
+
   renderRooms() {
     if (this.state.loading) {
       return <div style={{textAlign: `center`, marginTop: `10em`}}>
@@ -57,6 +81,8 @@ class IndexPage extends Component {
       for (let r of this.state.rooms) {
         arr.push(this.roomRow(r))
       }
+      if (this.state.missingSensors > 0)
+        arr.push(this.addRoomRow())
       return arr
     } else {
       return <Result
