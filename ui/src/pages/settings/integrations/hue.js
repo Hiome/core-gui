@@ -16,12 +16,12 @@ class HueSettingsPage extends Component {
     const client = connect(`ws://${window.location.host}:1884`)
     client.on('connect', () => {
       client.subscribe('_hiome/integrate/hue', {qos: 1})
-      client.subscribe('_hiome/integrate/settings/onlyControlAtNight', {qos: 1})
+      client.subscribe('_hiome/integrate/hue/settings/onlyControlAtNight', {qos: 1})
     })
     client.on('message', function(t, m, p) {
       if (m == null || m.toString() === 'connect' || m.toString() === 'disconnect') return
 
-      if (t === '_hiome/integrate/settings/onlyControlAtNight') {
+      if (t === '_hiome/integrate/hue/settings/onlyControlAtNight') {
         this.setState({onlyControlAtNight: m.toString() === 'true'})
         return
       }
@@ -51,7 +51,7 @@ class HueSettingsPage extends Component {
   controlAtNightToggle = (checked, e) => {
     this.setState({onlyControlAtNight: checked})
     const client = connect(`ws://${window.location.host}:1884`)
-    client.on('connect', () => client.publish('_hiome/integrate/settings/onlyControlAtNight', checked ? 'true' : 'false', {retain: true}))
+    client.on('connect', () => client.publish('_hiome/integrate/hue/settings/onlyControlAtNight', checked ? 'true' : 'false', {retain: true}))
   }
 
   renderHueButton() {
