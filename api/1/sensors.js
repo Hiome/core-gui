@@ -3,7 +3,7 @@ const { publishEvent, clearSensor } = require('../../publishEvent')
 const { getUrl } = require('../../getUrl')
 
 const CORE_ID = require('fs')
-  .readFileSync(process.env.UID_FILE || '/sys/class/net/eth0/address', {encoding: 'utf-8'})
+  .readFileSync(process.env.UID_FILE || '/sys/class/net/eth0/address', {encoding: 'utf8'})
   .trim().toLowerCase().replace(/:/g, '')
 
 function index(req, res, next) {
