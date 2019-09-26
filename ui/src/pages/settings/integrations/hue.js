@@ -120,10 +120,10 @@ class HueSettingsPage extends Component {
         <Button type="danger" onClick={this.disconnectHue} key="disconnect">Disconnect from Hue Bridge</Button>
       ]}
     >
-      <p><strong>Create a Hue group for each room with the same name.</strong></p>
-      <p>When a room in Hiome is occupied{this.state.onlyControlAtNight ? ' after sunset' : ''}, all devices in a Hue group
-          with the same name will be turned on. For example, if your Living Room is occupied, the "Living Room" group will be
-          turned on. When the room is no longer occupied, all devices in the Hue group will be turned off.</p>
+      <p><strong>Create rooms in the Hue app with the same names as your Hiome rooms.</strong></p>
+      <p>When a room in Hiome is occupied{this.state.onlyControlAtNight ? ' after sunset' : ''}, all lights in the Hue room
+          with the same name will be turned on. For example, if your Living Room is occupied, the "Living Room" group in Hue will be
+          turned on. When the room is no longer occupied, all lights in the room will be turned off.</p>
       <p style={{whiteSpace: `pre-wrap`}}>
         <strong>Only turn on lights after sunset?</strong> {`  `}
           <Switch

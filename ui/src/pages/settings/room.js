@@ -1,5 +1,5 @@
 import { navigate } from "gatsby"
-import { Modal, Icon, Switch, Button, PageHeader, Popconfirm, Tooltip, List, Empty, message } from "antd"
+import { Modal, Icon, Switch, Button, PageHeader, Tooltip, List, Empty, message } from "antd"
 import React, { Component } from 'react'
 
 import SettingsMenu from "../../components/SettingsMenu"
@@ -43,19 +43,6 @@ class RoomSettingsPage extends Component {
       },
       body: JSON.stringify({hidden: checked, occupancy_count: 0})
     }).then(resp => resp.json()).then(resp => this.setState({hidden: resp.hidden}))
-  }
-
-  deleteSensor(sensorId) {
-    fetch(`${process.env.API_URL}api/1/sensors/${sensorId}`, {
-      method: 'DELETE',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      }
-    }).then(resp => resp.json()).then(resp => {
-      this.componentDidMount()
-      message.success(`${resp.name} was deleted.`)
-    })
   }
 
   deleteRoom = () => {
@@ -131,16 +118,7 @@ class RoomSettingsPage extends Component {
           loading={this.state.loading}
           dataSource={this.state.sensors}
           rowKey={item => `sensor${item.id}`}
-          renderItem={sensor => <List.Item actions={[
-            <Popconfirm
-              title={`Are you sure you want to delete ${sensor.name}? This cannot be undone!`}
-              placement="left"
-              okText="Delete"
-              okType="danger"
-              onConfirm={e => this.deleteSensor(sensor.id)}>
-              <Button shape="circle" icon="delete" type="danger" ghost />
-            </Popconfirm>
-          ]}>
+          renderItem={sensor => <List.Item>
             <List.Item.Meta
               title={ this.renderDoorName(sensor) }
               description={this.renderVersion(sensor)}

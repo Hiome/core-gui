@@ -283,7 +283,7 @@ class AddSensorPage extends Component {
   }
 
   calibrationTimeRemaining() {
-    return 20 - Math.floor((new Date().getTime() - this.state.timeSinceBoot)/1000)
+    return 30 - Math.floor((new Date().getTime() - this.state.timeSinceBoot)/1000)
   }
 
   updateCountdown = () => {
