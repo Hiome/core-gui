@@ -7,6 +7,29 @@ const CORE_ID = require('fs')
   .readFileSync(process.env.UID_FILE || '/sys/class/net/eth0/address', {encoding: 'utf8'})
   .trim().toLowerCase().replace(/:/g, '')
 
+/**
+ * @api {get} /sensors Get all sensors
+ * @apiVersion 1.0.0
+ * @apiName Index
+ * @apiGroup Sensors
+ *
+ * @apiParam {String}    [type]           Filter to only sensor's of this type
+ * @apiSuccess {String}  id               the sensor's id
+ * @apiSuccess {String}  room_id          the sensor's room's id
+ * @apiSuccess {String}  name             the sensor's name
+ * @apiSuccess {String}  type             the sensor's type
+ * @apiSuccess {String}  battery          the sensor's battery level
+ * @apiSuccess {String}  version          the sensor's version
+ * @apiSuccessExample {json} Success-Response:
+ *    {
+ *      "id": "1",
+ *      "room_id": "1556767182::1556767178",
+ *      "name": "Living Room <-> Bedroom",
+ *      "type": "door",
+ *      "battery": null,
+ *      "version": "V0.7.12"
+ *    }
+ */
 function index(req, res, next) {
   const client = new Client()
   client.connect()
@@ -26,6 +49,33 @@ function manifest(req, res, next) {
   getUrl(`https://manifests.hiome.com/${CORE_ID}.json`).then(resp => res.send(resp)).catch(err => res.status(500).send(err))
 }
 
+/**
+ * @api {post} /sensors Create a new sensor
+ * @apiVersion 1.0.0
+ * @apiName Create
+ * @apiGroup Sensors
+ * @apiSampleRequest off
+ *
+ * @apiParam {Number}    id               Sensor's unique id
+ * @apiParam {Number}    room_id          Sensor's room id
+ * @apiParam {Number}    name             Sensor's name
+ * @apiParam {Number}    type             Sensor's type
+ * @apiSuccess {String}  id               the sensor's id
+ * @apiSuccess {String}  room_id          the sensor's room's id
+ * @apiSuccess {String}  name             the sensor's name
+ * @apiSuccess {String}  type             the sensor's type
+ * @apiSuccess {String}  battery          the sensor's battery level
+ * @apiSuccess {String}  version          the sensor's version
+ * @apiSuccessExample {json} Success-Response:
+ *    {
+ *      "id": "1",
+ *      "room_id": "1556767182::1556767178",
+ *      "name": "Living Room <-> Bedroom",
+ *      "type": "door",
+ *      "battery": null,
+ *      "version": null
+ *    }
+ */
 function create(req, res, next) {
   const client = new Client()
   client.connect()
@@ -62,6 +112,30 @@ function updateFirmware(req, res, next) {
   })
 }
 
+/**
+ * @api {delete} /sensors/:id Delete a sensor
+ * @apiVersion 1.0.0
+ * @apiName Delete
+ * @apiGroup Sensors
+ * @apiSampleRequest off
+ *
+ * @apiParam {Number}    id               Sensor's unique id
+ * @apiSuccess {String}  id               the deleted sensor's id
+ * @apiSuccess {String}  room_id          the deleted sensor's room's id
+ * @apiSuccess {String}  name             the deleted sensor's name
+ * @apiSuccess {String}  type             the deleted sensor's type
+ * @apiSuccess {String}  battery          the deleted sensor's battery level
+ * @apiSuccess {String}  version          the deleted sensor's version
+ * @apiSuccessExample {json} Success-Response:
+ *    {
+ *      "id": "1",
+ *      "room_id": "1556767182::1556767178",
+ *      "name": "Living Room <-> Bedroom",
+ *      "type": "door",
+ *      "battery": null,
+ *      "version": "V0.7.12"
+ *    }
+ */
 function del(req, res, next) {
   const client = new Client()
   client.connect()

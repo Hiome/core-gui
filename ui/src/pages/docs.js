@@ -26,6 +26,8 @@ const DocsPage = () => (
       {'[{"id":"1554713930","name":"Bedroom","occupancy_count":0},{"id":"1554713914","name":"Living Room","occupancy_count":2}, ...]'}
       </pre></code>
 
+      <p>For more detailed API docs, see <a href="http://hiome.local/api/docs">http://hiome.local/api/docs</a> for all possible endpoints</p>
+
       <h2>MQTT</h2>
 
       <p>

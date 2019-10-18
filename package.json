@@ -6,16 +6,35 @@
   "license": "All rights reserved",
   "main": "app.js",
   "scripts": {
-    "build": "rm -rf public/ && cd ui && npm run build && mv public/ ../public",
+    "build": "npm run docs && rm -rf public/ && cd ui && npm run build && mv public/ ../public",
     "start": "PGHOST=/var/run/postgresql node app.js",
-    "develop": "PGHOST=localhost UID_FILE=./uid node app.js"
+    "develop": "PGHOST=localhost UID_FILE=./uid node app.js",
+    "docs": "apidoc --private false -i api/1 -o ui/static/api/docs/"
   },
   "dependencies": {
+    "@sentry/node": "^5.0.3",
     "compression": "^1.7.4",
     "express": "^4.16.4",
     "mqtt": "^2.18.8",
-    "pg": "^7.9.0",
-    "@sentry/node": "^5.0.3"
+    "pg": "^7.9.0"
+  },
+  "devDependencies": {
+    "apidoc": "^0.17.7"
+  },
+  "apidoc": {
+    "name": "Hiome API",
+    "title": "Hiome REST API Documentation",
+    "url": "http://hiome.local/api/1",
+    "version": "1.0.0",
+    "description": "Hiome's REST API for fully managing your Hiome setup.",
+    "sampleUrl": "http://hiome.local/api/1",
+    "order": [
+      "Index",
+      "Show",
+      "Create",
+      "Update",
+      "Delete"
+    ]
   },
   "repository": {
     "type": "git",
