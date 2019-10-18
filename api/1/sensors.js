@@ -53,9 +53,11 @@ function updateFirmware(req, res, next) {
       return
     }
     if (stderr) {
-      res.send(stderr)
+      res.send(`error: ${stderr}`)
     } else {
-      res.send(stdout)
+      if (stdout === null || stdout.trim().length === 0) res.send('no updates')
+      else if (stdout.test(/SUCCESS/)) res.send('done updating')
+      else res.send(stdout)
     }
   })
 }

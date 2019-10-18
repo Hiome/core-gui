@@ -17,7 +17,7 @@ const sensors = require('./sensors')
 router.get('/sensors', sensors.index)
 router.get('/sensors/manifest', sensors.manifest)
 router.post('/sensors', sensors.create)
-router.get('/updatefirmware', sensors.updateFirmware)
+router.get('/sensors/updatefirmware', sensors.updateFirmware)
 router.delete('/sensors/:id', sensors.del)
 
 module.exports = router
