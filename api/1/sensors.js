@@ -1,6 +1,7 @@
 const { Client } = require('pg')
 const { publishEvent, clearSensor } = require('../../publishEvent')
 const { getUrl } = require('../../getUrl')
+const { exec } = require('child_process')
 
 const CORE_ID = require('fs')
   .readFileSync(process.env.UID_FILE || '/sys/class/net/eth0/address', {encoding: 'utf8'})
@@ -44,6 +45,21 @@ function create(req, res, next) {
       })
 }
 
+function updateFirmware(req, res, next) {
+  exec('/home/pi/hubsetup/bin/install_firmware', (err, stdout, stderr) => {
+    if (err) {
+      // node couldn't execute the command
+      res.status(500).send(err)
+      return
+    }
+    if (stderr) {
+      res.send(stderr)
+    } else {
+      res.send(stdout)
+    }
+  })
+}
+
 function del(req, res, next) {
   const client = new Client()
   client.connect()
@@ -57,4 +73,4 @@ function del(req, res, next) {
     })
 }
 
-module.exports = { index, manifest, create, del }
+module.exports = { index, manifest, create, updateFirmware, del }
