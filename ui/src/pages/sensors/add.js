@@ -209,7 +209,7 @@ class AddSensorPage extends Component {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({id: room_id, name: room_name, occupancy_count: 0, hidden: false})
+      body: JSON.stringify({id: room_id, name: room_name, occupancy_count: (this.state.step === 0 ? 1 : 0), hidden: false})
     }).then(resp => this.selectRoom(room_id, room_name, false))
   }
 
