@@ -182,7 +182,7 @@ function update(req, res, next) {
           publishEvent(`{"val": "hidden", "id": "${req.params.id}", "type": "room"}`)
           clearSensor(`${req.params.id}:occupancy`)
         } else {
-          publishEvent(`{"val": "updated", "id": "${req.params.id}", "type": "room"}`)
+          publishEvent(`{"val": "updated", "id": "${req.params.id}", "type": "room", "count": ${req.body.occupancy_count}}`)
         }
         client.end()
       })
