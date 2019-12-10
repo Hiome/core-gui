@@ -100,7 +100,7 @@ class DevicesSettingsPage extends Component {
                     </Divider>
                     {sensor.name.split(" <-> ")[1]}
                   </div>
-                  <SensitivitySlider sensorId={sensor.id} value={sensor.sensitivity || 0.9} />
+                  <SensitivitySlider sensorId={sensor.id} value={sensor.sensitivity == null ? 0.9 : sensor.sensitivity} />
                 </Card>
               </List.Item>
           }
