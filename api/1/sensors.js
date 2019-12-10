@@ -20,6 +20,7 @@ const CORE_ID = require('fs')
  * @apiSuccess {String}  type             the sensor's type
  * @apiSuccess {String}  battery          the sensor's battery level
  * @apiSuccess {String}  version          the sensor's version
+ * @apiSuccess {Number}  sensitivity      the sensor's sensitivity level
  * @apiSuccessExample {json} Success-Response:
  *    {
  *      "id": "1",
@@ -27,7 +28,8 @@ const CORE_ID = require('fs')
  *      "name": "Living Room <-> Bedroom",
  *      "type": "door",
  *      "battery": null,
- *      "version": "V0.7.12"
+ *      "version": "V0.7.12",
+ *      "sensitivity": 0.9
  *    }
  */
 function index(req, res, next) {
@@ -35,9 +37,9 @@ function index(req, res, next) {
   client.connect()
   let q;
   if (req.query.type) {
-    q = client.query('select id, room_id, name, type, battery, version from sensors where type = $1 order by name', [req.query.type])
+    q = client.query('select id, room_id, name, type, battery, version, sensitivity from sensors where type = $1 order by name', [req.query.type])
   } else {
-    q = client.query('select id, room_id, name, type, battery, version from sensors order by name')
+    q = client.query('select id, room_id, name, type, battery, version, sensitivity from sensors order by name')
   }
 
   q.then(r => res.send(r.rows))
@@ -56,16 +58,18 @@ function manifest(req, res, next) {
  * @apiGroup Sensors
  * @apiSampleRequest off
  *
- * @apiParam {Number}    id               Sensor's unique id
- * @apiParam {Number}    room_id          Sensor's room id
- * @apiParam {Number}    name             Sensor's name
- * @apiParam {Number}    type             Sensor's type
+ * @apiParam {String}    id               Sensor's unique id
+ * @apiParam {String}    room_id          Sensor's room id
+ * @apiParam {String}    name             Sensor's name
+ * @apiParam {String}    type             Sensor's type
+ * @apiParam {Number}    sensitivity      Sensor's sensitivity level
  * @apiSuccess {String}  id               the sensor's id
  * @apiSuccess {String}  room_id          the sensor's room's id
  * @apiSuccess {String}  name             the sensor's name
  * @apiSuccess {String}  type             the sensor's type
  * @apiSuccess {String}  battery          the sensor's battery level
  * @apiSuccess {String}  version          the sensor's version
+ * @apiSuccess {Number}  sensitivity      the sensor's sensitivity level
  * @apiSuccessExample {json} Success-Response:
  *    {
  *      "id": "1",
@@ -73,24 +77,74 @@ function manifest(req, res, next) {
  *      "name": "Living Room <-> Bedroom",
  *      "type": "door",
  *      "battery": null,
- *      "version": null
+ *      "version": null,
+ *      "sensitivity": 0.9
  *    }
  */
 function create(req, res, next) {
   const client = new Client()
   client.connect()
   client.query(`
-    insert into sensors(id, room_id, name, type) values($1, $2, $3, $4)
+    insert into sensors(id, room_id, name, type, sensitivity) values($1, $2, $3, $4, $5)
       on conflict (id) do update set
         room_id = coalesce(excluded.room_id, sensors.room_id),
         name = coalesce(excluded.name, sensors.name),
-        type = coalesce(excluded.type, sensors.type)
-      returning id, room_id, name, type, battery, version
-    `, [req.body.id, req.body.room_id, req.body.name, req.body.type])
+        type = coalesce(excluded.type, sensors.type),
+        sensitivity = coalesce(excluded.sensitivity, sensors.sensitivity)
+      returning id, room_id, name, type, battery, version, sensitivity
+    `, [req.body.id, req.body.room_id, req.body.name, req.body.type, req.body.sensitivity])
       .then(r => res.send(r.rows[0]))
       .catch(next)
       .then(() => {
         publishEvent(`{"val": "created", "id": "${req.body.id}", "type": "sensor"}`)
+        client.end()
+      })
+}
+
+/**
+ * @api {put} /sensors/:id Update a sensor
+ * @apiVersion 1.0.0
+ * @apiName Update
+ * @apiGroup Sensors
+ * @apiSampleRequest off
+ *
+ * @apiParam {String}    id               Sensor's unique id
+ * @apiParam {String}    room_id          Sensor's room id
+ * @apiParam {String}    name             Sensor's name
+ * @apiParam {Number}    sensitivity      Sensor's sensitivity level
+ * @apiSuccess {String}  id               the sensor's id
+ * @apiSuccess {String}  room_id          the sensor's room's id
+ * @apiSuccess {String}  name             the sensor's name
+ * @apiSuccess {String}  type             the sensor's type
+ * @apiSuccess {String}  battery          the sensor's battery level
+ * @apiSuccess {String}  version          the sensor's version
+ * @apiSuccess {Number}  sensitivity      the sensor's sensitivity level
+ * @apiSuccessExample {json} Success-Response:
+ *    {
+ *      "id": "1",
+ *      "room_id": "1556767182::1556767178",
+ *      "name": "Living Room <-> Bedroom",
+ *      "type": "door",
+ *      "battery": null,
+ *      "version": null,
+ *      "sensitivity": 0.9
+ *    }
+ */
+function update(req, res, next) {
+  const client = new Client()
+  client.connect()
+  client.query(`
+    update sensors set
+      room_id = coalesce($2, sensors.room_id),
+      name = coalesce($3, sensors.name),
+      sensitivity = coalesce($4, sensors.sensitivity)
+    where id = $1
+    returning id, room_id, name, type, battery, version, sensitivity
+    `, [req.params.id, req.body.room_id, req.body.name, req.body.sensitivity])
+      .then(r => res.send(r.rows[0]))
+      .catch(next)
+      .then(() => {
+        publishEvent(`{"val": "updated", "id": "${req.params.id}", "type": "sensor"}`)
         client.end()
       })
 }
@@ -119,13 +173,14 @@ function updateFirmware(req, res, next) {
  * @apiGroup Sensors
  * @apiSampleRequest off
  *
- * @apiParam {Number}    id               Sensor's unique id
+ * @apiParam {String}    id               Sensor's unique id
  * @apiSuccess {String}  id               the deleted sensor's id
  * @apiSuccess {String}  room_id          the deleted sensor's room's id
  * @apiSuccess {String}  name             the deleted sensor's name
  * @apiSuccess {String}  type             the deleted sensor's type
  * @apiSuccess {String}  battery          the deleted sensor's battery level
  * @apiSuccess {String}  version          the deleted sensor's version
+ * @apiSuccess {Number}  sensitivity      the sensor's sensitivity level
  * @apiSuccessExample {json} Success-Response:
  *    {
  *      "id": "1",
@@ -133,13 +188,14 @@ function updateFirmware(req, res, next) {
  *      "name": "Living Room <-> Bedroom",
  *      "type": "door",
  *      "battery": null,
- *      "version": "V0.7.12"
+ *      "version": "V0.7.12",
+ *      "sensitivity": 0.9
  *    }
  */
 function del(req, res, next) {
   const client = new Client()
   client.connect()
-  client.query('delete from sensors where id = $1 returning id, room_id, name, type, battery, version', [req.params.id])
+  client.query('delete from sensors where id = $1 returning id, room_id, name, type, battery, version, sensitivity', [req.params.id])
     .then(r => res.send(r.rows[0]))
     .catch(next)
     .then(() => {
@@ -149,4 +205,4 @@ function del(req, res, next) {
     })
 }
 
-module.exports = { index, manifest, create, updateFirmware, del }
+module.exports = { index, manifest, create, update, updateFirmware, del }

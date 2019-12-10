@@ -39,7 +39,7 @@ function index(req, res, next) {
  * @apiName Show
  * @apiGroup Rooms
  *
- * @apiParam {Number}    id               Room's unique id
+ * @apiParam {String}    id               Room's unique id
  * @apiSuccess {String}  id               the room's id
  * @apiSuccess {String}  name             the room's name
  * @apiSuccess {Number}  occupancy_count  the number of people in the room right now
@@ -69,13 +69,14 @@ function show(req, res, next) {
  * @apiName Doors
  * @apiGroup Rooms
  *
- * @apiParam {Number}    id               Room's unique id
+ * @apiParam {String}    id               Room's unique id
  * @apiSuccess {String}  id               the door's id
  * @apiSuccess {String}  room_id          the room's id
  * @apiSuccess {String}  name             the door's name
  * @apiSuccess {String}  type             always "door"
  * @apiSuccess {String}  battery          battery level if a Hiome PowerPack is used
  * @apiSuccess {String}  version          current version number for this sensor
+ * @apiSuccess {Number}  sensitivity      the door sensor's sensitivity level
  * @apiSuccessExample {json} Success-Response:
  *  [
  *    {
@@ -84,7 +85,8 @@ function show(req, res, next) {
  *      "name": "Living Room <-> Bedroom",
  *      "type": "door",
  *      "battery": null,
- *      "version": "V0.7.12"
+ *      "version": "V0.7.12",
+ *      "sensitivity": 0.9
  *    }
  *  ]
  */
@@ -92,7 +94,7 @@ function doors(req, res, next) {
   const client = new Client()
   client.connect()
   client.query(`
-    select id, room_id, name, type, battery, version from sensors
+    select id, room_id, name, type, battery, version, sensitivity from sensors
       where type = 'door' and (room_id like $1 OR room_id like $2)
     `, [`${req.params.id}::%`, `%::${req.params.id}`])
     .then(r => res.send(r.rows))
@@ -107,7 +109,7 @@ function doors(req, res, next) {
  * @apiGroup Rooms
  * @apiSampleRequest off
  *
- * @apiParam {Number}    id               Room's unique id, usually the current unix timestamp in seconds
+ * @apiParam {String}    id               Room's unique id, usually the current unix timestamp in seconds
  * @apiParam {String}    name             Room's name
  * @apiParam {Number}    occupancy_count  Room's current occupancy count, usually 0
  * @apiParam {Boolean}   hidden           Room's visibility, true only if all doors in the room are covered
@@ -148,7 +150,7 @@ function create(req, res, next) {
  * @apiName Update
  * @apiGroup Rooms
  *
- * @apiParam {Number}    id               Room's unique id
+ * @apiParam {String}    id               Room's unique id
  * @apiParam {String}    name             Room's name
  * @apiParam {Number}    occupancy_count  Room's current occupancy count, usually 0
  * @apiParam {Boolean}   hidden           Room's visibility, true only if all doors in the room are covered
@@ -195,7 +197,7 @@ function update(req, res, next) {
  * @apiGroup Rooms
  * @apiSampleRequest off
  *
- * @apiParam {Number}    id               Room's unique id
+ * @apiParam {String}    id               Room's unique id
  * @apiSuccess {String}  id               the deleted room's id
  * @apiSuccess {String}  name             the deleted room's name
  * @apiSuccess {Number}  occupancy_count  the number of people in the deleted room right now

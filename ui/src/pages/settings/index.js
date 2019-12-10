@@ -2,6 +2,7 @@ import { navigate } from 'gatsby'
 import { Button, Icon, Card, Divider, List, Empty, message, Modal } from "antd"
 import React, { Component } from 'react'
 
+import SensitivitySlider from "../../components/SensitivitySlider"
 import SettingsMenu from "../../components/SettingsMenu"
 import LayoutPage from "../../components/LayoutPage"
 import SEO from "../../components/seo"
@@ -94,9 +95,12 @@ class DevicesSettingsPage extends Component {
                     textOverflow: `ellipsis`, overflow: `hidden`, whiteSpace: `nowrap`
                   }}>
                     {sensor.name.split(" <-> ")[0]}
-                    <Divider style={{margin: `10px 0`}}>to</Divider>
+                    <Divider style={{margin: `10px 0`, fontStyle: `italic`, fontFamily: `cursive`, fontWeight: `100`, color: `#909090`}}>
+                      to
+                    </Divider>
                     {sensor.name.split(" <-> ")[1]}
                   </div>
+                  <SensitivitySlider sensorId={sensor.id} value={sensor.sensitivity || 0.9} />
                 </Card>
               </List.Item>
           }
