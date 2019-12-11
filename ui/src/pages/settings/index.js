@@ -95,7 +95,7 @@ class DevicesSettingsPage extends Component {
                     textOverflow: `ellipsis`, overflow: `hidden`, whiteSpace: `nowrap`
                   }}>
                     {sensor.name.split(" <-> ")[0]}
-                    <Divider style={{margin: `10px 0`, fontStyle: `italic`, fontFamily: `cursive`, fontWeight: `100`, color: `#909090`}}>
+                    <Divider style={{margin: `10px 0`, fontFamily: `cursive`}}>
                       to
                     </Divider>
                     {sensor.name.split(" <-> ")[1]}
