@@ -66,7 +66,7 @@ class AddSensorPage extends Component {
       if (msg['meta'] && msg['meta']['source'] === 'gateway' && typeof msg['val'] === 'string') {
         if (msg['val'].startsWith('V') && this.state.timeSinceBoot < msg['ts']) {
           this.setState({timeSinceBoot: msg['ts']})
-        } else if (msg['val'] === '1' || msg['val'] === '2') {
+        } else if (msg['type'] === 'raw_sensor_reading' && (msg['val'] === '1' || msg['val'] === '2') && msg['confidence'] >= 0.9) {
           if (!this.state.waitingForSensorData) return
           if (this.state.id === null || this.state.id === sensorId) {
             // this is our sensor
