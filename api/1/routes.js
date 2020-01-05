@@ -18,7 +18,6 @@ router.get('/sensors', sensors.index)
 router.get('/sensors/manifest', sensors.manifest)
 router.post('/sensors', sensors.create)
 router.put('/sensors/:id', sensors.update)
-router.get('/sensors/updatefirmware', sensors.updateFirmware)
 router.delete('/sensors/:id', sensors.del)
 
 module.exports = router

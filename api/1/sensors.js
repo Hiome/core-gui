@@ -149,23 +149,6 @@ function update(req, res, next) {
       })
 }
 
-function updateFirmware(req, res, next) {
-  exec('/home/pi/hubsetup/bin/install_firmware', (err, stdout, stderr) => {
-    if (err) {
-      // node couldn't execute the command
-      res.status(500).send(err)
-      return
-    }
-    if (stderr) {
-      res.send(`error: ${stderr}`)
-    } else {
-      if (stdout === null || stdout.trim().length === 0) res.send('no updates')
-      else if (stdout.test(/SUCCESS/)) res.send('done updating')
-      else res.send(stdout)
-    }
-  })
-}
-
 /**
  * @api {delete} /sensors/:id Delete a sensor
  * @apiVersion 1.0.0
@@ -205,4 +188,4 @@ function del(req, res, next) {
     })
 }
 
-module.exports = { index, manifest, create, update, updateFirmware, del }
+module.exports = { index, manifest, create, update, del }
