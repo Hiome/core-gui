@@ -38,20 +38,22 @@ class HueSettingsPage extends Component {
   scanForBridge = () => {
     this.setState({status: 'start'})
     const client = connect(`ws://${window.location.host}:1884`)
-    client.on('connect', () => client.publish('_hiome/integrate/hue', 'connect'))
+    client.on('connect', () => client.publish('_hiome/integrate/hue', 'connect', () => client.end()))
   }
 
   disconnectHue = () => {
     this.setState({status: 'start'})
     const client = connect(`ws://${window.location.host}:1884`)
-    client.on('connect', () => client.publish('_hiome/integrate/hue', 'disconnect'))
-    setTimeout(() => { client.publish('_hiome/integrate/hue', 'connect') }, 1000)
+    client.on('connect', () => client.publish('_hiome/integrate/hue', 'disconnect', () => {
+      setTimeout(() => { client.publish('_hiome/integrate/hue', 'connect', () => client.end()) }, 1000)
+    }))
   }
 
   controlAtNightToggle = (checked, e) => {
     this.setState({onlyControlAtNight: checked})
     const client = connect(`ws://${window.location.host}:1884`)
-    client.on('connect', () => client.publish('_hiome/integrate/hue/settings/onlyControlAtNight', checked ? 'true' : 'false', {retain: true}))
+    client.on('connect', () => client.publish(
+      '_hiome/integrate/hue/settings/onlyControlAtNight', checked ? 'true' : 'false', {retain: true}, () => client.end()))
   }
 
   renderHueButton() {
