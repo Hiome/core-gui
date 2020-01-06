@@ -40,7 +40,7 @@ class AdancedSettingsPage extends Component {
   factoryReset = () => {
     confirm({
       title: `Are you sure you want to factory reset Hiome Core?`,
-      content: "This will delete all of your data and reset everything. This cannot be undone!",
+      content: "This will delete all of your data and cannot be undone! Hiome Core will be unavailable for about 10 minutes as it reboots...",
       onOk: () => {
         const client = connect(`ws://${window.location.host}:1884`)
         client.on('connect', () => client.publish(
@@ -54,7 +54,7 @@ class AdancedSettingsPage extends Component {
   updateSensors = () => {
     confirm({
       title: `Are you sure you want to update firmware right now?`,
-      content: "This will cause Hiome to stop working while it updates each sensor. This generally takes about 1 minute per sensor.",
+      content: "Hiome will not update occupancy counts while it updates your sensors. This process takes about 1 minute per sensor.",
       onOk: () => {
         const client = connect(`ws://${window.location.host}:1884`)
         client.on('connect', () => client.publish(
