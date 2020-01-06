@@ -15,7 +15,7 @@ class HomekitSettingsPage extends Component {
       content: "This will force Hiome Core to forget your HomeKit setup. You should remove Hiome from HomeKit first. Only proceed if you're having issues with HomeKit!",
       onOk: () => {
         const client = connect(`ws://${window.location.host}:1884`)
-        client.on('connect', () => client.publish('hiome/1/api', '{"val": "homekitReset", "type": "core"}'))
+        client.on('connect', () => client.publish('hiome/1/api', `{"val": "homekitReset", "type": "core", "ts": ${Date.now() / 1000 | 0}}`))
       },
       okText: 'Reset',
       okType: 'danger'

@@ -15,7 +15,7 @@ class AdancedSettingsPage extends Component {
       content: "This will force Hiome Core to forget your HomeKit setup. You should remove Hiome from HomeKit first.",
       onOk: () => {
         const client = connect(`ws://${window.location.host}:1884`)
-        client.on('connect', () => client.publish('hiome/1/api', '{"val": "homekitReset", "type": "core"}'))
+        client.on('connect', () => client.publish('hiome/1/api', `{"val": "homekitReset", "type": "core", "ts": ${Date.now() / 1000 | 0}}`))
       },
       okText: 'Reset',
       okType: 'danger'
@@ -28,7 +28,7 @@ class AdancedSettingsPage extends Component {
       content: "This will force Hiome Core to forget your Philips Hue token.",
       onOk: () => {
         const client = connect(`ws://${window.location.host}:1884`)
-        client.on('connect', () => client.publish('hiome/1/api', '{"val": "hueReset", "type": "core"}'))
+        client.on('connect', () => client.publish('hiome/1/api', `{"val": "hueReset", "type": "core", "ts": ${Date.now() / 1000 | 0}}`))
       },
       okText: 'Reset',
       okType: 'danger'
@@ -41,7 +41,7 @@ class AdancedSettingsPage extends Component {
       content: "This will delete all of your data and reset everything. This cannot be undone!",
       onOk: () => {
         const client = connect(`ws://${window.location.host}:1884`)
-        client.on('connect', () => client.publish('hiome/1/api', '{"val": "factoryReset", "type": "core"}'))
+        client.on('connect', () => client.publish('hiome/1/api', `{"val": "factoryReset", "type": "core", "ts": ${Date.now() / 1000 | 0}}`))
       },
       okText: 'Reset',
       okType: 'danger'
@@ -54,7 +54,7 @@ class AdancedSettingsPage extends Component {
       content: "This will cause Hiome to stop working while it updates each sensor. This generally takes about 1 minute per sensor.",
       onOk: () => {
         const client = connect(`ws://${window.location.host}:1884`)
-        client.on('connect', () => client.publish('hiome/1/api', '{"val": "updateFirmware", "type": "core"}'))
+        client.on('connect', () => client.publish('hiome/1/api', `{"val": "updateFirmware", "type": "core", "ts": ${Date.now() / 1000 | 0}}`))
       },
       okText: 'Update',
       okType: 'primary'
