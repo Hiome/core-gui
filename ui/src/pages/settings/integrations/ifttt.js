@@ -42,7 +42,7 @@ class IftttSettingsPage extends Component {
 
   start() {
     return <>
-      <p>To find your key, go to <strong><a href="https://ifttt.com/maker_webhooks" target="_blank">https://ifttt.com/maker_webhooks</a></strong> (sign in if necessary) and click the <em>Documentation</em> button in the top right corner.</p>
+      <p>To find your key, go to <strong><a href="https://ifttt.com/maker_webhooks" target="_blank" rel="noopener noreferrer">https://ifttt.com/maker_webhooks</a></strong> (sign in if necessary) and click the <em>Documentation</em> button in the top right corner.</p>
       <IftttKey />
     </>
   }
@@ -54,7 +54,7 @@ class IftttSettingsPage extends Component {
     >
       <p>You can now connect Hiome to other services via the Webhooks trigger.</p>
       <ol>
-        <li><a href="https://ifttt.com/create" target="_blank">Create a new IFTTT applet</a></li>
+        <li><a href="https://ifttt.com/create" target="_blank" rel="noopener noreferrer">Create a new IFTTT applet</a></li>
         <li>Click "+ This"</li>
         <li>Search for "webhooks" and choose the <b>Webhooks</b> service</li>
         <li>Choose the "Receive a web request" trigger</li>
