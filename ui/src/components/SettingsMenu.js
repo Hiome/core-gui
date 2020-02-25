@@ -17,6 +17,9 @@ const SettingsMenu = ({ page }) => (
     <Menu.Item key="hue">
       <Link to="/settings/integrations/hue">Hue</Link>
     </Menu.Item>
+    <Menu.Item key="ifttt">
+      <Link to="/settings/integrations/ifttt">IFTTT</Link>
+    </Menu.Item>
   </Menu>
 )
 
