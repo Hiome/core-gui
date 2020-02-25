@@ -15,7 +15,7 @@ const IftttKey = () => (
         }
       }
     `}
-    render={data => <Img fixed={data.placeholderImage.childImageSharp.fluid} alt="IFTTT Documentation Link" loading="auto" />}
+    render={data => <Img fluid={data.placeholderImage.childImageSharp.fluid} alt="IFTTT Documentation Link" loading="auto" />}
   />
 )
 export default IftttKey
