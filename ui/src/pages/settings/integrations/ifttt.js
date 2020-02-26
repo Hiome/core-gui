@@ -76,7 +76,7 @@ class IftttSettingsPage extends Component {
   }
 
   sanitizeName(name) {
-    return name.replace(/[^\w\s_]/g, "").trim().replace(/\s+/g, "_").toLowerCase()
+    return name.replace(/[^\w\s_\-]/g, "").trim().replace(/\s+/g, "_").toLowerCase()
   }
 
   renderRoomEventNames() {
@@ -107,8 +107,9 @@ class IftttSettingsPage extends Component {
       const r2 = d.name.split(" <-> ")[1]
       const r1_san = this.sanitizeName(r1)
       const r2_san = this.sanitizeName(r2)
-      arr.push(<li><strong>hiome_{r1_san}_{r2_san}_door_opened</strong> &#x2192; door from {r1} to {r2} is opened</li>)
-      arr.push(<li><strong>hiome_{r1_san}_{r2_san}_door_closed</strong> &#x2192; door from {r1} to {r2} is closed</li>)
+      arr.push(<li><strong>hiome_{r1_san}_{r2_san}_door_opened</strong> &#x2192; {r1} to {r2} door is opened</li>)
+      arr.push(<li><strong>hiome_{r1_san}_{r2_san}_door_closed</strong> &#x2192; {r1} to {r2} door is closed</li>)
+      arr.push(<li><strong>hiome_{r1_san}_{r2_san}_door_ajar</strong> &#x2192; {r1} to {r2} door is ajar</li>)
     }
 
     return arr
