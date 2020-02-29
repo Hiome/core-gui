@@ -10,7 +10,7 @@ const LayoutPage = ({ children, headline, goBack }) => (
     {headline}
     <main className="page">
       {children}
-      <footer>&copy; Hiome Inc 2019</footer>
+      <footer>&copy; Hiome Inc {new Date().getFullYear()}</footer>
     </main>
     <div className="helloScroller">
       <span role="img" aria-hidden>👋</span>
