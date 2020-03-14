@@ -76,7 +76,7 @@ class IftttSettingsPage extends Component {
   }
 
   sanitizeName(name) {
-    return name.replace(/[^\w\s_\-]/g, "").trim().replace(/\s+/g, "_").toLowerCase()
+    return name.replace(/[^\w\s_-]/g, "").trim().replace(/\s+/g, "_").toLowerCase()
   }
 
   renderRoomEventNames() {

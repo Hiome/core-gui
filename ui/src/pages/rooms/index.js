@@ -23,8 +23,7 @@ class IndexPage extends Component {
     fetch(`${process.env.API_URL}api/1/rooms/${roomId}`)
       .then(resp => resp.json())
       .then(resp => {
-        this.setState(resp)
-        this.loadHistory()
+        this.setState(resp, this.loadHistory)
       })
 
     const client = connect(`ws://${window.location.host}:1884`)

@@ -73,8 +73,7 @@ class AddSensorPage extends Component {
             if (this.state.event1 === null) {
               this.setState({id: sensorId, event1: msg['val'], waitingForSensorData: false, step: 1})
             } else {
-              this.setState({id: sensorId, event2: msg['val'], waitingForSensorData: false, step: 2})
-              this.saveSensor()
+              this.setState({id: sensorId, event2: msg['val'], waitingForSensorData: false, step: 2}, this.saveSensor)
             }
           } else {
             // uh oh, there's another unknown sensor shooting off events at the same time. We can only handle one at a time
