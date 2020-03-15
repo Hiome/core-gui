@@ -42,6 +42,12 @@ class Header extends Component {
   menuClick = ({key}) => {
     if (key === 'settings') navigate('/settings')
     else if (key === 'help') this.openModal()
+    else if (this.props.menuCallback) this.props.menuCallback(key)
+  }
+
+  renderDivider() {
+    if (this.props.menuOptions.length > 0)
+      return <Menu.Divider />
   }
 
   renderMenu() {
@@ -50,6 +56,8 @@ class Header extends Component {
         marginTop: `-1.4rem`,
         marginRight: `1.6rem`
       }}>
+        { this.props.menuOptions }
+        { this.renderDivider() }
         <Menu.Item key="settings">
           <Icon type="setting" /> Settings
         </Menu.Item>
@@ -229,11 +237,15 @@ class Header extends Component {
 }
 
 Header.propTypes = {
-  goBack: PropTypes.bool
+  goBack: PropTypes.bool,
+  menuOptions: PropTypes.arrayOf(PropTypes.node),
+  menuCallback: PropTypes.func
 }
 
 Header.defaultProps = {
-  goBack: false
+  goBack: false,
+  menuOptions: [],
+  menuCallback: undefined
 }
 
 export default Header

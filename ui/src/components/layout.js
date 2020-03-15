@@ -4,9 +4,9 @@ import PropTypes from "prop-types"
 import Header from "./header"
 import "./layout.css"
 
-const Layout = ({ children, goBack }) => (
+const Layout = ({ children, goBack, menuOptions, menuCallback }) => (
   <>
-    <Header goBack={goBack} />
+    <Header goBack={goBack} menuOptions={menuOptions} menuCallback={menuCallback} />
     <main>{children}</main>
   </>
 )
@@ -14,10 +14,14 @@ const Layout = ({ children, goBack }) => (
 Layout.propTypes = {
   children: PropTypes.node.isRequired,
   goBack: PropTypes.bool,
+  menuOptions: PropTypes.arrayOf(PropTypes.node),
+  menuCallback: PropTypes.func
 }
 
 Layout.defaultProps = {
-  goBack: false
+  goBack: false,
+  menuOptions: [],
+  menuCallback: undefined
 }
 
 export default Layout
