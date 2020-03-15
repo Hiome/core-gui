@@ -3,8 +3,9 @@ import React, { Component } from 'react'
 import { connect } from 'mqtt/dist/mqtt'
 import { Result, Button, Icon, Spin } from 'antd'
 
-import Layout from "../components/layout"
+import LayoutPage from "../components/LayoutPage"
 import SEO from "../components/seo"
+import LogViewer from "../components/LogViewer"
 
 import "./rooms.css"
 
@@ -95,14 +96,23 @@ class IndexPage extends Component {
     }
   }
 
+  headline() {
+    return <div className="roomContainer">
+      { this.renderRooms() }
+    </div>
+  }
+
+  logsEndpoint() {
+    if ((new URL(document.location)).searchParams.get('debug') === 'true') return 'api/1/logs/debug'
+    return 'api/1/logs'
+  }
+
   render() {
     return (
-      <Layout>
+      <LayoutPage headline={this.headline()}>
         <SEO title="Rooms" />
-        <div className="roomContainer">
-          { this.renderRooms() }
-        </div>
-      </Layout>
+        <LogViewer endpoint={this.logsEndpoint()} />
+      </LayoutPage>
     )
   }
 }

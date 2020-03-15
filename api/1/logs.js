@@ -42,6 +42,24 @@ function index(req, res, next) {
       .then(() => client.end())
 }
 
+// same as index but without limit on level types
+// intentionally undocumented because this endpoint is for internal use only!
+function debug(req, res, next) {
+  const pageSize = req.query.size || 50
+  const page = req.query.page || 0
+  const client = new Client()
+  client.connect()
+  client.query(`
+    select id, event_type, object_type, object_id, message, level, occurred_at
+      from logs
+      order by occurred_at desc
+      limit $1 offset $2
+    `, [pageSize, page * pageSize])
+      .then(r => res.send(r.rows))
+      .catch(next)
+      .then(() => client.end())
+}
+
 /**
  * @api {get} /logs/:type/:id Get logs for an object
  * @apiVersion 1.0.0
@@ -89,4 +107,4 @@ function show(req, res, next) {
       .then(() => client.end())
 }
 
-module.exports = { index, show }
+module.exports = { index, debug, show }
