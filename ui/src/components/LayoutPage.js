@@ -12,9 +12,6 @@ const LayoutPage = ({ children, headline, goBack, menuOptions, menuCallback }) =
       {children}
       <footer>&copy; Hiome Inc {new Date().getFullYear()}</footer>
     </main>
-    <div className="helloScroller">
-      <span role="img" aria-hidden>👋</span>
-    </div>
   </div>
 )
 

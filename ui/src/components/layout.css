@@ -620,22 +620,6 @@ footer {
   margin: 100px auto 0 auto;
 }
 
-.helloScroller {
-  position: fixed;
-  bottom: 25px;
-  z-index: -10;
-  font-size: 20px;
-  text-align: center;
-  width: 100%;
-}
-
-@media only screen and (max-height: 650px) {
-  .helloScroller {
-    display: none;
-  }
-}
-
-
 /* ANTD DESIGN OVERRIDES */
 
 ul.ant-menu-horizontal {
