@@ -13,10 +13,13 @@ class IndexPage extends Component {
   state = {
     rooms: [],
     loading: true,
-    missingSensors: 0
+    missingSensors: 0,
+    endpoint: 'api/1/logs'
   }
 
   componentDidMount() {
+    if ((new URL(document.location)).searchParams.get('debug') === 'true') this.setState({endpoint: 'api/1/logs/debug'})
+
     fetch(`${process.env.API_URL}api/1/rooms`).then(resp => resp.json()).then(resp => this.setState({rooms: resp, loading: false}))
 
     let knownSensors = []
@@ -102,16 +105,11 @@ class IndexPage extends Component {
     </div>
   }
 
-  logsEndpoint() {
-    if ((new URL(document.location)).searchParams.get('debug') === 'true') return 'api/1/logs/debug'
-    return 'api/1/logs'
-  }
-
   render() {
     return (
       <LayoutPage headline={this.headline()}>
         <SEO title="Rooms" />
-        <LogViewer endpoint={this.logsEndpoint()} />
+        <LogViewer endpoint={this.state.endpoint} />
       </LayoutPage>
     )
   }
