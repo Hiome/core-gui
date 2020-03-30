@@ -1,16 +1,14 @@
 import { Link, navigate } from "gatsby"
 import React, { Component } from 'react'
-import { connect } from 'mqtt/dist/mqtt'
 import { Result, Button, Icon, Spin } from 'antd'
 
 import LayoutPage from "../components/LayoutPage"
-import Layout from "../components/Layout"
 import SEO from "../components/seo"
 import LogViewer from "../components/LogViewer"
 
 import "./rooms.css"
 
-class IndexPage extends Component {
+class DebugPage extends Component {
   state = {
     rooms: [],
     loading: true,
@@ -33,23 +31,6 @@ class IndexPage extends Component {
       const missingSensors = manifestSensors.filter(id => !knownSensors.includes(id))
       this.setState({missingSensors: missingSensors.length})
     })
-
-    const client = connect(`ws://${window.location.host}:1884`)
-    client.on('connect', () => client.subscribe('hiome/1/sensor/#', {qos: 1}))
-    client.on('message', function(t, m, p) {
-      if (m == null) return
-      const message = JSON.parse(m.toString())
-      if (message['meta']['type'] === 'occupancy' && message['meta']['source'] === 'gateway') {
-        const rooms = this.state.rooms
-        for (let r of rooms) {
-          if (r.id === message['meta']['room']) {
-            r.occupancy_count = message['val']
-            this.setState({rooms})
-            break
-          }
-        }
-      }
-    }.bind(this))
   }
 
   roomRow(room) {
@@ -104,18 +85,11 @@ class IndexPage extends Component {
   }
 
   render() {
-    if (!this.state.loading && this.state.rooms.length > 0) {
-      return <LayoutPage headline={this.headline()}>
-        <SEO title="Rooms" />
-        <LogViewer endpoint="api/1/logs" />
-      </LayoutPage>
-    } else {
-      return <Layout>
-        <SEO title="Rooms" />
-        { this.headline() }
-      </Layout>
-    }
+    return <LayoutPage headline={this.headline()}>
+      <SEO title="Rooms" />
+      <LogViewer endpoint="api/1/logs/debug" />
+    </LayoutPage>
   }
 }
 
-export default IndexPage
+export default DebugPage
