@@ -105,19 +105,18 @@ class IndexPage extends Component {
     </div>
   }
 
-  renderLogs() {
-    if (!this.state.loading && this.state.rooms.length > 0) {
-      return <LogViewer endpoint={this.state.endpoint} />
-    }
-  }
-
   render() {
-    return (
-      <LayoutPage headline={this.headline()}>
+    if (!this.state.loading && this.state.rooms.length > 0) {
+      return <LayoutPage headline={this.headline()}>
         <SEO title="Rooms" />
-        { this.renderLogs() }
+        <LogViewer endpoint={this.state.endpoint} />
       </LayoutPage>
-    )
+    } else {
+      return <Layout>
+        <SEO title="Rooms" />
+        { this.headline() }
+      </Layout>
+    }
   }
 }
 
