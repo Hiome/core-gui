@@ -89,7 +89,7 @@ class LogViewer extends Component {
       <Timeline.Item key={history.id} color={this.dotColor(history.level)} style={{clear: `both`}}>
         <div className="timeago" style={{
           display: `inline-block`,
-          width: `4.5rem`,
+          width: this.props.debug ? `7.5rem` : `4.5rem`,
           fontSize: `0.8rem`,
           color: `#ccc`
         }}><TimeAgo time={history.occurred_at} debug={this.props.debug} /></div>
