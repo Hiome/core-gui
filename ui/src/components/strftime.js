@@ -50,6 +50,7 @@ const strftime = function(sFormat, date) {
       '%P': (nHour<12) ? 'am' : 'pm',
       '%s': Math.round(date.getTime()/1000),
       '%S': zeroPad(date.getSeconds(), 2),
+      '%f': zeroPad(date.getMilliseconds(), 3),
       '%t': nthSuffix(),
       '%u': nDay || 7,
       '%V': (function() {

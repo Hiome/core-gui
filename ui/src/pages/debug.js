@@ -87,7 +87,7 @@ class DebugPage extends Component {
   render() {
     return <LayoutPage headline={this.headline()}>
       <SEO title="Rooms" />
-      <LogViewer endpoint="api/1/logs/debug" />
+      <LogViewer endpoint="api/1/logs/debug" debug={true} />
     </LayoutPage>
   }
 }

@@ -27,7 +27,7 @@ class LogViewer extends Component {
       const message = JSON.parse(m.toString())
 
       // only live update info/warning messages meant for users
-      if (['info', 'warning'].indexOf(message['level']) === -1) return
+      if (!this.props.debug && ['info', 'warning'].indexOf(message['level']) === -1) return
 
       // if viewing a specific device/room, only update for messages from that device
       const endpointParts = this.props.endpoint.split('/')
@@ -44,7 +44,7 @@ class LogViewer extends Component {
         object_id: message['device_id'],
         message: message['message'],
         level: message['level'],
-        occurred_at: new Date()
+        occurred_at: new Date(message['ts'])
       }
       const history = this.state.history
       history.unshift(h)
@@ -92,7 +92,7 @@ class LogViewer extends Component {
           width: `4.5rem`,
           fontSize: `0.8rem`,
           color: `#ccc`
-        }}><TimeAgo time={history.occurred_at} /></div>
+        }}><TimeAgo time={history.occurred_at} debug={this.props.debug} /></div>
         <div style={{
           display: `inline-block`,
           color: history.level === 'debug' || history.level === 'data' ? '#aaa' : `inherit`
@@ -143,11 +143,13 @@ class LogViewer extends Component {
 }
 
 LogViewer.propTypes = {
-  endpoint: PropTypes.string
+  endpoint: PropTypes.string,
+  debug: PropTypes.bool
 }
 
 LogViewer.defaultProps = {
-  endpoint: null
+  endpoint: null,
+  debug: false
 }
 
 export default LogViewer

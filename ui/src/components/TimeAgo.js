@@ -14,6 +14,10 @@ class TimeAgo extends Component {
 
   format(time) {
     const d = new Date(time)
+    if (this.props.debug) {
+      return strftime('%l:%M:%S.%f %p', d)
+    }
+
     const totalSec = Math.floor((new Date() - d)/1000)
     // set a timer to format this time again in 1 second
     if (totalSec < 60) setTimeout(this.componentDidMount.bind(this), (10 - (totalSec % 10))*1000)
@@ -31,7 +35,12 @@ class TimeAgo extends Component {
 }
 
 TimeAgo.propTypes = {
-  time: PropTypes.number.isRequired
+  time: PropTypes.number.isRequired,
+  debug: PropTypes.bool
+}
+
+TimeAgo.defaultProps = {
+  debug: false
 }
 
 export default TimeAgo
