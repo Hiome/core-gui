@@ -200,7 +200,7 @@ class AddSensorPage extends Component {
       return
     }
 
-    const room_id = Date.now() / 1000 | 0
+    const room_id = "room_" + (Date.now() / 1000 | 0)
     this.setState({loadingButton: true})
     fetch(`${process.env.API_URL}api/1/rooms`, {
       method: 'POST',
