@@ -180,11 +180,27 @@ function update(req, res, next) {
       .then(r => res.send(r.rows[0]))
       .catch(next)
       .then(() => {
-        if (req.body.hidden) {
+        let hidden = req.body.hidden
+        // parse bool
+        if (typeof hidden == "string") {
+          if (hidden.toLowerCase() == "true")
+            hidden = true
+          else if (hidden.toLowerCase() == "false")
+            hidden = false
+          else
+            hidden = null
+        }
+        if (hidden) {
           publishEvent(`{"val": "hidden", "id": "${req.params.id}", "type": "room"}`)
           clearSensor(`${req.params.id}:occupancy`)
         } else {
-          let resp = {"val": "updated", "id": req.params.id, "type": "room", "count": req.body.occupancy_count || 0, "hidden": req.body.hidden}
+          let occ_count = parseInt(req.body.occupancy_count)
+          let resp
+          if (isNaN(occ_count)) {
+            resp = {"val": "updated", "id": "restore", "type": "room", "count": null, "hidden": hidden}
+          } else {
+            resp = {"val": "updated", "id": req.params.id, "type": "room", "count": occ_count, "hidden": hidden}
+          }
           publishEvent(JSON.stringify(resp))
         }
         client.end()
