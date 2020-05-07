@@ -10,7 +10,7 @@ app.use(express.urlencoded({ extended: true }))
 app.use(function (req, res, next) {
   for (let [key, value] of Object.entries(req.body)) {
     // treat empty strings as null, thanks to url encoded forms
-    if (value == "") req.body[key] = null
+    if (value === "") req.body[key] = null
   }
   next()
 })
