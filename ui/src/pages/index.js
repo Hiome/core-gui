@@ -107,7 +107,7 @@ class IndexPage extends Component {
     if (!this.state.loading && this.state.rooms.length > 0) {
       return <LayoutPage headline={this.headline()}>
         <SEO title="Rooms" />
-        <LogViewer endpoint="api/1/logs" />
+        <LogViewer />
       </LayoutPage>
     } else {
       return <Layout>

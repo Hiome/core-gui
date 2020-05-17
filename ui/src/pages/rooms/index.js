@@ -52,7 +52,7 @@ class IndexPage extends Component {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({occupancy_count: count})
-    }).then(resp => resp.json()).then(resp => this.setState({occupancy_count: resp.occupancy_count}))
+    }).then(resp => this.setState({occupancy_count: count}))
   }
 
   headline() {

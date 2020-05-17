@@ -5,6 +5,7 @@ const { Client } = require('pg')
  * @apiVersion 1.0.0
  * @apiName Index
  * @apiGroup Logs
+ * @apiDeprecated use now (#Events:Index).
  *
  * @apiParam {Number}    [page=0]         Page number to fetch, starting at 0
  * @apiParam {Number}    [size=50]        Number of lines to return per page
@@ -65,6 +66,7 @@ function debug(req, res, next) {
  * @apiVersion 1.0.0
  * @apiName Show
  * @apiGroup Logs
+ * @apiDeprecated use now (#Events:Index).
  *
  * @apiParam {String}    type             The object's type to filter to
  * @apiParam {String}    id               The object's id to filter to

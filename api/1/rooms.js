@@ -1,5 +1,6 @@
 const { Client } = require('pg')
-const { publishEvent, clearSensor } = require('../../publishEvent')
+const HomeStream = require('../../homestream')
+const parseBool = require('../../parseBool')
 
 /**
  * @api {get} /rooms Get all rooms
@@ -7,6 +8,7 @@ const { publishEvent, clearSensor } = require('../../publishEvent')
  * @apiName Index
  * @apiGroup Rooms
  *
+ * @apiParam {Boolean}   [include_hidden=false]   include hidden rooms in response
  * @apiSuccess {String}  id               the room's id
  * @apiSuccess {String}  name             the room's name
  * @apiSuccess {Number}  occupancy_count  the number of people in the room right now
@@ -111,37 +113,22 @@ function doors(req, res, next) {
  *
  * @apiParam {String}    id               Room's unique id, usually the current unix timestamp in seconds
  * @apiParam {String}    name             Room's name
- * @apiParam {Number}    occupancy_count  Room's current occupancy count, usually 0
- * @apiParam {Boolean}   hidden           Room's visibility, true only if all doors in the room are covered
- * @apiSuccess {String}  id               the room's id
- * @apiSuccess {String}  name             the room's name
- * @apiSuccess {Number}  occupancy_count  the number of people in the room right now
- * @apiSuccess {Boolean} hidden           whether or not this room is hidden from Hiome because not all doors are covered
- * @apiSuccessExample {json} Success-Response:
- *    {
- *      "id": "1556767178",
- *      "name": "Living Room",
- *      "occupancy_count": 1,
- *      "hidden": false
- *    }
+ * @apiParam {Number}    [occupancy_count=0]  Room's current occupancy count, usually 0
+ * @apiParam {Boolean}   [hidden=false]   Room's visibility, true only if all doors in the room are covered
  */
 function create(req, res, next) {
-  const client = new Client()
-  client.connect()
-  client.query(`
-    insert into rooms(id, name, occupancy_count, hidden) values($1, $2, $3, $4)
-      on conflict (id) do update set
-        name = coalesce(excluded.name, rooms.name),
-        occupancy_count = coalesce(excluded.occupancy_count, rooms.occupancy_count),
-        hidden = coalesce(excluded.hidden, rooms.hidden)
-      returning *
-    `, [req.body.id, req.body.name, req.body.occupancy_count, req.body.hidden])
-      .then(r => res.send(r.rows[0]))
-      .catch(next)
-      .then(() => {
-        publishEvent(`{"val": "created", "id": "${req.body.id}", "type": "room"}`)
-        client.end()
-      })
+  if (!req.body.id || !req.body.name) {
+    res.status(422).send("id and name are required")
+    return
+  }
+
+  HomeStream.write(`com.hiome/api/to/com.hiome/gateway/create_room`, {
+    val: req.body.id,
+    name: req.body.name,
+    occupancy: parseInt(req.body.occupancy_count),
+    hidden: parseBool(req.body.hidden)
+  })
+  res.sendStatus(200)
 }
 
 /**
@@ -149,62 +136,23 @@ function create(req, res, next) {
  * @apiVersion 1.0.0
  * @apiName Update
  * @apiGroup Rooms
+ * @apiDescription This endpoint supports partial updates, meaning you can pass only the attribute(s) you want to change to leave the others as is.
  *
- * @apiParam {String}    id               Room's unique id
- * @apiParam {String}    name             Room's name
- * @apiParam {Number}    occupancy_count  Room's current occupancy count, usually 0
- * @apiParam {Boolean}   hidden           Room's visibility, true only if all doors in the room are covered
- * @apiSuccess {String}  id               the room's id
- * @apiSuccess {String}  name             the room's name
- * @apiSuccess {Number}  occupancy_count  the number of people in the room right now
- * @apiSuccess {Boolean} hidden           whether or not this room is hidden from Hiome because not all doors are covered
- * @apiSuccessExample {json} Success-Response:
- *    {
- *      "id": "1556767178",
- *      "name": "Living Room",
- *      "occupancy_count": 1,
- *      "hidden": false
- *    }
+ * @apiParam {String}    id                Room's unique id
+ * @apiParam {String}    [name]            Room's name
+ * @apiParam {Number}    [occupancy_count] Room's current occupancy count
+ * @apiParam {Boolean}   [hidden]          Room's visibility, true only if all doors in the room are covered
  */
 function update(req, res, next) {
-  const client = new Client()
-  client.connect()
-  client.query(`
-    update rooms set
-      name = coalesce($2, rooms.name),
-      occupancy_count = coalesce($3, rooms.occupancy_count),
-      hidden = coalesce($4, rooms.hidden)
-    where id = $1
-    returning *
-    `, [req.params.id, req.body.name, req.body.occupancy_count, req.body.hidden])
-      .then(r => res.send(r.rows[0]))
-      .catch(next)
-      .then(() => {
-        let hidden = req.body.hidden
-        // parse bool
-        if (typeof hidden == "string") {
-          if (hidden.toLowerCase() == "true")
-            hidden = true
-          else if (hidden.toLowerCase() == "false")
-            hidden = false
-          else
-            hidden = null
-        }
-        if (hidden) {
-          publishEvent(`{"val": "hidden", "id": "${req.params.id}", "type": "room"}`)
-          clearSensor(`${req.params.id}:occupancy`)
-        } else {
-          let occ_count = parseInt(req.body.occupancy_count)
-          let resp
-          if (isNaN(occ_count)) {
-            resp = {"val": "updated", "id": "restore", "type": "room", "count": null, "hidden": hidden}
-          } else {
-            resp = {"val": "updated", "id": req.params.id, "type": "room", "count": occ_count, "hidden": hidden}
-          }
-          publishEvent(JSON.stringify(resp))
-        }
-        client.end()
-      })
+  if (req.body.name)
+    HomeStream.write(`com.hiome/api/to/com.hiome/${req.params.id}/name`, req.body.name)
+  if (!isNan(parseInt(req.body.occupancy_count)))
+    HomeStream.write(`com.hiome/api/to/com.hiome/${req.params.id}/occupancy`, parseInt(req.body.occupancy_count))
+  const hidden = parseBool(req.body.hidden)
+  if (hidden !== null)
+    HomeStream.write(`com.hiome/api/to/com.hiome/${req.params.id}/hidden`, hidden)
+
+  res.sendStatus(200)
 }
 
 /**
@@ -228,16 +176,8 @@ function update(req, res, next) {
  *    }
  */
 function del(req, res, next) {
-  const client = new Client()
-  client.connect()
-  client.query('delete from rooms where id = $1 returning *', [req.params.id])
-    .then(r => res.send(r.rows[0]))
-    .catch(next)
-    .then(() => {
-      publishEvent(`{"val": "deleted", "id": "${req.params.id}", "type": "room"}`)
-      clearSensor(`${req.params.id}:occupancy`)
-      client.end()
-    })
+  HomeStream.write(`com.hiome/api/to/com.hiome/${req.params.id}/connected`, 'delete')
+  res.sendStatus(200)
 }
 
 module.exports = { index, show, doors, create, update, del }

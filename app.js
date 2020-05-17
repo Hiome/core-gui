@@ -1,19 +1,13 @@
 const Sentry = require('@sentry/node')
 Sentry.init()
 
+const HomeStream = require('./homestream')
 const compression = require('compression')
 const express = require('express')
 const app = express()
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
-app.use(function (req, res, next) {
-  for (let [key, value] of Object.entries(req.body)) {
-    // treat empty strings as null, thanks to url encoded forms
-    if (value === "") req.body[key] = null
-  }
-  next()
-})
 app.use(compression())
 
 app.use(function(req, res, next) {
@@ -26,7 +20,7 @@ app.use(function(req, res, next) {
 const index = require('./api/1/routes')
 app.use('/api/1', index)
 
-// serve static files from public (built by gatsby)
+// serve static files from public
 app.use(express.static('public'))
 
 app.use(function (req, res, next) {
@@ -45,6 +39,7 @@ app.use(function (err, req, res, next) {
   res.status(500).send('Something broke!')
 })
 
-app.listen(3000, function(){
+app.listen(3000, function() {
+  HomeStream.write('com.hiome/api/connected', true)
   console.log('Hiome listening on port 3000')
 })

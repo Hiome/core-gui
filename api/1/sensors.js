@@ -1,11 +1,5 @@
 const { Client } = require('pg')
-const { publishEvent, clearSensor } = require('../../publishEvent')
-const { getUrl } = require('../../getUrl')
-const { exec } = require('child_process')
-
-const CORE_ID = require('fs')
-  .readFileSync(process.env.UID_FILE || '/sys/class/net/eth0/address', {encoding: 'utf8'})
-  .trim().toLowerCase().replace(/:/g, '')
+const HomeStream = require('../../homestream')
 
 /**
  * @api {get} /sensors Get all sensors
@@ -49,126 +43,19 @@ function index(req, res, next) {
     .then(() => client.end())
 }
 
-function manifest(req, res, next) {
-  getUrl(`https://manifests.hiome.com/${CORE_ID}.json`).then(resp => res.send(resp)).catch(err => res.status(500).send(err))
-}
-
 /**
- * @api {post} /sensors Create a new sensor
+ * @api {get} /sensors/:id  Show a specific sensor
  * @apiVersion 1.0.0
- * @apiName Create
+ * @apiName Show
  * @apiGroup Sensors
- * @apiSampleRequest off
  *
- * @apiParam {String}    id               Sensor's unique id
- * @apiParam {String}    room_id          Sensor's room id
- * @apiParam {String}    name             Sensor's name
- * @apiParam {String}    type             Sensor's type
- * @apiParam {Number}    sensitivity      Sensor's sensitivity level
+ * @apiParam {String}    id               if of the sensor
  * @apiSuccess {String}  id               the sensor's id
  * @apiSuccess {String}  room_id          the sensor's room's id
  * @apiSuccess {String}  name             the sensor's name
  * @apiSuccess {String}  type             the sensor's type
  * @apiSuccess {String}  battery          the sensor's battery level
  * @apiSuccess {String}  version          the sensor's version
- * @apiSuccess {String}  last_seen        timestamp of sensor's last message
- * @apiSuccess {Number}  sensitivity      the sensor's sensitivity level
- * @apiSuccessExample {json} Success-Response:
- *    {
- *      "id": "1",
- *      "room_id": "1556767182::1556767178",
- *      "name": "Living Room <-> Bedroom",
- *      "type": "door",
- *      "battery": null,
- *      "version": null,
- *      "last_seen": null,
- *      "sensitivity": 0.9
- *    }
- */
-function create(req, res, next) {
-  const client = new Client()
-  client.connect()
-  client.query(`
-    insert into sensors(id, room_id, name, type, sensitivity) values($1, $2, $3, $4, $5)
-      on conflict (id) do update set
-        room_id = coalesce(excluded.room_id, sensors.room_id),
-        name = coalesce(excluded.name, sensors.name),
-        type = coalesce(excluded.type, sensors.type),
-        sensitivity = coalesce(excluded.sensitivity, sensors.sensitivity)
-      returning id, room_id, name, type, battery, version, last_seen, sensitivity
-    `, [req.body.id, req.body.room_id, req.body.name, req.body.type, req.body.sensitivity])
-      .then(r => res.send(r.rows[0]))
-      .catch(next)
-      .then(() => {
-        publishEvent(`{"val": "created", "id": "${req.body.id}", "type": "sensor"}`)
-        client.end()
-      })
-}
-
-/**
- * @api {put} /sensors/:id Update a sensor
- * @apiVersion 1.0.0
- * @apiName Update
- * @apiGroup Sensors
- * @apiSampleRequest off
- *
- * @apiParam {String}    id               Sensor's unique id
- * @apiParam {String}    room_id          Sensor's room id
- * @apiParam {String}    name             Sensor's name
- * @apiParam {Number}    sensitivity      Sensor's sensitivity level
- * @apiSuccess {String}  id               the sensor's id
- * @apiSuccess {String}  room_id          the sensor's room's id
- * @apiSuccess {String}  name             the sensor's name
- * @apiSuccess {String}  type             the sensor's type
- * @apiSuccess {String}  battery          the sensor's battery level
- * @apiSuccess {String}  version          the sensor's version
- * @apiSuccess {String}  last_seen        timestamp of sensor's last message
- * @apiSuccess {Number}  sensitivity      the sensor's sensitivity level
- * @apiSuccessExample {json} Success-Response:
- *    {
- *      "id": "1",
- *      "room_id": "1556767182::1556767178",
- *      "name": "Living Room <-> Bedroom",
- *      "type": "door",
- *      "battery": null,
- *      "version": null,
- *      "last_seen": "2020-04-24 18:31:07.706785",
- *      "sensitivity": 0.9
- *    }
- */
-function update(req, res, next) {
-  const client = new Client()
-  client.connect()
-  client.query(`
-    update sensors set
-      room_id = coalesce($2, sensors.room_id),
-      name = coalesce($3, sensors.name),
-      sensitivity = coalesce($4, sensors.sensitivity)
-    where id = $1
-    returning id, room_id, name, type, battery, version, last_seen, sensitivity
-    `, [req.params.id, req.body.room_id, req.body.name, req.body.sensitivity])
-      .then(r => res.send(r.rows[0]))
-      .catch(next)
-      .then(() => {
-        publishEvent(`{"val": "updated", "id": "${req.params.id}", "type": "sensor"}`)
-        client.end()
-      })
-}
-
-/**
- * @api {delete} /sensors/:id Delete a sensor
- * @apiVersion 1.0.0
- * @apiName Delete
- * @apiGroup Sensors
- * @apiSampleRequest off
- *
- * @apiParam {String}    id               Sensor's unique id
- * @apiSuccess {String}  id               the deleted sensor's id
- * @apiSuccess {String}  room_id          the deleted sensor's room's id
- * @apiSuccess {String}  name             the deleted sensor's name
- * @apiSuccess {String}  type             the deleted sensor's type
- * @apiSuccess {String}  battery          the deleted sensor's battery level
- * @apiSuccess {String}  version          the deleted sensor's version
  * @apiSuccess {String}  last_seen        timestamp of sensor's last message
  * @apiSuccess {Number}  sensitivity      the sensor's sensitivity level
  * @apiSuccessExample {json} Success-Response:
@@ -183,17 +70,91 @@ function update(req, res, next) {
  *      "sensitivity": 0.9
  *    }
  */
-function del(req, res, next) {
+function show(req, res, next) {
   const client = new Client()
   client.connect()
-  client.query('delete from sensors where id = $1 returning id, room_id, name, type, battery, version, last_seen, sensitivity', [req.params.id])
+  client.query(`
+    select * from sensors where id = $1
+    `, [req.params.id])
     .then(r => res.send(r.rows[0]))
     .catch(next)
-    .then(() => {
-      publishEvent(`{"val": "deleted", "id": "${req.params.id}", "type": "sensor"}`)
-      clearSensor(req.params.id)
-      client.end()
-    })
+    .then(() => client.end())
 }
 
-module.exports = { index, manifest, create, update, del }
+/**
+ * @api {post} /sensors Create a new sensor
+ * @apiVersion 1.0.0
+ * @apiName Create
+ * @apiGroup Sensors
+ * @apiSampleRequest off
+ *
+ * @apiParam {String}    id               Sensor's unique id
+ * @apiParam {String}    type             Sensor's type
+ * @apiParam {String}    [room_id]        Sensor's room id, if applicable
+ * @apiParam {String}    [name]           Sensor's name, if applicable
+ */
+function create(req, res, next) {
+  if (!req.body.id || !req.body.type) {
+    res.status(422).send("id and type are required")
+    return
+  }
+
+  HomeStream.write(`com.hiome/api/to/com.hiome/gateway/create_sensor`, {
+    val: req.body.id,
+    type: req.body.type,
+    room_id: req.body.room_id,
+    name: req.body.name
+  })
+  res.sendStatus(200)
+}
+
+/**
+ * @api {put} /sensors/:id Update a sensor
+ * @apiVersion 1.0.0
+ * @apiName Update
+ * @apiGroup Sensors
+ * @apiSampleRequest off
+ * @apiDescription This endpoint supports partial updates, meaning you can pass only the attribute(s) you want to change to leave the others as is.
+ *
+ * @apiParam {String}    id               Sensor's unique id
+ * @apiParam {String}    [room_id]        Sensor's room id
+ * @apiParam {String}    [name]           Sensor's name
+ * @apiParam {Number}    [sensitivity]    Sensor's sensitivity level
+ */
+function update(req, res, next) {
+  if (req.body.room_id)
+    HomeStream.write(`com.hiome/api/to/com.hiome/${req.params.id}/room`, req.body.room_id)
+  if (req.body.name)
+    HomeStream.write(`com.hiome/api/to/com.hiome/${req.params.id}/name`, req.body.name)
+
+  if (!isNaN(parseFloat(req.body.sensitivity))) {
+    const client = new Client()
+    client.connect()
+    client.query(`
+      update sensors set
+        sensitivity = coalesce($2, sensors.sensitivity)
+      where id = $1
+      `, [req.params.id, parseFloat(req.body.sensitivity)])
+        .then(r => res.sendStatus(200))
+        .catch(next)
+        .then(() => client.end())
+  } else {
+    res.sendStatus(200)
+  }
+}
+
+/**
+ * @api {delete} /sensors/:id Delete a sensor
+ * @apiVersion 1.0.0
+ * @apiName Delete
+ * @apiGroup Sensors
+ * @apiSampleRequest off
+ *
+ * @apiParam {String}    id               Sensor's unique id
+ */
+function del(req, res, next) {
+  HomeStream.write(`com.hiome/api/to/com.hiome/${req.params.id}/connected`, 'delete')
+  res.sendStatus(200)
+}
+
+module.exports = { index, show, create, update, del }
