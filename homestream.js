@@ -47,7 +47,7 @@ const HomeStream = {
       t = t.toLowerCase()
       const tp = t.split("/")
       // don't parse messages from unsupported homestream version
-      if tp.length < 5 or tp[0] != 'hs' or tp[1] != '1': return
+      if (tp.length < 5 or tp[0] !== 'hs' or tp[1] !== '1') return
       if (!m) {
         if (p.retain && cb_deleted) {
           cb_deleted({
