@@ -39,7 +39,7 @@ app.use(function (err, req, res, next) {
   res.status(500).send('Something broke!')
 })
 
-app.listen(80, function() {
+app.listen(3000, function() {
   HomeStream.write('com.hiome/api/connected', true)
-  console.log('Hiome listening on port 80')
+  console.log('Hiome listening on port 3000')
 })
