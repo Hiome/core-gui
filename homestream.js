@@ -28,12 +28,12 @@ const mqttPub = (t, m, o) => {
 const HomeStream = {
   read: readStream,
   readRetained: (topic, cb) => readStream(topic, 'retained', cb),
-  erase: topic => mqttPub(`hs/1/${topic}`, null, {retain: true}),
+  erase: topic => mqttPub(`hs/1/${topic}`, '', {retain: true}),
   write: (topic, val, opts) => {
     if (typeof opts === "boolean") opts = {retain: opts}
     const payload = typeof val === 'object' ? val : {'val': val}
     payload['ts'] = Date.now()
-    mqttPub(`hs/1/${topic}`, payload, opts)
+    mqttPub(`hs/1/${topic}`, JSON.stringify(payload), opts)
     return payload['ts']
   },
   subscribe: (topics, cb, cb_deleted) => {
