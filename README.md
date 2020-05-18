@@ -21,7 +21,7 @@ In second tab:
 
 You now have both a nodejs server and a gatsby server running.
 
-The nodejs server is accessible at `http://localhost:3000` - it will render the compiled static JS in `public`.
+The nodejs server is accessible at `http://localhost` - it will render the compiled static JS in `public`.
 The gatsby server is accessible at `http://localhost:8000` - it will render the latest ui changes.
 
 Most likely, you want to work with `http://localhost:8000`
