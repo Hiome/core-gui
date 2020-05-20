@@ -17,8 +17,9 @@ const readStream = (topic, start, opts, cb) => {
     }
   }
   return fetch(url).then(resp => resp.json()).then(resp => resp.forEach(m => {
-    m.data = JSON.parse(m.payload)
-    m.val = m.data['val']
+    m.data = m.payload
+    m.val = m.data.val
+    m.payload = JSON.stringify(m.data)
   })).then(cb)
 }
 
