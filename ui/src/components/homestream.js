@@ -49,7 +49,7 @@ const HomeStream = {
       const tp = t.split("/")
       // don't parse messages from unsupported homestream version
       if (tp.length < 5 || tp[0] !== 'hs' || tp[1] !== '1') return
-      if (!m) {
+      if (m.length === 0) {
         if (p.retain && cb_deleted) {
           cb_deleted({
             topic: t,

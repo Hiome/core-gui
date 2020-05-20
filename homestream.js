@@ -1,7 +1,7 @@
 const { connect } = require('mqtt')
 const fetch = require('./fetch')
 
-const API_URL = 'http://hiome/'
+const API_URL = 'http://hiome:3000/'
 const mqttClient = () => connect('mqtt://hiome:1883')
 
 const readStream = (topic, start, opts, cb) => {
@@ -48,7 +48,7 @@ const HomeStream = {
       const tp = t.split("/")
       // don't parse messages from unsupported homestream version
       if (tp.length < 5 || tp[0] !== 'hs' || tp[1] !== '1') return
-      if (!m) {
+      if (m.length === 0) {
         if (p.retain && cb_deleted) {
           cb_deleted({
             topic: t,
