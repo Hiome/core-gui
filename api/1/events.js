@@ -60,7 +60,10 @@ function index(req, res, next) {
   const client = new Client()
   client.connect()
   client.query(`
-    select * from events
+    SELECT
+      ts, topic, namespace, object_id, attribute, to_namespace, to_object_id, to_attribute,
+      payload AS data, retain, context_ts, context_topic
+    FROM events
       where ts > $1 and ts <= $2 ${namespace_filter} ${object_filter} ${attr_filter}
       order by ts ${sort} limit $3
     `, args)
@@ -99,7 +102,10 @@ function index_commands(req, res, next) {
   const client = new Client()
   client.connect()
   client.query(`
-    select * from events
+    SELECT
+      ts, topic, namespace, object_id, attribute, to_namespace, to_object_id, to_attribute,
+      payload AS data, retain, context_ts, context_topic
+    FROM events
       where ts > $1 and ts <= $2 ${namespace_filter} ${object_filter} and attribute = 'to'
         ${to_namespace_filter} ${to_object_filter} ${to_attr_filter}
       order by ts ${sort} limit $3
@@ -156,7 +162,10 @@ function retained(req, res, next) {
   const client = new Client()
   client.connect()
   client.query(`
-    select DISTINCT ON (topic) * from events
+    SELECT DISTINCT ON (topic)
+      ts, topic, namespace, object_id, attribute, to_namespace, to_object_id, to_attribute,
+      payload AS data, retain, context_ts, context_topic
+    FROM events
       where retain IS TRUE ${namespace_filter} ${object_filter} ${attr_filter}
       ORDER BY topic, ts DESC
     `, args)

@@ -16,11 +16,13 @@ const readStream = (topic, start, opts, cb) => {
       url += '?' + q
     }
   }
-  return fetch(url).then(resp => resp.json()).then(resp => resp.forEach(m => {
-    m.data = m.payload
-    m.val = m.data.val
-    m.payload = JSON.stringify(m.data)
-  })).then(cb)
+  return fetch(url).then(resp => resp.json()).then(resp => {
+    resp.forEach(m => {
+      m.val = m.data.val
+      m.payload = JSON.stringify(m.data)
+    }
+    return resp
+  )}).then(cb)
 }
 
 const mqttPub = (t, m, o) => {
