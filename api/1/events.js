@@ -41,7 +41,7 @@ function index(req, res, next) {
   const limit = req.query.limit || 1000
   const sort = req.query.reverse === 'true' ? 'desc' : 'asc'
   const args = [req.params.from, stop_ts, limit]
-  let namespace_filter, object_filter, attr_filter = ''
+  let namespace_filter = object_filter = attr_filter = ''
   if (req.params.namespace !== '~') {
     args.push(req.params.namespace)
     namespace_filter = `and namespace = $${args.length}`
@@ -74,7 +74,7 @@ function index_commands(req, res, next) {
   const limit = req.query.limit || 1000
   const sort = req.query.reverse === 'true' ? 'desc' : 'asc'
   const args = [req.params.from, stop_ts, limit]
-  let namespace_filter, object_filter, to_namespace_filter, to_object_filter, to_attr_filter = ''
+  let namespace_filter = object_filter = to_namespace_filter = to_object_filter = to_attr_filter = ''
   if (req.params.namespace !== '~') {
     args.push(req.params.namespace)
     namespace_filter = `and namespace = $${args.length}`
@@ -139,7 +139,7 @@ function index_commands(req, res, next) {
  */
 function retained(req, res, next) {
   const args = []
-  let namespace_filter, object_filter, attr_filter = ''
+  let namespace_filter = object_filter = attr_filter = ''
   if (req.params.namespace !== '~') {
     args.push(req.params.namespace)
     namespace_filter = `and namespace = $${args.length}`
