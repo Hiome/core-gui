@@ -40,6 +40,22 @@ function index(req, res, next) {
   const stop_ts = req.query.until || Date.now()
   const limit = req.query.limit || 1000
   const sort = req.query.reverse === 'true' ? 'desc' : 'asc'
+  const args = [req.params.from, stop_ts, limit]
+  let namespace_filter, object_filter, attr_filter = ''
+  if (req.params.namespace !== '~') {
+    args.push(req.params.namespace)
+    namespace_filter = `and namespace = $${args.length}`
+  }
+  if (req.params.object_id !== '~') {
+    args.push(req.params.object_id)
+    object_filter = `and object_id = $${args.length}`
+  }
+  if (req.params.attr === '~') {
+    attr_filter = `and attribute <> 'to'`
+  } else if (req.params.attr !== '~~') {
+    args.push(req.params.attr)
+    attr_filter = `and attribute = $${args.length}`
+  }
   const namespace_filter = req.params.namespace === '~' ? '' : 'and namespace = $4'
   const object_filter = req.params.object_id === '~' ? '' : 'and object_id = $5'
   const attr_filter = req.params.attr === '~~' ? '' : (req.params.attr === '~' ? "and attribute <> 'to'" : 'and attribute = $6')
@@ -49,7 +65,7 @@ function index(req, res, next) {
     select * from events
       where ts > $1 and ts <= $2 ${namespace_filter} ${object_filter} ${attr_filter}
       order by ts ${sort} limit $3
-    `, [req.params.from, stop_ts, limit, req.params.namespace, req.params.object_id, req.params.attr])
+    `, args)
       .then(r => res.send(r.rows))
       .catch(next)
       .then(() => client.end())
@@ -59,11 +75,29 @@ function index_commands(req, res, next) {
   const stop_ts = req.query.until || Date.now()
   const limit = req.query.limit || 1000
   const sort = req.query.reverse === 'true' ? 'desc' : 'asc'
-  const namespace_filter = req.params.namespace === '~' ? '' : 'and namespace = $4'
-  const object_filter = req.params.object_id === '~' ? '' : 'and object_id = $5'
-  const to_namespace_filter = req.params.to_namespace === '~' ? '' : 'and to_namespace = $6'
-  const to_object_filter = req.params.to_object_id === '~' ? '' : 'and to_object_id = $7'
-  const to_attr_filter = req.params.to_attr === '~' ? '' : 'and to_attribute = $8'
+  const args = [req.params.from, stop_ts, limit]
+  let namespace_filter, object_filter, to_namespace_filter, to_object_filter, to_attr_filter = ''
+  if (req.params.namespace !== '~') {
+    args.push(req.params.namespace)
+    namespace_filter = `and namespace = $${args.length}`
+  }
+  if (req.params.object_id !== '~') {
+    args.push(req.params.object_id)
+    object_filter = `and object_id = $${args.length}`
+  }
+  if (req.params.to_namespace !== '~') {
+    args.push(req.params.to_namespace)
+    to_namespace_filter = `and to_namespace = $${args.length}`
+  }
+  if (req.params.to_object_id !== '~') {
+    args.push(req.params.to_object_id)
+    to_object_filter = `and to_object_id = $${args.length}`
+  }
+  if (req.params.to_attr !== '~') {
+    args.push(req.params.to_attr)
+    to_attr_filter = `and to_attribute = $${args.length}`
+  }
+
   const client = new Client()
   client.connect()
   client.query(`
@@ -71,15 +105,14 @@ function index_commands(req, res, next) {
       where ts > $1 and ts <= $2 ${namespace_filter} ${object_filter} and attribute = 'to'
         ${to_namespace_filter} ${to_object_filter} ${to_attr_filter}
       order by ts ${sort} limit $3
-    `, [req.params.from, stop_ts, limit, req.params.namespace, req.params.object_id,
-        req.params.to_namespace, req.params.to_object_id, req.params.to_attr])
+    `, args)
       .then(r => res.send(r.rows))
       .catch(next)
       .then(() => client.end())
 }
 
 /**
- * @api {get} /:topic/retained   Read latest retained state of topic(s)
+ * @api {get} /:topic   Read latest retained state of topic(s)
  * @apiVersion 1.0.0
  * @apiName Retained
  * @apiGroup Events
@@ -107,16 +140,28 @@ function index_commands(req, res, next) {
  *    }
  */
 function retained(req, res, next) {
-  const namespace_filter = req.params.namespace === '~' ? '' : 'and namespace = $1'
-  const object_filter = req.params.object_id === '~' ? '' : 'and object_id = $2'
-  const attr_filter = (req.params.attr === '~' || req.params.attr === '~~') ? '' : 'and attribute = $3'
+  const args = []
+  let namespace_filter, object_filter, attr_filter = ''
+  if (req.params.namespace !== '~') {
+    args.push(req.params.namespace)
+    namespace_filter = `and namespace = $${args.length}`
+  }
+  if (req.params.object_id !== '~') {
+    args.push(req.params.object_id)
+    object_filter = `and object_id = $${args.length}`
+  }
+  if (req.params.attr !== '~' && req.params.attr !== '~~') {
+    args.push(req.params.attr)
+    attr_filter = `and attribute = $${args.length}`
+  }
+
   const client = new Client()
   client.connect()
   client.query(`
     select DISTINCT ON (topic) * from events
       where retain IS TRUE ${namespace_filter} ${object_filter} ${attr_filter}
       ORDER BY topic, ts DESC
-    `, [req.params.namespace, req.params.object_id, req.params.attr])
+    `, args)
       .then(r => res.send(r.rows))
       .catch(next)
       .then(() => client.end())

@@ -6,6 +6,7 @@ const mqttClient = () => connect(`ws://${window.location.host}:1884`)
 /* everything (EXCEPT EXPORT) below is identical to nodejs version */
 
 const readStream = (topic, start, opts, cb) => {
+  if (!start) start = '' // default to retained
   let url = `${API_URL}api/1/${topic.replace('#', '~~').replace('+','~')}/${start}`
   if (typeof opts === "function") {
     cb = opts
@@ -28,7 +29,6 @@ const mqttPub = (t, m, o) => {
 
 const HomeStream = {
   read: readStream,
-  readRetained: (topic, cb) => readStream(topic, 'retained', cb),
   erase: topic => mqttPub(`hs/1/${topic}`, '', {retain: true}),
   write: (topic, val, opts) => {
     if (typeof opts === "boolean") opts = {retain: opts}

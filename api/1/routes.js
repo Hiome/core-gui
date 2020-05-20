@@ -22,7 +22,7 @@ router.put('/sensors/:id', sensors.update)
 router.delete('/sensors/:id', sensors.del)
 
 const events = require('./events')
-router.get('/hs/1/:namespace/:object_id/:attr/retained', events.retained)
+router.get('/hs/1/:namespace/:object_id/:attr', events.retained)
 router.get('/hs/1/:namespace/:object_id/:attr/:from', events.index)
 router.get('/hs/1/:namespace/:object_id/to/:to_namespace/:to_object_id/:to_attr/:from', events.index_commands)
 

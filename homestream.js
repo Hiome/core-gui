@@ -5,6 +5,7 @@ const API_URL = 'http://hiome:3000/'
 const mqttClient = () => connect('mqtt://hiome:1883')
 
 const readStream = (topic, start, opts, cb) => {
+  if (!start) start = '' // default to retained
   let url = `${API_URL}api/1/${topic.replace('#', '~~').replace('+','~')}/${start}`
   if (typeof opts === "function") {
     cb = opts
@@ -27,7 +28,6 @@ const mqttPub = (t, m, o) => {
 
 const HomeStream = {
   read: readStream,
-  readRetained: (topic, cb) => readStream(topic, 'retained', cb),
   erase: topic => mqttPub(`hs/1/${topic}`, '', {retain: true}),
   write: (topic, val, opts) => {
     if (typeof opts === "boolean") opts = {retain: opts}
