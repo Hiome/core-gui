@@ -20,9 +20,9 @@ const readStream = (topic, start, opts, cb) => {
     resp.forEach(m => {
       m.val = m.data.val
       m.payload = JSON.stringify(m.data)
-    }
+    })
     return resp
-  )}).then(cb)
+  }).then(cb)
 }
 
 const mqttPub = (t, m, o) => {
