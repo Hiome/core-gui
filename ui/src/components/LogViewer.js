@@ -87,6 +87,7 @@ class LogViewer extends Component {
       const urlParams = new URLSearchParams(window.location.search)
       const start = urlParams.get('s') || new Date().setHours(0,0,0,0)
       const debug = urlParams.get('debug') === 'true'
+      const formattedD = strftime('%A, %B %e%t', new Date(h.ts))
       const arr = [
         <Timeline.Item key={formattedD}
           dot={<Icon type="clock-circle-o" style={{ fontSize: '20px', fontWeight: `bold`, color: `#000` }} />}>
