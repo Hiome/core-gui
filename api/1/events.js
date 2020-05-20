@@ -56,9 +56,7 @@ function index(req, res, next) {
     args.push(req.params.attr)
     attr_filter = `and attribute = $${args.length}`
   }
-  const namespace_filter = req.params.namespace === '~' ? '' : 'and namespace = $4'
-  const object_filter = req.params.object_id === '~' ? '' : 'and object_id = $5'
-  const attr_filter = req.params.attr === '~~' ? '' : (req.params.attr === '~' ? "and attribute <> 'to'" : 'and attribute = $6')
+
   const client = new Client()
   client.connect()
   client.query(`
