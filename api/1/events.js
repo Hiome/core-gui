@@ -22,7 +22,6 @@ const { Client } = require('pg')
  * @apiSuccess {String}  object_id        object that published this event
  * @apiSuccess {String}  attribute        the attribute of the event
  * @apiSuccess {String}  payload          full json of the payload, as a string
- * @apiSuccess {Boolean}  retain          true if this event was a state change and retained
  * @apiSuccess {Number}  context_ts       if this event occurred in resposne to another, ts of the parent event
  * @apiSuccess {String}  context_topic    if this event occurred in resposne to another, topic of the parent event
  * @apiSuccessExample {json} Success-Response:
@@ -32,8 +31,7 @@ const { Client } = require('pg')
  *      "namespace":"com.hiome",
  *      "object_id":"room_1578349369",
  *      "attribute":"occupancy",
- *      "payload":"{'val':0,'ts':1556767182}",
- *      "retain":true
+ *      "payload":"{'val':0,'ts':1556767182}"
  *    }
  */
 function index(req, res, next) {
@@ -62,7 +60,7 @@ function index(req, res, next) {
   client.query(`
     SELECT
       ts, topic, namespace, object_id, attribute, to_namespace, to_object_id, to_attribute,
-      payload AS data, retain, context_ts, context_topic
+      payload AS data, context_ts, context_topic
     FROM events
       where ts > $1 and ts <= $2 ${namespace_filter} ${object_filter} ${attr_filter}
       order by ts ${sort} limit $3
@@ -104,7 +102,7 @@ function index_commands(req, res, next) {
   client.query(`
     SELECT
       ts, topic, namespace, object_id, attribute, to_namespace, to_object_id, to_attribute,
-      payload AS data, retain, context_ts, context_topic
+      payload AS data, context_ts, context_topic
     FROM events
       where ts > $1 and ts <= $2 ${namespace_filter} ${object_filter} and attribute = 'to'
         ${to_namespace_filter} ${to_object_filter} ${to_attr_filter}
@@ -116,11 +114,11 @@ function index_commands(req, res, next) {
 }
 
 /**
- * @api {get} /:topic   Read latest retained state of topic(s)
+ * @api {get} /:topic   Read latest state of topic(s)
  * @apiVersion 1.0.0
- * @apiName Retained
+ * @apiName Latest
  * @apiGroup Events
- * @apiDescription This will return at most 1 event per matching topic, which is that topic's most recent retained state.
+ * @apiDescription This will return at most 1 event per matching topic, which is that topic's most recent state.
  *
  * @apiParam {String}    topic            Any valid HomeStream topic. Replace + wildcard with '~'
  * @apiSuccess {Number}  ts               timestamp of the event, as milliseconds since epoch
@@ -129,7 +127,6 @@ function index_commands(req, res, next) {
  * @apiSuccess {String}  object_id        object that published this event
  * @apiSuccess {String}  attribute        the attribute of the event
  * @apiSuccess {String}  payload          full json of the payload, as a string
- * @apiSuccess {Boolean}  retain          true if this event was a state change and retained
  * @apiSuccess {Number}  context_ts       if this event occurred in resposne to another, ts of the parent event
  * @apiSuccess {String}  context_topic    if this event occurred in resposne to another, topic of the parent event
  * @apiSuccessExample {json} Success-Response:
@@ -139,13 +136,18 @@ function index_commands(req, res, next) {
  *      "namespace":"com.hiome",
  *      "object_id":"room_1578349369",
  *      "attribute":"occupancy",
- *      "payload":"{'val':0,'ts':1556767182}",
- *      "retain":true
+ *      "payload":"{'val':0,'ts':1556767182}"
  *    }
  */
-function retained(req, res, next) {
+function latest(req, res, next) {
   const args = []
-  let namespace_filter = object_filter = attr_filter = ''
+  let namespace_filter = object_filter = attr_filter = ""
+  if (req.params.attr !== '~') {
+    args.push(req.params.attr)
+    attr_filter = `attribute = $${args.length}`
+  } else {
+    attr_filter = "attribute <> 'to'"
+  }
   if (req.params.namespace !== '~') {
     args.push(req.params.namespace)
     namespace_filter = `and namespace = $${args.length}`
@@ -154,19 +156,15 @@ function retained(req, res, next) {
     args.push(req.params.object_id)
     object_filter = `and object_id = $${args.length}`
   }
-  if (req.params.attr !== '~' && req.params.attr !== '~~') {
-    args.push(req.params.attr)
-    attr_filter = `and attribute = $${args.length}`
-  }
 
   const client = new Client()
   client.connect()
   client.query(`
     SELECT DISTINCT ON (topic)
       ts, topic, namespace, object_id, attribute, to_namespace, to_object_id, to_attribute,
-      payload AS data, retain, context_ts, context_topic
+      payload AS data, context_ts, context_topic
     FROM events
-      where retain IS TRUE ${namespace_filter} ${object_filter} ${attr_filter}
+      WHERE ${attr_filter} ${namespace_filter} ${object_filter}
       ORDER BY topic, ts DESC
     `, args)
       .then(r => res.send(r.rows))
@@ -174,4 +172,4 @@ function retained(req, res, next) {
       .then(() => client.end())
 }
 
-module.exports = { index, index_commands, retained }
+module.exports = { index, index_commands, latest }

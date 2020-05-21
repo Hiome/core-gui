@@ -22,6 +22,7 @@ app.use('/api/1', index)
 
 // serve static files from public
 app.use(express.static('public'))
+app.use('/hs/*', express.static('public'))
 
 app.use(function (req, res, next) {
   if (req.path.startsWith('/api/'))
@@ -41,5 +42,4 @@ app.use(function (err, req, res, next) {
 
 app.listen(3000, function() {
   HomeStream.write('com.hiome/api/connected', true)
-  console.log('Hiome listening on port 3000')
 })
