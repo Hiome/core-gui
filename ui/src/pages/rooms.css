@@ -55,3 +55,22 @@
   margin: 0 auto;
   box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
 }
+
+.pagination {
+  margin-top: 60px;
+  text-align: center;
+}
+
+a.hidden {
+  visibility: hidden;
+}
+
+a.newer {
+  float: left;
+  z-index: 2;
+}
+
+a.older {
+  float: right;
+  z-index: 2;
+}

@@ -11,8 +11,12 @@ const mqttPub = (t, m, o) => {
 
 const HomeStream = {
   read: (topic, start, opts, cb) => {
+    if (typeof start === "function") {
+      cb = start
+      start = opts = null
+    }
     if (!start) start = '' // default to latest
-    let url = `${API_URL}api/1/${topic.replace('#', '~~').replace('+','~')}/${start}`
+    let url = `${API_URL}api/1/${topic.replace(/#/g, '~~').replace(/\+/g,'~')}/${start}`
     if (typeof opts === "function") {
       cb = opts
     } else if (opts) {
@@ -23,8 +27,9 @@ const HomeStream = {
     }
     return fetch(url).then(resp => resp.json()).then(resp => {
       resp.forEach(m => {
+        m.uuid = m.namespace + '/' + m.object_id
+        m.ts = m.data.ts
         m.val = m.data.val
-        m.payload = JSON.stringify(m.data)
       })
       return resp
     }).then(cb)
@@ -40,10 +45,7 @@ const HomeStream = {
   subscribe: (topics, cb, cb_deleted) => {
     const msg_cache = {}
     const client = mqttClient()
-    client.on('connect', () => {
-      if (typeof topics === "string") topics = Array(topics)
-      topics.forEach(t => client.subscribe(t, {qos: 1}))
-    })
+    client.on('connect', () => client.subscribe(topics, {qos: 1}))
     client.on('message', function(t, m, p) {
       t = t.toLowerCase()
       const tp = t.split("/")
@@ -53,6 +55,7 @@ const HomeStream = {
         if (cb_deleted) {
           cb_deleted({
             topic: t,
+            uuid: tp[2] + '/' + tp[3],
             namespace: tp[2],
             object_id: tp[3],
             attribute: tp[4],
@@ -73,6 +76,7 @@ const HomeStream = {
       return cb({
         ts: message['ts'],
         topic: t,
+        uuid: tp[2] + '/' + tp[3],
         namespace: tp[2],
         object_id: tp[3],
         attribute: tp[4],
@@ -83,9 +87,11 @@ const HomeStream = {
         data: message,
         val: message.val,
         context_ts: message.context_ts,
-        context_topic: message.context_topic
+        context_topic: message.context_topic,
+        retain: p.retain
       })
     })
+    return client
   }
 }
 

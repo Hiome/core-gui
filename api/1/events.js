@@ -16,7 +16,7 @@ const { Client } = require('pg')
  * @apiParam {Number}    [until=now]      timestamp (in milliseconds since epoch) to stop reading, defaults to current time
  * @apiParam {Number}    [limit=1000]     max number of events to return, even if we didn't reach "until" timestamp
  * @apiParam {Boolean}   [reverse=false]  if "true", events will be returned in reverse chronological order
- * @apiSuccess {Number}  ts               timestamp of the event, as milliseconds since epoch
+ * @apiSuccess {String}  ts               timestamp of the event, as milliseconds since epoch
  * @apiSuccess {String}  topic            topic where event was published
  * @apiSuccess {String}  namespace        namespace of event
  * @apiSuccess {String}  object_id        object that published this event
@@ -26,7 +26,7 @@ const { Client } = require('pg')
  * @apiSuccess {String}  context_topic    if this event occurred in resposne to another, topic of the parent event
  * @apiSuccessExample {json} Success-Response:
  *    {
- *      "ts": 1556767182,
+ *      "ts": "1556767182",
  *      "topic":"hs/1/com.hiome/room_1578349369/occupancy",
  *      "namespace":"com.hiome",
  *      "object_id":"room_1578349369",
@@ -121,7 +121,7 @@ function index_commands(req, res, next) {
  * @apiDescription This will return at most 1 event per matching topic, which is that topic's most recent state.
  *
  * @apiParam {String}    topic            Any valid HomeStream topic. Replace + wildcard with '~'
- * @apiSuccess {Number}  ts               timestamp of the event, as milliseconds since epoch
+ * @apiSuccess {String}  ts               timestamp of the event, as milliseconds since epoch
  * @apiSuccess {String}  topic            topic where event was published
  * @apiSuccess {String}  namespace        namespace of event
  * @apiSuccess {String}  object_id        object that published this event
@@ -131,7 +131,7 @@ function index_commands(req, res, next) {
  * @apiSuccess {String}  context_topic    if this event occurred in resposne to another, topic of the parent event
  * @apiSuccessExample {json} Success-Response:
  *    {
- *      "ts": 1556767182,
+ *      "ts": "1556767182",
  *      "topic":"hs/1/com.hiome/room_1578349369/occupancy",
  *      "namespace":"com.hiome",
  *      "object_id":"room_1578349369",

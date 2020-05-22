@@ -9,12 +9,12 @@ class TimeAgo extends Component {
   }
 
   componentDidMount() {
-    this.setState({formattedTime: this.format(this.props.time)})
+    this.setState({formattedTime: this.format(this.props.time, this.props.debug)})
   }
 
-  format(time) {
+  format(time, debug) {
     const d = new Date(time)
-    if (this.props.debug) {
+    if (debug) {
       return strftime('%l:%M:%S.%f %p', d)
     }
 
@@ -30,7 +30,8 @@ class TimeAgo extends Component {
   }
 
   render() {
-    return <time>{this.state.formattedTime}</time>
+    const d = new Date(this.props.time)
+    return <time dateTime={d} title={strftime('%l:%M:%S %p', d)}>{this.state.formattedTime}</time>
   }
 }
 

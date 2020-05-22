@@ -7,7 +7,6 @@ const mqttClient = () => connect(`ws://hiome:1884`)
 
 const mqttPub = (t, m, o) => {
   const client = mqttClient()
-  client.on('error', err => console.error(err))
   client.on('connect', () => client.publish(t, m, o, () => client.end()))
 }
 
@@ -29,8 +28,9 @@ const HomeStream = {
     }
     return fetch(url).then(resp => resp.json()).then(resp => {
       resp.forEach(m => {
+        m.uuid = m.namespace + '/' + m.object_id
+        m.ts = m.data.ts
         m.val = m.data.val
-        m.payload = JSON.stringify(m.data)
       })
       return resp
     }).then(cb)
@@ -47,7 +47,6 @@ const HomeStream = {
     const msg_cache = {}
     const client = mqttClient()
     client.on('connect', () => client.subscribe(topics, {qos: 1}))
-    client.on('error', err => console.error(err))
     client.on('message', function(t, m, p) {
       t = t.toLowerCase()
       const tp = t.split("/")
@@ -57,6 +56,7 @@ const HomeStream = {
         if (cb_deleted) {
           cb_deleted({
             topic: t,
+            uuid: tp[2] + '/' + tp[3],
             namespace: tp[2],
             object_id: tp[3],
             attribute: tp[4],
@@ -77,6 +77,7 @@ const HomeStream = {
       return cb({
         ts: message['ts'],
         topic: t,
+        uuid: tp[2] + '/' + tp[3],
         namespace: tp[2],
         object_id: tp[3],
         attribute: tp[4],
@@ -87,9 +88,11 @@ const HomeStream = {
         data: message,
         val: message.val,
         context_ts: message.context_ts,
-        context_topic: message.context_topic
+        context_topic: message.context_topic,
+        retain: p.retain
       })
     })
+    return client
   }
 }
 
