@@ -1,15 +1,23 @@
-import React, { Component } from "react"
+import React, { PureComponent } from "react"
 import PropTypes from "prop-types"
+import { Tooltip } from 'antd'
 
 import strftime from "./strftime"
 
-class TimeAgo extends Component {
+class TimeAgo extends PureComponent {
   state = {
     formattedTime: ''
   }
 
   componentDidMount() {
     this.setState({formattedTime: this.format(this.props.time, this.props.debug)})
+  }
+
+  componentWillUnmount() {
+    if (this.timerHandler) {
+      clearTimeout(this.timerHandler)
+      this.timerHandler = 0
+    }
   }
 
   format(time, debug) {
@@ -19,9 +27,10 @@ class TimeAgo extends Component {
     }
 
     const totalSec = Math.floor((new Date() - d)/1000)
-    // set a timer to format this time again in 1 second
-    if (totalSec < 60) setTimeout(this.componentDidMount.bind(this), (10 - (totalSec % 10))*1000)
-    else if (totalSec < 300) setTimeout(this.componentDidMount.bind(this), 61000)
+    // set a timer to format this time again every 5 seconds
+    if (totalSec < 60) this.timerHandler = setTimeout(this.componentDidMount.bind(this), (5 - (totalSec % 5))*1000)
+    // or every minute after the first 60 seconds
+    else if (totalSec < 300) this.timerHandler = setTimeout(this.componentDidMount.bind(this), 61000)
 
     if (totalSec < 5) return 'just now'
     if (totalSec < 60) return `${totalSec} sec ago`
@@ -31,7 +40,11 @@ class TimeAgo extends Component {
 
   render() {
     const d = new Date(this.props.time)
-    return <time dateTime={d} title={strftime('%l:%M:%S %p', d)}>{this.state.formattedTime}</time>
+    return (
+      <Tooltip title={strftime('%l:%M:%S %p', d)}>
+        <time dateTime={d}>{this.state.formattedTime}</time>
+      </Tooltip>
+    )
   }
 }
 
