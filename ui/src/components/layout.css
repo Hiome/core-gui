@@ -610,8 +610,7 @@ header a:hover path, header .hoverable:hover path {
   border-top-right-radius: 30px;
   border-top-left-radius: 30px;
   color: #0e0e0e;
-  padding: 50px;
-  box-shadow: 0 0 30px 5px rgba(0, 0, 0, 0.2);
+  padding: 2em;
 }
 
 footer {
@@ -629,4 +628,8 @@ ul.ant-menu-horizontal {
 
 .ant-result-extra > *, .ant-result-extra > *:last-child {
   margin: 8px 4px;
+}
+
+.clear {
+  clear: both;
 }
