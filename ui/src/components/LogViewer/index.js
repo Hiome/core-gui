@@ -5,8 +5,11 @@ import useSWR, { useSWRPages, mutate } from '@ykzts/swr'
 import { Avatar, Button, Empty, Tooltip, Spin } from 'antd'
 import VirtualScrollerComponent, { Viewport } from '@liximomo/react-virtual-scroller'
 
-import TimeAgo from "../components/TimeAgo"
-import HomeStream from '../components/homestream'
+import Battery from '../Battery'
+import TimeAgo from "../TimeAgo"
+import HomeStream from '../homestream'
+
+import './style.css'
 
 // object attribute reducer
 const updateObjects = (newObjs, acc) => {
@@ -126,10 +129,8 @@ const batteryText = (label) => {
 }
 
 const batteryStatus = (battery) => {
-  if (!battery || !battery.label || battery.label === 'none') return null
-  return <Tooltip title={batteryText(battery.label)}>
-    <div className={`battery battery-${battery.label}`}></div>
-  </Tooltip>
+  if (!battery) return null
+  return <Battery label={battery.label} />
 }
 
 const renderable = (row, objects, knownTs, debug) => {

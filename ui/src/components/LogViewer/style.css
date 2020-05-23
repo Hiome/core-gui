@@ -1,0 +1,62 @@
+.logDate {
+  display: inline-block;
+  font-size: 1.5em;
+  font-weight: bold;
+  cursor: pointer;
+  margin-bottom: 1em;
+  border-bottom: 1px dashed #fff;
+}
+.logDate:hover {
+  border-bottom: 1px dashed #000;
+}
+
+.atTag {
+  background-color: #F8F7FC;
+  border-radius: 5px;
+  padding: 2px 5px;
+  color: #000;
+}
+.atTag:hover {
+  background-color: #EAE7F8;
+  color: #424242;
+}
+
+.log-line {
+  display: flex;
+  width: 100%;
+}
+.log-contextual {
+  padding-left: 30px;
+  border-left: 2px solid #ccc;
+}
+.log-avatar {
+  width: 40px;
+  vertical-align: top;
+  display: inline-block;
+}
+.log-message {
+  display: inline-block;
+  margin-left: 1em;
+}
+.log-meta {
+  margin-bottom: 5px;
+}
+.log-author a {
+  font-weight: bold;
+  font-size: 1em;
+}
+.log-time {
+  margin: 0 0.5em;
+  color: #A6B1BB;
+  font-size: 0.8em;
+  line-height: 1.6em;
+}
+@media only screen and (max-width: 500px) {
+  .log-time {
+    margin-left: 0;
+  }
+  .log-time:before {
+    display: block;
+    content: "";
+  }
+}

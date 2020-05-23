@@ -1,0 +1,43 @@
+.battery {
+  display: inline-block;
+  background: #E4E7EB;
+  height: 10px;
+  margin-left: 0.5em;
+  vertical-align: middle;
+}
+
+.battery:before {
+  content: "";
+  display: inline-block;
+  background: transparent;
+  border: 2px solid #E4E7EB;
+  margin: -2px;
+  width: 30px;
+  height: 13px;
+  position: absolute;
+  border-radius: 3px;
+}
+
+.battery:after {
+  content: "";
+  display: inline-block;
+  background: transparent;
+  border: 2px solid #E4E7EB;
+  margin: 2px 27px;
+  width: 2px;
+  height: 5px;
+  border-radius: 1px;
+  position: absolute;
+}
+
+.battery-critical {
+  width: 3px;
+  background-color: #EC4C47;
+}
+.battery-low {
+  width: 7px;
+  background-color: #F7D154;
+}
+.battery-normal {width: 17px;}
+.battery-high {width: 22px;}
+.battery-full {width: 25px;}
