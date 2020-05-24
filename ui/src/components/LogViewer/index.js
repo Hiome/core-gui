@@ -73,13 +73,37 @@ const renderTemplate = (template, vals, obj) => {
 }
 
 const templates = (msg) => {
-  switch([msg.attribute, msg.data.template || '*'].join('/')) {
+  switch([msg.attribute, msg.data.tmpl || '*'].join('/')) {
+    case 'occupancy/negative':
+      return "Oops, I made a mistake somewhere."
+    case 'occupancy/siphoned':
+      return "Hiome corrected my occupancy to ${val} ${val === 1 ? 'person' : 'people'}."
+    case 'occupancy/cleared':
+      return "Hiome cleared my occupancy to ${val} due to inactivity."
+    case 'occupancy/decayed':
+      return "Hiome reduced my occupancy to ${val} ${val === 1 ? 'person' : 'people'} due to inactivity."
+    case 'occupancy/reset':
+      return "Somebody changed my occupancy to ${val} ${val === 1 ? 'person' : 'people'}."
     case 'occupancy/*':
       return "There ${val === 1 ? 'is' : 'are'} now ${val} ${val === 1 ? 'person' : 'people'} in here."
-    case 'entry/*':
-      return "Somebody walked into @com.hiome/${entered} from @com.hiome/${exited}."
+    case 'entry/entry_exit':
+      return "Somebody walked into @com.hiome/${entered}."
+    case 'entry/entry_only':
+      return "Somebody entered from outside."
+    case 'entry/exit_only':
+      return "Somebody went outside."
+    case 'entry/revert':
+      return "Somebody reverted a previous entry."
     case 'door/*':
       return "The door is now ${val}."
+    case 'position/sunrise':
+      return "Good morning!"
+    case 'position/sunset':
+      return "Have a good evening!"
+    case 'connected/disconnected':
+      return "Help, I haven't been seen in a while. I think I'm disconnected!"
+    case 'connected/reconnected':
+      return "I'm online! It feels good to be back."
     default:
       return null
   }

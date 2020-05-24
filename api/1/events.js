@@ -21,7 +21,8 @@ const { Client } = require('pg')
  * @apiSuccess {String}  namespace        namespace of event
  * @apiSuccess {String}  object_id        object that published this event
  * @apiSuccess {String}  attribute        the attribute of the event
- * @apiSuccess {String}  payload          full json of the payload, as a string
+ * @apiSuccess {Object}  data             full json of the payload
+ * @apiSuccess {String}  tmpl             template key to render this event
  * @apiSuccess {Number}  context_ts       if this event occurred in resposne to another, ts of the parent event
  * @apiSuccess {String}  context_topic    if this event occurred in resposne to another, topic of the parent event
  * @apiSuccessExample {json} Success-Response:
@@ -31,7 +32,7 @@ const { Client } = require('pg')
  *      "namespace":"com.hiome",
  *      "object_id":"room_1578349369",
  *      "attribute":"occupancy",
- *      "payload":"{'val':0,'ts':1556767182}"
+ *      "data":{'val':0,'ts':1556767182}
  *    }
  */
 function index(req, res, next) {
@@ -60,7 +61,7 @@ function index(req, res, next) {
   client.query(`
     SELECT
       ts, topic, namespace, object_id, attribute, to_namespace, to_object_id, to_attribute,
-      payload AS data, context_ts, context_topic
+      payload AS data, tmpl, context_ts, context_topic
     FROM events
       where ts > $1 and ts <= $2 ${namespace_filter} ${object_filter} ${attr_filter}
       order by ts ${sort} limit $3
@@ -102,7 +103,7 @@ function index_commands(req, res, next) {
   client.query(`
     SELECT
       ts, topic, namespace, object_id, attribute, to_namespace, to_object_id, to_attribute,
-      payload AS data, context_ts, context_topic
+      payload AS data, tmpl, context_ts, context_topic
     FROM events
       where ts > $1 and ts <= $2 ${namespace_filter} ${object_filter} and attribute = 'to'
         ${to_namespace_filter} ${to_object_filter} ${to_attr_filter}
@@ -126,7 +127,8 @@ function index_commands(req, res, next) {
  * @apiSuccess {String}  namespace        namespace of event
  * @apiSuccess {String}  object_id        object that published this event
  * @apiSuccess {String}  attribute        the attribute of the event
- * @apiSuccess {String}  payload          full json of the payload, as a string
+ * @apiSuccess {Object}  data             full json of the payload, as a string
+ * @apiSuccess {String}  tmpl             template key to render this event
  * @apiSuccess {Number}  context_ts       if this event occurred in resposne to another, ts of the parent event
  * @apiSuccess {String}  context_topic    if this event occurred in resposne to another, topic of the parent event
  * @apiSuccessExample {json} Success-Response:
@@ -136,7 +138,7 @@ function index_commands(req, res, next) {
  *      "namespace":"com.hiome",
  *      "object_id":"room_1578349369",
  *      "attribute":"occupancy",
- *      "payload":"{'val':0,'ts':1556767182}"
+ *      "data":{'val':0,'ts':1556767182}
  *    }
  */
 function latest(req, res, next) {
@@ -162,7 +164,7 @@ function latest(req, res, next) {
   client.query(`
     SELECT DISTINCT ON (topic)
       ts, topic, namespace, object_id, attribute, to_namespace, to_object_id, to_attribute,
-      payload AS data, context_ts, context_topic
+      payload AS data, tmpl, context_ts, context_topic
     FROM events
       WHERE ${attr_filter} ${namespace_filter} ${object_filter}
       ORDER BY topic, ts DESC
