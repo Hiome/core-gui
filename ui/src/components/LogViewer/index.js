@@ -1,8 +1,8 @@
-import { Link } from "gatsby"
+import { Link, navigate } from "gatsby"
 import PropTypes from "prop-types"
 import React, { useEffect, useRef } from 'react'
 import useSWR, { mutate } from 'swr'
-import { Avatar, Button, Empty, Spin } from 'antd'
+import { Avatar, Button, Empty, Spin, Tag } from 'antd'
 
 import Battery from '../Battery'
 import TimeAgo from "../TimeAgo"
@@ -152,6 +152,11 @@ const smartTrim = (input) => {
   return input.substring(0, 9)
 }
 
+const trim = input => {
+  if (input.length < 20) return input
+  return input.substring(0, 15) + '...'
+}
+
 const batteryStatus = (battery) => {
   if (!battery) return null
   return <Battery label={battery.label} />
@@ -247,6 +252,16 @@ const renderContext = (row, objects, debug) => {
   return arr
 }
 
+const renderFilterBtn = (topic, objects) => {
+  if (topic.startsWith('~/~/~')) return null
+  let uuid = topic.split('/')
+  uuid = uuid[0] + '/' + uuid[1]
+  const txt = objects && uuid in objects ? `Logs are filtered to ${trim(objects[uuid].name.val)}` : 'Logs are filtered'
+  return <div style={{marginBottom: '20px'}}>
+    <Tag closable={true} onClose={() => navigate('/hs/1/~/~/~~')}>{txt}</Tag>
+  </div>
+}
+
 const LogViewer = (props) => {
   const objectAttrs = useSWR(`${process.env.API_URL}api/1/hs/1/~/~/~`, url => fetcher(url).then(updateObjects))
   const {
@@ -295,8 +310,9 @@ const LogViewer = (props) => {
       const client = HomeStream.subscribe('hs/1/' + props.topic.replace(/~~/g, '#').replace(/~/g,'+'), function(m) {
         if (m.retain || m.ts < props.day) return
         m.uuid = m.namespace + '/' + m.object_id
-        mutate(`${process.env.API_URL}api/1/hs/1/${props.topic}/${props.day}?limit=300&reverse=true&until=${props.day + 86399999}`, async h => ([m, ...h]), false)
-        if (m.attribute !== 'to') mutate(`${process.env.API_URL}api/1/hs/1/~/~/~`, ( async attrs => updateObjects(m, attrs) ), false)
+        mutate(`${process.env.API_URL}api/1/hs/1/${props.topic}/${props.day}?limit=300&reverse=true&until=${props.day + 86399999}`,
+          async h => ([m, ...h]), templates(m))
+        if (m.attribute !== 'to') mutate(`${process.env.API_URL}api/1/hs/1/~/~/~`, async attrs => updateObjects(m, attrs), false)
       })
       return () => client.end()
     }
@@ -325,6 +341,8 @@ const LogViewer = (props) => {
   }, [$loadMoreButton.current, loadMore])
 
   return (<>
+      { renderFilterBtn(props.topic, objectAttrs.data) }
+
       { pages }
 
       { !isLoading && !hasItems ? <Empty description="Nothing to see here!" /> : null }

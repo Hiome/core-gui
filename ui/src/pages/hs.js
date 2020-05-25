@@ -32,7 +32,7 @@ const HomeStreamPage = (props) => {
   const debug = debugging(props.location.search)
 
   return (<LayoutPage>
-      <SEO title="HomeStream" />
+      <SEO title="Logs" />
       <Popover content={<DatePicker topic={topic} day={day} />} title="Change Date" placement="bottomLeft">
         <div className="logDate">
           { strftime('%A, %b %e%t', new Date(day)) }
