@@ -29,15 +29,20 @@ const debugging = (search) => {
 
 const HomeStreamPage = (props) => {
   const [topic, day] = currentTopic(props.location.pathname)
-  // const debug = debugging(props.location.search)
+  const debug = debugging(props.location.search)
 
   return (<LayoutPage>
       <SEO title="HomeStream" />
       <Popover content={<DatePicker topic={topic} day={day} />} title="Change Date" placement="bottomLeft">
-        <div className="logDate">{ strftime('%A, %b %e%t', new Date(day)) }</div>
+        <div className="logDate">
+          { strftime('%A, %b %e%t', new Date(day)) }
+          <svg width="0.7em" height="0.7em" style={{marginLeft: '5px'}} viewBox="0 0 16 16" fill="#A6B1BB" xmlns="http://www.w3.org/2000/svg">
+            <path fillRule="evenodd" d="M1.646 4.646a.5.5 0 01.708 0L8 10.293l5.646-5.647a.5.5 0 01.708.708l-6 6a.5.5 0 01-.708 0l-6-6a.5.5 0 010-.708z" clipRule="evenodd"/>
+          </svg>
+        </div>
       </Popover>
 
-      <LogViewer topic={topic} day={day} />
+      <LogViewer topic={topic} day={day} debug={debug} />
 
       <div className="pagination">
         <Link to={`/hs/1/${topic}/${day - 86400000}`} className="newer">

@@ -1,0 +1,17 @@
+.collapsible {
+  margin-bottom: 20px;
+}
+.collapsible_content {
+  max-height: 0;
+  overflow: hidden;
+}
+
+a.expandable {
+  color: #A6B1BB;
+}
+.expandable svg {
+  transition: transform 0.5s ease-in;
+}
+.expandable.active svg {
+  transform: rotate(180deg);
+}

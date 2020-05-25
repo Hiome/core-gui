@@ -24,10 +24,16 @@
 .log-line {
   display: flex;
   width: 100%;
+  padding-bottom: 0;
 }
-.log-contextual {
-  padding-left: 30px;
-  border-left: 2px solid #ccc;
+.log-contexts {
+  margin-left: 20px;
+  padding-top: 20px;
+  padding-left: 10px;
+  margin-bottom: 40px;
+  margin-top: -20px;
+  padding-bottom: 0;
+  background-color: #F7F9FD;
 }
 .log-avatar {
   width: 40px;
@@ -37,6 +43,7 @@
 .log-message {
   display: inline-block;
   margin-left: 1em;
+  overflow: scroll;
 }
 .log-meta {
   margin-bottom: 5px;

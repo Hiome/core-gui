@@ -1,14 +1,15 @@
 import { Link } from "gatsby"
 import PropTypes from "prop-types"
 import React, { useEffect, useRef } from 'react'
-import useSWR, { useSWRPages, mutate } from '@ykzts/swr'
-import { Avatar, Button, Empty, Tooltip, Spin } from 'antd'
-import VirtualScrollerComponent, { Viewport } from '@liximomo/react-virtual-scroller'
+import useSWR, { mutate } from 'swr'
+import { Avatar, Button, Empty, Spin } from 'antd'
 
 import Battery from '../Battery'
 import TimeAgo from "../TimeAgo"
 import HomeStream from '../homestream'
+import Collapsible from '../Collapsible'
 
+import useSWRPages from './use-swr-pages'
 import './style.css'
 
 // object attribute reducer
@@ -73,40 +74,56 @@ const renderTemplate = (template, vals, obj) => {
 }
 
 const templates = (msg) => {
-  switch([msg.attribute, msg.data.tmpl || '*'].join('/')) {
-    case 'occupancy/negative':
-      return "Oops, I made a mistake somewhere."
-    case 'occupancy/siphoned':
-      return "Hiome corrected my occupancy to ${val} ${val === 1 ? 'person' : 'people'}."
-    case 'occupancy/cleared':
-      return "Hiome cleared my occupancy to ${val} due to inactivity."
-    case 'occupancy/decayed':
-      return "Hiome reduced my occupancy to ${val} ${val === 1 ? 'person' : 'people'} due to inactivity."
-    case 'occupancy/reset':
-      return "Somebody changed my occupancy to ${val} ${val === 1 ? 'person' : 'people'}."
-    case 'occupancy/*':
-      return "There ${val === 1 ? 'is' : 'are'} now ${val} ${val === 1 ? 'person' : 'people'} in here."
-    case 'entry/entry_exit':
-      return "Somebody walked into @com.hiome/${entered}."
-    case 'entry/entry_only':
-      return "Somebody entered from outside."
-    case 'entry/exit_only':
-      return "Somebody went outside."
-    case 'entry/revert':
-      return "Somebody reverted a previous entry."
-    case 'door/*':
-      return "The door is now ${val}."
-    case 'position/sunrise':
-      return "Good morning!"
-    case 'position/sunset':
-      return "Have a good evening!"
-    case 'connected/disconnected':
-      return "Help, I haven't been seen in a while. I think I'm disconnected!"
-    case 'connected/reconnected':
-      return "I'm online! It feels good to be back."
-    default:
-      return null
+  if (msg.attribute === 'occupancy') {
+    switch(msg.data.tmpl) {
+      case 'negative':
+        return "Oops, I made a mistake somewhere."
+      case 'siphoned':
+        return "Hiome corrected my occupancy to ${val} ${val === 1 ? 'person' : 'people'}."
+      case 'cleared':
+        return "Hiome cleared my occupancy to ${val} due to inactivity."
+      case 'decayed':
+        return "Hiome reduced my occupancy to ${val} ${val === 1 ? 'person' : 'people'} due to inactivity."
+      case 'reset':
+        return "Somebody changed my occupancy to ${val} ${val === 1 ? 'person' : 'people'}."
+      default:
+        return "There ${val === 1 ? 'is' : 'are'} now ${val} ${val === 1 ? 'person' : 'people'} in here."
+    }
+  } else if (msg.attribute === 'entry') {
+    switch(msg.data.tmpl) {
+      case 'entry_exit':
+        return "Somebody walked into @com.hiome/${entered}."
+      case 'entry_only':
+        return "Somebody entered from outside."
+      case 'exit_only':
+        return "Somebody went outside."
+      case 'revert':
+        return "Somebody reverted a previous entry."
+      default:
+        return null
+    }
+  } else if (msg.attribute === 'door') {
+    return "The door is ${val}."
+  } else if (msg.attribute === 'position') {
+    switch(msg.data.tmpl) {
+      case 'sunrise':
+        return "Good morning!"
+      case 'sunset':
+        return "Have a good evening!"
+      default:
+        return null
+    }
+  } else if (msg.attribute === 'connected') {
+    switch(msg.data.tmpl) {
+      case 'disconnected':
+        return "Help, I haven't been seen in a while. I think I'm disconnected!"
+      case 'reconnected':
+        return "I'm online! It feels good to be back."
+      default:
+        return null
+    }
   }
+  return null
 }
 
 const addLinksToText = (txt, objects) => {
@@ -135,71 +152,99 @@ const smartTrim = (input) => {
   return input.substring(0, 9)
 }
 
-const batteryText = (label) => {
-  switch(label) {
-    case 'full':
-      return 'The battery is fully charged.'
-    case 'high':
-      return 'The battery level is high.'
-    case 'normal':
-      return 'The battery level is good.'
-    case 'low':
-      return 'The battery is running low. Recharge soon!'
-    case 'critical':
-      return 'Recharge battery immediately!'
-    default:
-      return 'The battery level is unknown.'
-  }
-}
-
 const batteryStatus = (battery) => {
   if (!battery) return null
   return <Battery label={battery.label} />
 }
 
-const renderable = (row, objects, knownTs, debug) => {
+const renderable = (row, objects, debug) => {
   if (!row || !objects) return null
   const o = objects[row.uuid] || {}
   if (!o.name) return null
+  if (debug) return true
   const template = templates(row)
   if (!template) return null
   return true
 }
 
-const renderLog = (row, objects, knownTs, debug) => {
+const renderLog = (row, objects, debug) => {
   if (!row || !objects) return null
   const o = objects[row.uuid] || {}
   if (!o.name) return null
   const template = templates(row)
-  if (!template) return null
-  const knownContext = row.context_ts ? knownTs.indexOf(row.context_topic + '/' + row.context_ts) !== -1 : false
+  if (!template && !debug) return null
   return (
-    <div className={`log-line ${knownContext ? 'log-contextual' : ''}`}>
-      <div className="log-avatar">
-        <Avatar style={{ backgroundColor: colorize(o.name.val) }} shape="square" size="large">
-          {smartTrim(o.name.val)}
-        </Avatar>
-      </div>
-      <div className="log-message">
-        <div className="log-meta">
-          <span className="log-author">
-            <Link to={`/hs/1/${row.uuid}/~~`}>{ o.name.val }</Link>
-          </span>
-          <span className="log-time">
-            <TimeAgo time={row.ts} />
-          </span>
-          <span className="log-battery">
-            {batteryStatus(o.battery)}
-          </span>
+    <div className="log-container" key={`${row.topic}/${row.ts}`}>
+      <div className="log-line">
+        <div className="log-avatar">
+          <Avatar style={{ backgroundColor: colorize(o.name.val) }} shape="square" size="large">
+            {smartTrim(o.name.val)}
+          </Avatar>
         </div>
-        <div className="log-content">
-          <p>
-            { addLinksToText(renderTemplate(template, row.data, o), objects) }
-          </p>
+        <div className="log-message">
+          <div className="log-meta">
+            <span className="log-author">
+              <Link to={`/hs/1/${row.uuid}/~~`}>{ o.name.val }</Link>
+            </span>
+            <span className="log-time">
+              <TimeAgo time={row.ts} />
+            </span>
+            <span className="log-battery">
+              {batteryStatus(o.battery)}
+            </span>
+          </div>
+          <div className="log-content">
+            <p>
+              { template ? addLinksToText(renderTemplate(template, {...row, ...row.data}, o), objects) : row.topic.substr(5) }
+            </p>
+            { debug ? <Collapsible><pre>{ JSON.stringify(row.data, null, 2) }</pre></Collapsible> : null }
+          </div>
         </div>
       </div>
+      
+        { renderContext(row, objects, debug) }
     </div>
   )
+}
+
+const renderContext = (row, objects, debug) => {
+  const arr = []
+  for (let r of row.contexts) {
+    const o = objects[r.uuid] || {}
+    if (!o.name) continue
+    const template = templates(r)
+    if (!template && !debug) continue
+    arr.push(
+      <div className="log-line" key={`${r.topic}/${r.ts}`}>
+        <div className="log-avatar">
+          <Avatar style={{ backgroundColor: colorize(o.name.val) }} shape="square" size="large">
+            {smartTrim(o.name.val)}
+          </Avatar>
+        </div>
+        <div className="log-message">
+          <div className="log-meta">
+            <span className="log-author">
+              <Link to={`/hs/1/${r.uuid}/~~`}>{ o.name.val }</Link>
+            </span>
+            <span className="log-time">
+              <TimeAgo time={r.ts} />
+            </span>
+            <span className="log-battery">
+              {batteryStatus(o.battery)}
+            </span>
+          </div>
+          <div className="log-content">
+            <p>
+              { template ? addLinksToText(renderTemplate(template, {...r, ...r.data}, o), objects) : r.topic.substr(5) }
+            </p>
+            { debug ? <Collapsible><pre>{ JSON.stringify(r.data, null, 2) }</pre></Collapsible> : null }
+          </div>
+        </div>
+      </div>
+    )
+  }
+  if (arr.length) return <div className="log-contexts">{arr}</div>
+  return arr
 }
 
 const LogViewer = (props) => {
@@ -213,13 +258,35 @@ const LogViewer = (props) => {
   } = useSWRPages(
     `${props.topic}/${props.day}`, // key of this page
     ({ offset, withSWR }) => {
-      withSWR(
+      const {data} = withSWR(
         useSWR(`${process.env.API_URL}api/1/hs/1/${props.topic}/${props.day}?limit=300&reverse=true&until=${offset || (props.day + 86399999)}`, fetcher)
       )
-      return <></>
+      if (!data) return null
+      return data.reduceRight(([i,contexts], x) => {
+        if (x.context_ts) {
+          const key = x.context_topic + '/' + x.context_ts
+          if (key in contexts) {
+            contexts[key].unshift(x)
+          } else {
+            i.unshift(x)
+          }
+        } else {
+          // otherwise add it to items array
+          i.unshift(x)
+          contexts[x.topic + '/' + x.ts] = []
+        }
+        return [i, contexts]
+      }, [[], {}]).reduceRight((contexts,i) => {
+        if (Array.isArray(i)) {
+          i.forEach(x => {
+            x.contexts = (contexts[x.topic + '/' + x.ts] || []).reverse()
+          })
+        }
+        return i
+      }, []).map(i => renderLog(i, objectAttrs.data, props.debug))
     },
     swr => swr.data.length >= 300 ? (swr.data[swr.data.length - 1].ts - 1) : null,
-    [props.topic, props.day]
+    [props.topic, props.day, props.debug, objectAttrs.data && Object.keys(objectAttrs.data).length]
   )
 
   // mqtt live updates
@@ -228,33 +295,42 @@ const LogViewer = (props) => {
       const client = HomeStream.subscribe('hs/1/' + props.topic.replace(/~~/g, '#').replace(/~/g,'+'), function(m) {
         if (m.retain || m.ts < props.day) return
         m.uuid = m.namespace + '/' + m.object_id
-        mutate(`${process.env.API_URL}api/1/hs/1/${props.topic}/${props.day}?limit=300&reverse=true&until=${props.day + 86399999}`, async h => ([m, ...h]))
+        mutate(`${process.env.API_URL}api/1/hs/1/${props.topic}/${props.day}?limit=300&reverse=true&until=${props.day + 86399999}`, async h => ([m, ...h]), false)
         if (m.attribute !== 'to') mutate(`${process.env.API_URL}api/1/hs/1/~/~/~`, ( async attrs => updateObjects(m, attrs) ), false)
       })
       return () => client.end()
     }
   }, [props.topic, props.day])
 
-  const vp = useRef(new Viewport(window))
-  const items = pageSWRs.reduce((x,y) => y ? x.concat(y.data) : x, []).filter(x => renderable(x, objectAttrs.data, [], false))
-  const isLoading = isLoadingMore || pageSWRs.length === 0 || (items.length === 0 && objectAttrs.isValidating)
+  const hasItems = pageSWRs.some(p => p.data ? p.data.some(x => renderable(x, objectAttrs.data, props.debug)) : false)
+  // const hasItems = useMemo(() => (
+  // ), [props.topic, props.day, props.debug, pageSWRs.length, objectAttrs.data && Object.keys(objectAttrs.data).length])
+  const isLoading = isLoadingMore || pageSWRs.length === 0 || (!hasItems && objectAttrs.isValidating)
+
+  if (!hasItems && !isReachingEnd && !isLoading) loadMore()
+
+  // infinite scroll
+  const $loadMoreButton = useRef(null);
+  useEffect(() => {
+    if ($loadMoreButton.current) {
+      const observer = new IntersectionObserver(([entry]) => {
+        if (entry.isIntersecting) loadMore()
+      }, { rootMargin: '200px' })
+      const btn = $loadMoreButton.current
+      observer.observe(btn)
+      return () => {
+        observer.unobserve(btn)
+      }
+    }
+  }, [$loadMoreButton.current, loadMore])
 
   return (<>
       { pages }
 
-      { items.length === 0 ? (isLoading ? null : <Empty description="Nothing to see here!" />) : 
-        <VirtualScrollerComponent
-          items={items}
-          renderItem={(item, index) => renderLog(item, objectAttrs.data, [], false)}
-          identityFunction={item => `${item.topic}/${item.ts}`}
-          viewport={vp.current}
-          assumedItemHeight={100}
-          onNearEnd={loadMore}
-        />
-      }
+      { !isLoading && !hasItems ? <Empty description="Nothing to see here!" /> : null }
 
-      { isLoading || isReachingEnd || items.length === 0 ? null :
-          <Button icon="reload" onClick={loadMore} type="primary">Load More</Button>
+      { isLoading || !hasItems || isReachingEnd ? null :
+          <div ref={$loadMoreButton}><Button icon="reload" onClick={loadMore} type="primary">Load More</Button></div>
       }
 
       { isLoading ? <div style={{textAlign: `center`,marginTop:'20px'}}><Spin size="large" /></div> : null }
@@ -264,7 +340,12 @@ const LogViewer = (props) => {
 
 LogViewer.propTypes = {
   topic: PropTypes.string.isRequired,
-  day: PropTypes.number.isRequired
+  day: PropTypes.number.isRequired,
+  debug: PropTypes.bool
+}
+
+LogViewer.defaultProps = {
+  debug: false
 }
 
 export default LogViewer
