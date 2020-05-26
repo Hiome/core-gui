@@ -34,7 +34,7 @@ class IndexPage extends Component {
       this.setState({missingSensors: missingSensors.length})
     })
 
-    const client = connect(`ws://${window.location.host}:1884`)
+    const client = connect(`ws://hiome:1884`)
     client.on('connect', () => client.subscribe('hiome/1/sensor/#', {qos: 1}))
     client.on('message', function(t, m, p) {
       if (m == null) return
@@ -104,17 +104,10 @@ class IndexPage extends Component {
   }
 
   render() {
-    if (!this.state.loading && this.state.rooms.length > 0) {
-      return <LayoutPage headline={this.headline()}>
-        <SEO title="Rooms" />
-        <LogViewer />
-      </LayoutPage>
-    } else {
-      return <Layout>
-        <SEO title="Rooms" />
-        { this.headline() }
-      </Layout>
-    }
+    return <Layout>
+      <SEO title="Rooms" />
+      { this.headline() }
+    </Layout>
   }
 }
 

@@ -11,8 +11,13 @@ class IndexPage extends Component {
   state = {
     id: null,
     name: 'this room',
-    occupancy_count: 0,
-    endpoint: null
+    occupancy_count: 0
+  }
+
+  topic() {
+    const params = (new URL(document.location)).searchParams
+    const roomId = params.get('id')
+    return `com.hiome/${roomId}/~~`
   }
 
   componentDidMount() {
@@ -21,10 +26,10 @@ class IndexPage extends Component {
     fetch(`${process.env.API_URL}api/1/rooms/${roomId}`)
       .then(resp => resp.json())
       .then(resp => {
-        this.setState({...resp, endpoint: `api/1/logs/room/${resp.id}`})
+        this.setState({...resp})
       })
 
-    const client = connect(`ws://${window.location.host}:1884`)
+    const client = connect(`ws://hiome:1884`)
     client.on('connect', () => {
       client.subscribe(`hiome/1/sensor/${roomId}:occupancy`, {qos: 1})
     })
@@ -72,7 +77,7 @@ class IndexPage extends Component {
     return (
       <LayoutPage goBack={true} headline={this.headline()}>
         <SEO title={this.state.name} />
-        <LogViewer endpoint={this.state.endpoint} />
+        <LogViewer topic={this.topic()} day={new Date().setHours(0,0,0,0)} />
       </LayoutPage>
     )
   }

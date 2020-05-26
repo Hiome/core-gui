@@ -84,11 +84,12 @@ const pageCacheMap = new Map();
 export default function useSWRPages(pageKey, pageFn, SWRToOffset, deps = []) {
     const pageCountKey = `_swr_page_count_` + pageKey;
     const pageOffsetKey = `_swr_page_offset_` + pageKey;
+    const pageSWRsKey = `_swr_page_swrs_` + pageKey;
     const [pageCount, setPageCount] = useState(cache.get(pageCountKey) || 1);
     const [pageOffsets, setPageOffsets] = useState(cache.get(pageOffsetKey) || [null]);
-    const [pageSWRs, setPageSWRs] = useState([]);
+    const [pageSWRs, setPageSWRs] = useState(cache.get(pageSWRsKey) || []);
     useLayoutEffect(() => {
-        setPageSWRs([]);
+        setPageSWRs(cache.get(pageSWRsKey) || []);
         setPageOffsets(cache.get(pageOffsetKey) || [null]);
         setPageCount(cache.get(pageCountKey) || 1);
     }, [pageKey]);
@@ -140,19 +141,20 @@ export default function useSWRPages(pageKey, pageFn, SWRToOffset, deps = []) {
                             isValidating: swr.isValidating,
                             mutate: swr.mutate
                         };
+                        cache.set(pageSWRsKey, _swrs);
                         return _swrs;
                     });
                     if (typeof swr.data !== 'undefined') {
                         // set next page's offset
                         const newPageOffset = SWRToOffset(swr, id);
-                        // if (pageOffsets[id + 1] !== newPageOffset) {
+                        if (newPageOffset === null || pageOffsets[id + 1] !== newPageOffset) {
                             setPageOffsets(arr => {
                                 const _arr = [...arr];
                                 _arr[id + 1] = newPageOffset;
                                 cache.set(pageOffsetKey, _arr);
                                 return _arr;
                             });
-                        // }
+                        }
                     }
                 });
             }
@@ -160,10 +162,7 @@ export default function useSWRPages(pageKey, pageFn, SWRToOffset, deps = []) {
         };
         // render each page
         const p = [];
-        if (!pageCacheMap.has(pageKey)) {
-            pageCacheMap.set(pageKey, []);
-        }
-        const pageCache = pageCacheMap.get(pageKey);
+        const pageCache = pageCacheMap.get(pageKey) || [];
         for (let i = 0; i < pageCount; ++i) {
             if (!pageCache[i] ||
                 pageCache[i].offset !== pageOffsets[i] ||
@@ -178,6 +177,7 @@ export default function useSWRPages(pageKey, pageFn, SWRToOffset, deps = []) {
             }
             p.push(pageCache[i].component);
         }
+        pageCacheMap.set(pageKey, pageCache);
         return p;
     }, [_pageFn, pageCount, pageSWRs, pageOffsets, pageKey]);
     return {

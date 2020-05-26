@@ -77,7 +77,7 @@ const templates = (msg) => {
   if (msg.attribute === 'occupancy') {
     switch(msg.data.tmpl) {
       case 'negative':
-        return "Oops, I made a mistake somewhere."
+        return "Hmm I was already empty."
       case 'siphoned':
         return "Hiome corrected my occupancy to ${val} ${val === 1 ? 'person' : 'people'}."
       case 'cleared':
@@ -92,7 +92,7 @@ const templates = (msg) => {
   } else if (msg.attribute === 'entry') {
     switch(msg.data.tmpl) {
       case 'entry_exit':
-        return "Somebody walked into @com.hiome/${entered}."
+        return "Somebody walked into @com.hiome/${entered} from @com.hiome/${exited}."
       case 'entry_only':
         return "Somebody entered from outside."
       case 'exit_only':
@@ -201,6 +201,7 @@ const renderLog = (row, objects, debug) => {
           <div className="log-content">
             <p>
               { template ? addLinksToText(renderTemplate(template, {...row, ...row.data}, o), objects) : row.topic.substr(5) }
+              { row.attribute === 'entry' ? renderRevertLink(row) : null }
             </p>
             { debug ? <Collapsible><pre>{ JSON.stringify(row.data, null, 2) }</pre></Collapsible> : null }
           </div>
@@ -210,6 +211,14 @@ const renderLog = (row, objects, debug) => {
         { renderContext(row, objects, debug) }
     </div>
   )
+}
+
+const onRevert = (sensorId, ts) => {
+  HomeStream.write(`com.hiome/gui/to/com.hiome/${sensorId}/entry`, {val: 'revert', 'entry_ts': ts})
+}
+
+const renderRevertLink = row => {
+  return <Button type="link" title="Revert this entry" onClick={() => onRevert(row.object_id, row.ts)}>Revert</Button>
 }
 
 const renderContext = (row, objects, debug) => {
@@ -277,20 +286,27 @@ const LogViewer = (props) => {
         useSWR(`${process.env.API_URL}api/1/hs/1/${props.topic}/${props.day}?limit=300&reverse=true&until=${offset || (props.day + 86399999)}`, fetcher)
       )
       if (!data) return null
-      return data.reduceRight(([i,contexts], x) => {
-        if (x.context_ts) {
-          const key = x.context_topic + '/' + x.context_ts
-          if (key in contexts) {
-            contexts[key].unshift(x)
-          } else {
-            i.unshift(x)
-          }
-        } else {
-          // otherwise add it to items array
-          i.unshift(x)
-          contexts[x.topic + '/' + x.ts] = []
-        }
+      return data.reduce(([i,contexts], x) => {
+        i.push(x)
+        contexts[x.topic + '/' + x.ts] = []
         return [i, contexts]
+      }, [[], {}]).reduceRight(([_t, contexts], i) => {
+        if (Array.isArray(i)) {
+          return i.reduce(([new_i, c], x) => {
+            if (x.context_ts) {
+              const key = x.context_topic + '/' + x.context_ts
+              if (key in c) {
+                c[key].push(x)
+              } else {
+                new_i.push(x)
+              }
+            } else {
+              new_i.push(x)
+            }
+            return [new_i, c]
+          }, [[], contexts])
+        }
+        return [[], i]
       }, [[], {}]).reduceRight((contexts,i) => {
         if (Array.isArray(i)) {
           i.forEach(x => {
