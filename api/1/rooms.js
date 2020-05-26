@@ -146,7 +146,7 @@ function create(req, res, next) {
 function update(req, res, next) {
   if (req.body.name)
     HomeStream.write(`com.hiome/api/to/com.hiome/${req.params.id}/name`, req.body.name)
-  if (!isNan(parseInt(req.body.occupancy_count)))
+  if (!isNaN(parseInt(req.body.occupancy_count)))
     HomeStream.write(`com.hiome/api/to/com.hiome/${req.params.id}/occupancy`, parseInt(req.body.occupancy_count))
   const hidden = parseBool(req.body.hidden)
   if (hidden !== null)
