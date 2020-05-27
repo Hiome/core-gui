@@ -85,6 +85,11 @@ class IndexPage extends Component {
       }
       if (this.state.missingSensors > 0)
         arr.push(this.addRoomRow())
+      arr.push(
+        <div key="view_logs_link" style={{textAlign: 'center', padding: '30px', fontSize: '2em'}}>
+          <Link to="/hs" style={{color: '#fff'}}>View Logs &#x2192;</Link>
+        </div>
+      )
       return arr
     } else {
       return <Result

@@ -23,6 +23,7 @@ app.use('/api/1', index)
 // serve static files from public
 app.use(express.static('public'))
 app.use('/hs/*', express.static('public'))
+app.use('/door/*', express.static('public'))
 
 app.use(function (req, res, next) {
   if (req.path.startsWith('/api/'))

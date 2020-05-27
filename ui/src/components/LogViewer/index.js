@@ -201,8 +201,8 @@ const renderLog = (row, objects, debug) => {
           <div className="log-content">
             <p>
               { template ? addLinksToText(renderTemplate(template, {...row, ...row.data}, o), objects) : row.topic.substr(5) }
-              { row.attribute === 'entry' ? renderRevertLink(row) : null }
             </p>
+            { row.attribute === 'entry' ? renderRevertLink(row) : null }
             { debug ? <Collapsible><pre>{ JSON.stringify(row.data, null, 2) }</pre></Collapsible> : null }
           </div>
         </div>
@@ -218,7 +218,11 @@ const onRevert = (sensorId, ts) => {
 }
 
 const renderRevertLink = row => {
-  return <Button type="link" title="Revert this entry" onClick={() => onRevert(row.object_id, row.ts)}>Revert</Button>
+  if (!row.data.confidence) return null
+  return <p>
+    {Math.floor(row.data.confidence*100)}% confidence
+    <Button type="link" title="Revert this entry" onClick={() => onRevert(row.object_id, row.ts)}>Revert</Button>
+  </p>
 }
 
 const renderContext = (row, objects, debug) => {

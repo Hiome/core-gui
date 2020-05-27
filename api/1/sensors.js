@@ -49,7 +49,7 @@ function index(req, res, next) {
  * @apiName Show
  * @apiGroup Sensors
  *
- * @apiParam {String}    id               if of the sensor
+ * @apiParam {String}    id               id of the sensor
  * @apiSuccess {String}  id               the sensor's id
  * @apiSuccess {String}  room_id          the sensor's room's id
  * @apiSuccess {String}  name             the sensor's name

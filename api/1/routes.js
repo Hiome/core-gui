@@ -21,6 +21,11 @@ router.post('/sensors', sensors.create)
 router.put('/sensors/:id', sensors.update)
 router.delete('/sensors/:id', sensors.del)
 
+const entries = require('./entries')
+router.get('/entries', entries.index)
+router.get('/entries/:id', entries.show)
+router.put('/entries/:id/:ts', entries.update)
+
 const events = require('./events')
 router.get('/hs/1/:namespace/:object_id/:attr', events.latest)
 router.get('/hs/1/:namespace/:object_id/:attr/:from', events.index)
