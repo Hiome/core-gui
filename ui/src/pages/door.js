@@ -1,6 +1,4 @@
 import React from 'react'
-import { Link } from "gatsby"
-import { Popover } from 'antd'
 
 import LayoutPage from "../components/LayoutPage"
 import SEO from "../components/seo"
@@ -9,8 +7,8 @@ import EntryViewer from '../components/EntryViewer'
 import "./rooms.css"
 
 const sensorId = (pathname) => {
-  const path = pathname.split("/").filter(x => x)
-  return path.pop()
+  const filter = pathname.split("/").filter(x => x).pop()
+  return filter === 'door' ? '' : filter
 }
 
 const debugging = (search) => {
@@ -19,7 +17,7 @@ const debugging = (search) => {
 }
 
 const DoorTrainPage = (props) => {
-  return (<LayoutPage>
+  return (<LayoutPage goBack={true}>
       <SEO title="Train Sensor" />
       <EntryViewer filter={sensorId(props.location.pathname)} debug={debugging(props.location.search)} />
     </LayoutPage>

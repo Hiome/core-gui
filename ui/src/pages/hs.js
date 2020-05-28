@@ -31,7 +31,7 @@ const HomeStreamPage = (props) => {
   const [topic, day] = currentTopic(props.location.pathname)
   const debug = debugging(props.location.search)
 
-  return (<LayoutPage>
+  return (<LayoutPage goBack={true}>
       <SEO title="Logs" />
       <Popover content={<DatePicker topic={topic} day={day} />} title="Change Date" placement="bottomLeft">
         <div className="logDate">

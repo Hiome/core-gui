@@ -1,0 +1,13 @@
+.valid-confidence {
+  color: #47B881;
+  font-weight: bold;
+}
+
+.invalid-confidence {
+  color: #EC4C47;
+  font-weight: bold;
+}
+
+.invalid-entry {
+  text-decoration: line-through;
+}

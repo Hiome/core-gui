@@ -201,28 +201,16 @@ const renderLog = (row, objects, debug) => {
           <div className="log-content">
             <p>
               { template ? addLinksToText(renderTemplate(template, {...row, ...row.data}, o), objects) : row.topic.substr(5) }
+              { row.attribute === 'entry' && row.data.val !== 'reverted' ?
+                <Button icon="history" shape="circle" type="link" onClick={() => navigate(`/door/${row.object_id}`)} /> : null }
             </p>
-            { row.attribute === 'entry' ? renderRevertLink(row) : null }
             { debug ? <Collapsible><pre>{ JSON.stringify(row.data, null, 2) }</pre></Collapsible> : null }
           </div>
         </div>
       </div>
-      
-        { renderContext(row, objects, debug) }
+      { renderContext(row, objects, debug) }
     </div>
   )
-}
-
-const onRevert = (sensorId, ts) => {
-  HomeStream.write(`com.hiome/gui/to/com.hiome/${sensorId}/entry`, {val: 'revert', 'entry_ts': ts})
-}
-
-const renderRevertLink = row => {
-  if (!row.data.confidence) return null
-  return <p>
-    {Math.floor(row.data.confidence*100)}% confidence
-    <Button type="link" title="Revert this entry" onClick={() => onRevert(row.object_id, row.ts)}>Revert</Button>
-  </p>
 }
 
 const renderContext = (row, objects, debug) => {
@@ -246,9 +234,6 @@ const renderContext = (row, objects, debug) => {
             </span>
             <span className="log-time">
               <TimeAgo time={r.ts} />
-            </span>
-            <span className="log-battery">
-              {batteryStatus(o.battery)}
             </span>
           </div>
           <div className="log-content">

@@ -3,10 +3,8 @@ import React, { Component } from 'react'
 import { connect } from 'mqtt/dist/mqtt'
 import { Result, Button, Icon, Spin } from 'antd'
 
-import LayoutPage from "../components/LayoutPage"
 import Layout from "../components/Layout"
 import SEO from "../components/seo"
-import LogViewer from "../components/LogViewer"
 
 import "./rooms.css"
 
