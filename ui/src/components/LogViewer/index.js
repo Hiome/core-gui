@@ -251,7 +251,7 @@ const renderContext = (row, objects, debug) => {
 }
 
 const renderFilterBtn = (topic, objects) => {
-  if (topic.startsWith('~/~/~')) return null
+  if (!topic || topic.startsWith('~/~/~')) return null
   let uuid = topic.split('/')
   uuid = uuid[0] + '/' + uuid[1]
   const txt = objects && uuid in objects ? `Logs are filtered to ${trim(objects[uuid].name.val)}` : 'Logs are filtered'

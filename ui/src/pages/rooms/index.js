@@ -15,13 +15,13 @@ class IndexPage extends Component {
   }
 
   topic() {
-    const params = (new URL(document.location)).searchParams
+    const params = new URLSearchParams(this.props.location.search)
     const roomId = params.get('id')
     return `com.hiome/${roomId}/~~`
   }
 
   componentDidMount() {
-    const params = (new URL(document.location)).searchParams
+    const params = new URLSearchParams(this.props.location.search)
     const roomId = params.get('id')
     fetch(`${process.env.API_URL}api/1/rooms/${roomId}`)
       .then(resp => resp.json())
