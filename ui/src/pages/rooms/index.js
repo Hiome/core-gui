@@ -29,7 +29,7 @@ class IndexPage extends Component {
         this.setState({...resp})
       })
 
-    const client = connect(`ws://hiome:1884`)
+    const client = connect(`ws://${window.location.host}:1884`)
     client.on('connect', () => {
       client.subscribe(`hiome/1/sensor/${roomId}:occupancy`, {qos: 1})
     })

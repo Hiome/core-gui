@@ -32,7 +32,7 @@ class IndexPage extends Component {
       this.setState({missingSensors: missingSensors.length})
     })
 
-    const client = connect(`ws://hiome:1884`)
+    const client = connect(`ws://${window.location.host}:1884`)
     client.on('connect', () => client.subscribe('hiome/1/sensor/#', {qos: 1}))
     client.on('message', function(t, m, p) {
       if (m == null) return

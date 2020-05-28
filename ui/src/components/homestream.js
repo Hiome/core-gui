@@ -1,7 +1,7 @@
 import { connect } from 'mqtt/dist/mqtt'
 
 const API_URL = process.env.API_URL
-const mqttClient = () => connect(`ws://hiome:1884`)
+const mqttClient = () => connect(`ws://${window.location.host}:1884`)
 
 /* everything (EXCEPT EXPORT) below is identical to nodejs version */
 
