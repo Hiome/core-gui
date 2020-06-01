@@ -99,6 +99,8 @@ const templates = (msg) => {
         return "Somebody went outside."
       case 'revert':
         return "Somebody reverted a previous entry."
+      case 'auto_revert':
+        return "Hiome reverted a previous entry."
       default:
         return null
     }
