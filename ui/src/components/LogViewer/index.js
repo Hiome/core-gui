@@ -115,6 +115,22 @@ const templates = (msg) => {
       default:
         return null
     }
+  } else if (msg.attribute === 'updating') {
+    switch(msg.data.tmpl) {
+      case 'start':
+        return "I am updating your sensors to the latest firmware!"
+      case 'stop':
+        return "I'm done updating!"
+      default:
+        return null
+    }
+  } else if (msg.attribute === 'version') {
+    switch(msg.data.tmpl) {
+      case 'updated':
+        return "I am now running firmware ${val}"
+      default:
+        return null
+    }
   } else if (msg.attribute === 'connected') {
     switch(msg.data.tmpl) {
       case 'disconnected':
