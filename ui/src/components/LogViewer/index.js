@@ -120,7 +120,9 @@ const templates = (msg) => {
       case 'start':
         return "I am updating your sensors to the latest firmware!"
       case 'stop':
-        return "I'm done updating!"
+        return "All done updating!"
+      case 'retry_later':
+        return "Some sensors didn't respond. I'll try again later..."
       default:
         return null
     }
