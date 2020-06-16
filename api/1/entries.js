@@ -11,7 +11,7 @@ const HomeStream = require('../../homestream')
 function index(req, res, next) {
   const client = new Client()
   client.connect()
-  client.query('select sensor_id, corrected, is_valid, payload from entries where ts > $1 order by ts desc', [Date.now() - 43200000])
+  client.query('select sensor_id, corrected, is_valid, payload from entries where ts > $1 order by ts desc limit 100', [Date.now() - 43200000])
     .then(r => res.send(r.rows.map(x => {
       x.payload.sensor_id = x.sensor_id
       x.payload.corrected = x.corrected
@@ -32,7 +32,7 @@ function show(req, res, next) {
   const client = new Client()
   client.connect()
   client.query(`
-    select sensor_id, corrected, is_valid, payload from entries where sensor_id = $1 and ts > $2 order by ts desc
+    select sensor_id, corrected, is_valid, payload from entries where sensor_id = $1 and ts > $2 order by ts desc limit 100
     `, [req.params.id, Date.now() - 43200000])
     .then(r => res.send(r.rows.map(x => {
       x.payload.sensor_id = x.sensor_id
