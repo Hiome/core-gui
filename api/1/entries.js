@@ -2,7 +2,7 @@ const { Client } = require('pg')
 const HomeStream = require('../../homestream')
 
 /**
- * @api {get} /entries List all entries from last 12 hours
+ * @api {get} /entries List all entries from last 12 hours, up to 100
  * @apiVersion 1.0.0
  * @apiName Index
  * @apiGroup Entries
@@ -21,7 +21,7 @@ function index(req, res, next) {
 }
 
 /**
- * @api {get} /entries/:id  Show entries from last 12 hours for a specific door
+ * @api {get} /entries/:id  Show entries from last 12 hours, up to 100, for a specific door
  * @apiVersion 1.0.0
  * @apiName Show
  * @apiGroup Entries
