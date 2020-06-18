@@ -1,15 +1,21 @@
 import { navigate } from "gatsby"
-import React, { Component } from "react"
+import React, { PureComponent } from "react"
 import PropTypes from "prop-types"
-import { Button, Menu, Dropdown, Icon, Modal, Result } from 'antd'
+import { Button, Menu, Dropdown, Icon, Modal, Result, Alert } from 'antd'
 
-class Header extends Component {
+import HomeStream from './homestream'
+
+class Header extends PureComponent {
   state = {
-    supportVisible: false
+    supportVisible: false,
+    updating: false
   }
 
   componentDidMount() {
     window.addEventListener('helpMe', this.openModal)
+    HomeStream.subscribe('hs/1/com.hiome/updater/updating', function(m) {
+      this.setState({updating: m.val})
+    }.bind(this))
   }
 
   componentWillUnmount() {
@@ -207,6 +213,15 @@ class Header extends Component {
     </svg>
   }
 
+  renderAlert() {
+    if (this.state.updating) {
+      return <Alert type="info" style={{margin: `20px auto`}} showIcon
+          message="Update In Progress"
+          description="Your sensors are busy updating to the latest firmware! Entries won't be counted while Hiome is updating." />
+    }
+    return null
+  }
+
   render() {
     return (
       <header
@@ -216,6 +231,7 @@ class Header extends Component {
           padding: `1.45rem 20px`
         }}
       >
+        { this.renderAlert() }
         { this.renderMenu() }
         { this.renderModal() }
       </header>
