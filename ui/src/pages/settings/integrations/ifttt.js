@@ -103,9 +103,9 @@ class IftttSettingsPage extends Component {
     const arr = []
     for (let d of this.state.doors) {
       const san_name = this.sanitizeName(d.name)
-      arr.push(<li><strong>hiome_{san_name}_door_opened</strong> &#x2192; {d.name} is opened</li>)
-      arr.push(<li><strong>hiome_{san_name}_door_closed</strong> &#x2192; {d.name} is closed</li>)
-      arr.push(<li><strong>hiome_{san_name}_door_ajar</strong> &#x2192; {d.name} is ajar</li>)
+      arr.push(<li><strong>hiome_{san_name}_open</strong> &#x2192; {d.name} is open</li>)
+      arr.push(<li><strong>hiome_{san_name}_closed</strong> &#x2192; {d.name} is closed</li>)
+      arr.push(<li><strong>hiome_{san_name}_ajar</strong> &#x2192; {d.name} is ajar</li>)
     }
 
     return arr
