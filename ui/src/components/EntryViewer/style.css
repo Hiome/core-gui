@@ -1,11 +1,19 @@
+.invalid-confidence, .valid-confidence {
+  margin-left: 5px;
+  color: #000;
+  font-size: 0.8em;
+  padding: 4px 5px;
+  border-radius: 3px;
+  vertical-align: text-top;
+  white-space: nowrap;
+}
+
 .valid-confidence {
-  color: #47B881;
-  font-weight: bold;
+  background-color: #D4EEE2;
 }
 
 .invalid-confidence {
-  color: #EC4C47;
-  font-weight: bold;
+  background-color: #FAE2E2;
 }
 
 .invalid-entry {

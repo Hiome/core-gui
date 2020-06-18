@@ -1,32 +1,31 @@
-import { navigate } from 'gatsby'
-import { Button, Icon, Card, Divider, List, Empty, message, Modal } from "antd"
-import React, { Component } from 'react'
+import { navigate, Link } from 'gatsby'
+import { Button, Icon, Spin, Empty, message } from 'antd'
+import React, { PureComponent } from 'react'
 
-import SensitivitySlider from "../../components/SensitivitySlider"
 import SettingsMenu from "../../components/SettingsMenu"
-import LayoutPage from "../../components/LayoutPage"
-import SEO from "../../components/seo"
+import Layout from "../../components/Layout"
 
-const { confirm } = Modal
+import "../rooms.css"
 
-class DevicesSettingsPage extends Component {
+class DoorIndexPage extends PureComponent {
   state = {
     sensors: [],
     loading: true
   }
 
   componentDidMount() {
+    if (this.props.location.state && this.props.location.state.justDeleted) {
+      message.success(`${this.props.location.state.justDeleted} was successfully deleted.`)
+      // clear justDeleted state so we don't keep seeing it
+      let state = this.props.location.state
+      delete state.justDeleted
+      navigate(this.props.location.pathname, {state, replace: true})
+    }
+
     this.setState({loading: true})
     fetch(`${process.env.API_URL}api/1/sensors?type=door`)
       .then(resp => resp.json())
       .then(resp => this.setState({sensors: resp, loading: false}))
-  }
-
-  renderVersion(sensor) {
-    if (sensor.version)
-      return (
-        <em style={{fontSize: `0.8em`, marginRight: `10px`}}>{ sensor.version }</em>
-      )
   }
 
   renderDoor() {
@@ -45,67 +44,13 @@ class DevicesSettingsPage extends Component {
     )
   }
 
-  deleteSensor = (sensorId, sensorName, e) => {
-    e.preventDefault()
-
-    confirm({
-      title: `Are you sure you want to delete the ${sensorName} door?`,
-      content: 'This cannot be undone.',
-      onOk: () => {
-        fetch(`${process.env.API_URL}api/1/sensors/${sensorId}`, {
-          method: 'DELETE',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-          }
-        }).then(resp => resp.json()).then(resp => {
-          this.componentDidMount()
-          message.success(`${resp.name} was successfully deleted.`)
-        })
-      },
-      okText: 'Delete',
-      okType: 'danger'
-    })
-
-    return false
-  }
-
   renderSensors() {
-    if (this.state.loading || this.state.sensors.length > 0) {
-      return (
-        <List
-          dataSource={this.state.sensors}
-          rowKey={item => `sensor${item.id}`}
-          loading={this.state.loading}
-          grid={{
-            gutter: 25,
-            xs: 1,
-            sm: 2,
-            md: 2,
-            lg: 3,
-            xl: 4,
-            xxl: 5,
-          }}
-          renderItem={sensor => <List.Item>
-                <Card style={{textAlign: `center`, minWidth: `200px`}} actions={[
-                  // eslint-disable-next-line
-                  <a href="#" onClick={(e) => this.deleteSensor(sensor.id, sensor.name, e)}><Icon type="delete" /> Delete</a>
-                ]}>
-                  <div style={{
-                    textOverflow: `ellipsis`, overflow: `hidden`, whiteSpace: `nowrap`
-                  }}>
-                    {sensor.name.split(" <-> ")[0]}
-                    <Divider style={{margin: `10px 0`, fontFamily: `cursive`}}>
-                      to
-                    </Divider>
-                    {sensor.name.split(" <-> ")[1]}
-                  </div>
-                  <SensitivitySlider sensorId={sensor.id} value={sensor.sensitivity == null ? 0.9 : sensor.sensitivity} />
-                </Card>
-              </List.Item>
-          }
-        />
-      )
+    if (this.state.loading) {
+      return <div style={{textAlign: 'center'}}><Spin size="large" indicator={<Icon type="loading" />} /></div>
+    } else if (this.state.sensors.length > 0) {
+      return this.state.sensors.map(sensor => <Link to={`/settings/door/${sensor.id}`}
+              className='room active' key={`sensor${sensor.id}`}
+              title={sensor.name}>{ sensor.name }</Link>)
     } else {
       return (
         <Empty image={this.renderDoor()} imageStyle={{height: 80}} description={"No doors found."} />
@@ -115,18 +60,17 @@ class DevicesSettingsPage extends Component {
 
   render() {
     return (
-      <LayoutPage goBack={true}>
-        <SEO title="Settings" />
-        <h1>Settings</h1>
+      <Layout title="Settings">
         <SettingsMenu page="doors" />
 
         { this.renderSensors() }
+
         <div style={{textAlign: `center`, marginTop: `40px`}}>
           <Button type="primary" shape="round" icon="plus" size="large" onClick={() => navigate('/sensors/add')}>Add New Door</Button>
         </div>
-      </LayoutPage>
+      </Layout>
     )
   }
 }
 
-export default DevicesSettingsPage
+export default DoorIndexPage

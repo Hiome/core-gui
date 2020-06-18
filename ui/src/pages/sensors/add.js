@@ -1,10 +1,9 @@
 import { navigate } from "gatsby"
 import React, { Component } from 'react'
-import { connect } from 'mqtt/dist/mqtt'
 import { Button, Icon, Card, List, Steps, Alert, Result, Switch, message } from "antd"
 
-import LayoutPage from "../../components/LayoutPage"
-import SEO from "../../components/seo"
+import Layout from "../../components/Layout"
+import HomeStream from "../../components/homestream"
 
 const { Step } = Steps
 
@@ -22,7 +21,6 @@ class AddSensorPage extends Component {
     event2: null,
     rooms: [],
     sensors: [],
-    allSensors: [],
     loading: true,
     loadingButton: false,
     step: 0,
@@ -35,52 +33,37 @@ class AddSensorPage extends Component {
 
   componentDidMount() {
     this.setState({loading: true})
-    const f1 = fetch(`${process.env.API_URL}api/1/rooms?include_hidden=true`)
+    fetch(`${process.env.API_URL}api/1/rooms?include_hidden=true`)
       .then(resp => resp.json())
-      .then(resp => this.setState({rooms: resp}))
+      .then(resp => this.setState({rooms: resp, loading: false}))
 
-    const f2 = fetch(`${process.env.API_URL}api/1/sensors?type=door`)
+    fetch(`${process.env.API_URL}api/1/sensors?type=door`)
       .then(resp => resp.json())
       .then(resp => this.setState({sensors: resp}))
 
-    Promise.all([f1, f2]).then(() => this.setState({loading: false})).then(() => this.listenMqtt())
+    HomeStream.subscribe('hs/1/com.hiome/+/entry', function(m) {
+      // we can't already be in a crisis
+      if (this.state.multipleSensorsFound || !this.state.waitingForSensorData) return
+      // ignore any invalid event
+      if (!m.data.is_valid) return
+      // sensor must not have room_id defined already
+      if (!this.state.sensors.some(x => x.id === m.object_id && x.room_id === null)) return
 
-    fetch(`${process.env.API_URL}api/1/sensors/manifest`)
-      .then(resp => resp.json())
-      .then(resp => this.setState({allSensors: Object.keys(resp).filter(id => resp[id].startsWith('door/'))}))
-  }
-
-  listenMqtt() {
-    const client = connect(`ws://${window.location.host}:1884`)
-    client.on('connect', () => {
-      client.subscribe('hiome/1/sensor/#', {qos: 1})
-    })
-    client.on('message', function(t, m, p) {
-      if (m == null || this.state.multipleSensorsFound) return
-      const sensorId = t.split('/')[3]
-      // must be a sensor from manifest file that we don't know about, assuming we got a manifest file
-      if ((this.state.allSensors.length > 0 && this.state.allSensors.indexOf(sensorId) < 0) ||
-          this.state.sensors.map(s => s.id).indexOf(sensorId) >= 0) return
-
-      const msg = JSON.parse(m.toString())
-      if (msg['meta'] && msg['meta']['source'] === 'gateway' && typeof msg['val'] === 'string') {
-        if (msg['val'].startsWith('V') && this.state.timeSinceBoot < msg['ts']) {
-          this.setState({timeSinceBoot: msg['ts']})
-        } else if (msg['type'] === 'raw_sensor_reading' && (msg['val'] === '1' || msg['val'] === '2') && msg['confidence'] >= 0.9) {
-          if (!this.state.waitingForSensorData) return
-          if (this.state.id === null || this.state.id === sensorId) {
-            // this is our sensor
-            if (this.state.event1 === null) {
-              this.setState({id: sensorId, event1: msg['val'], waitingForSensorData: false, step: 1})
-            } else {
-              this.setState({id: sensorId, event2: msg['val'], waitingForSensorData: false, step: 2}, this.saveSensor)
-            }
-          } else {
-            // uh oh, there's another unknown sensor shooting off events at the same time. We can only handle one at a time
-            this.setState({multipleSensorsFound: true})
-          }
+      if (this.state.id === null || this.state.id === m.object_id) {
+        // this is our sensor
+        if (this.state.event1 === null) {
+          this.setState({id: m.object_id, event1: m.val, waitingForSensorData: false, step: 1})
+        } else {
+          this.setState({id: m.object_id, event2: m.val, waitingForSensorData: false, step: 2}, this.saveSensor)
         }
+      } else {
+        // uh oh, there's another unknown sensor shooting off events at the same time. We can only handle one at a time
+        this.setState({multipleSensorsFound: true})
       }
+    }.bind(this))
+    HomeStream.subscribe('hs/1/com.hiome/+/version', function(m) {
+      // if we just saw a version message, that means the sensor just booted
+      if (this.state.timeSinceBoot < m.ts) this.setState({timeSinceBoot: m.ts})
     }.bind(this))
   }
 
@@ -101,14 +84,14 @@ class AddSensorPage extends Component {
     let finalRoomId, finalSensorName
     const room1Id = this.state.room1 === 'external' ? '' : this.state.room1
     const room2Id = this.state.room2 === 'external' ? '' : this.state.room2
-    if (this.state.event1 === '1' && this.state.event2 === '2') {
+    if (this.state.event1 === 1 && this.state.event2 === 2) {
       // 2 -> 1
       finalRoomId = `${room2Id}::${room1Id}`
-      finalSensorName = `${this.state.room2_name} <-> ${this.state.room1_name}`
-    } else if (this.state.event1 === '2' && this.state.event2 === '1') {
+      finalSensorName = `${this.state.room2_name} to ${this.state.room1_name} Door`
+    } else if (this.state.event1 === 2 && this.state.event2 === 1) {
       // 1 -> 2
       finalRoomId = `${room1Id}::${room2Id}`
-      finalSensorName = `${this.state.room1_name} <-> ${this.state.room2_name}`
+      finalSensorName = `${this.state.room1_name} to ${this.state.room2_name} Door`
     } else {
       // something went wrong
       this.setState({unknownError: true})
@@ -136,11 +119,12 @@ class AddSensorPage extends Component {
   renderHiddenQ(roomId, roomName, roomHidden, otherRoomName) {
     if (roomId === 'external') return
 
-    let room_sensors = this.state.sensors.filter(s => s.room_id.includes(roomId))
-    room_sensors = room_sensors.map(s => {
-      const names = s.name.split(' <-> ')
-      return names[0].trim() === roomName ? names[1].trim() : names[0].trim()
-    })
+    const room_sensors = this.state.sensors.map(s => {
+      const sId = s.room_id.split("::")
+      if (sId[0] === roomId) return this.state.rooms.find(r => r.id === sId[0])
+      if (sId[1] === roomId) return this.state.rooms.find(r => r.id === sId[1])
+      return null
+    }).filter(x => x).map(x => x.name)
     const sensor_list = room_sensors.length === 0 ? `a door to` :
       `${room_sensors.length + 1} doors to ${room_sensors.join(', ')}${room_sensors.length > 1 ? ',' : ''} and`
 
@@ -171,7 +155,7 @@ class AddSensorPage extends Component {
 
   renderFinished() {
     return (
-      <Result status="success" title={`The ${this.state.name.replace('<->', 'to')} door is ready!`} subTitle="Enjoy your smarter door."
+      <Result status="success" title={`${this.state.name} is ready!`} subTitle="Enjoy your smarter door."
       extra={[
         <Button key="add_another" onClick={() => window.location.reload()} loading={this.state.loading}>Add Another Door</Button>,
         <Button key="all_done" type="primary" onClick={() => navigate("/")} loading={this.state.loading}>Done</Button>
@@ -228,7 +212,11 @@ class AddSensorPage extends Component {
   }
 
   renderRoomList() {
-    const dataSource = this.state.rooms.concat([{id:'external', name: 'Outside'}]).filter(r => r.id !== this.state.room1)
+    let dataSource = this.state.rooms
+    if (this.state.step > 0) {
+      dataSource = dataSource.filter(r => r.id !== this.state.room1)
+      dataSource.push({id:'external', name: "I'm Outside My Home"})
+    }
     if (dataSource.length === 0) return <br/>
     return <List
       dataSource={dataSource}
@@ -349,8 +337,7 @@ class AddSensorPage extends Component {
 
   render() {
     return (
-      <LayoutPage goBack={true}>
-        <SEO title="Add Sensor" />
+      <Layout title="Add Sensor">
         <Steps size="small" labelPlacement="vertical" current={this.state.step}>
           <Step title={this.state.room1_name || 'Current Room'} />
           <Step title={this.state.room2_name || 'Adjoining Room'} />
@@ -358,7 +345,7 @@ class AddSensorPage extends Component {
         </Steps>
 
         { this.renderStep() }
-      </LayoutPage>
+      </Layout>
     )
   }
 }

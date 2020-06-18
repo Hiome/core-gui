@@ -1,11 +1,6 @@
 const express = require('express')
 const router = express.Router()
 
-const logs = require('./logs')
-router.get('/logs', logs.index)
-router.get('/logs/debug', logs.debug)
-router.get('/logs/:type/:id', logs.show)
-
 const rooms = require('./rooms')
 router.get('/rooms', rooms.index)
 router.get('/rooms/:id', rooms.show)

@@ -1,25 +1,29 @@
 import React from "react"
 import PropTypes from "prop-types"
 
+import SEO from './seo'
 import Header from "./header"
 import "./layout.css"
 
-const Layout = ({ children, goBack, menuOptions, menuCallback }) => (
+const Layout = ({ children, title, menuOptions, menuCallback }) => (
   <>
-    <Header goBack={goBack} menuOptions={menuOptions} menuCallback={menuCallback} />
-    <main>{children}</main>
+    <SEO title={title} />
+    <Header title={title} menuOptions={menuOptions} menuCallback={menuCallback} />
+    <main>
+      {children}
+      <footer>Powered by Hiome.</footer>
+    </main>
   </>
 )
 
 Layout.propTypes = {
   children: PropTypes.node.isRequired,
-  goBack: PropTypes.bool,
+  title: PropTypes.string.isRequired,
   menuOptions: PropTypes.arrayOf(PropTypes.node),
   menuCallback: PropTypes.func
 }
 
 Layout.defaultProps = {
-  goBack: false,
   menuOptions: [],
   menuCallback: undefined
 }

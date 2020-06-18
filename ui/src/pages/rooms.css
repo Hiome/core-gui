@@ -1,87 +1,20 @@
-.roomContainer {
-  margin: 0 auto 100px auto;
-  width: 900px;
-}
-
-@media only screen and (max-width: 900px) {
-  .roomContainer {
-    width: 600px;
-  }
-}
-
-@media only screen and (max-width: 600px) {
-  .roomContainer {
-    width: 300px;
-  }
-}
-
 .room {
-  font-weight: bold;
   font-size: 25px;
-  margin: 25px;
-  padding: 25px;
-  width: 250px;
-  height: 200px;
-  display: inline-block;
-  border-radius: 10px;
-  color: #A17EDF;
-  background-color: #5428AE;
-  position: relative;
+  padding: 10px 5px;
+  display: block;
+  color: #a0a0a0;
   text-decoration: none;
-  transition: background-color 0.5s ease-in-out, color 0.5s ease-in-out, box-shadow 0.5s ease-in-out;
+  transition: color 0.5s ease-in-out;
   text-overflow: ellipsis;
-  text-align: center;
   overflow: hidden;
   white-space: nowrap;
 }
 
 .room.active {
-  color: #fff;
-  background-color: #5E2FB9;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  color: #000;
+  font-weight: bold;
 }
 
 .room:hover {
-  background-color: #0074B2;
-  color: #fff;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-}
-
-.addNew {
-  background-color: #fff;
-  width: 80%;
-  min-width: 300px;
-  border-radius: 10px;
-  margin: 0 auto;
-  box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
-}
-
-.pagination {
-  margin-top: 60px;
-  text-align: center;
-}
-
-a.hidden {
-  visibility: hidden;
-}
-
-a.newer {
-  float: left;
-  z-index: 2;
-}
-
-a.older {
-  float: right;
-  z-index: 2;
-}
-@media only screen and (max-width: 500px) {
-  a.newer {
-    display: block;
-    float: none;
-    margin-bottom: 10px;
-  }
-  a.older {
-    display: block;
-    float: none;
-  }
+  color: #735DD0;
 }

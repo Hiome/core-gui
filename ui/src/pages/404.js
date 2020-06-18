@@ -2,14 +2,12 @@ import React from 'react'
 import { navigate } from 'gatsby'
 import { Button } from 'antd'
 
-import LayoutPage from '../components/LayoutPage'
-import SEO from '../components/seo'
+import Layout from '../components/Layout'
 
 import startled from '../images/startled.svg'
 
 const NotFoundPage = () => (
-  <LayoutPage>
-    <SEO title="Not Found" />
+  <Layout title="Not Found">
     <object data={startled} type="image/svg+xml" style={{
       display: `block`,
       margin: `10px auto`,
@@ -27,7 +25,7 @@ const NotFoundPage = () => (
         <Button onClick={() => window.dispatchEvent(new Event("helpMe"))}>Contact Support</Button>
         <Button onClick={() => navigate('/')} type="primary">Go to Dashboard</Button>
       </div>
-  </LayoutPage>
+  </Layout>
 )
 
 export default NotFoundPage

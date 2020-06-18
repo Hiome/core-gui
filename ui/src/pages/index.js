@@ -1,10 +1,10 @@
 import { Link, navigate } from "gatsby"
 import React, { Component } from 'react'
-import { connect } from 'mqtt/dist/mqtt'
 import { Result, Button, Icon, Spin } from 'antd'
 
 import Layout from "../components/Layout"
-import SEO from "../components/seo"
+import HomeStream from '../components/homestream'
+import RoomRow from '../components/RoomRow'
 
 import "./rooms.css"
 
@@ -16,57 +16,35 @@ class IndexPage extends Component {
   }
 
   componentDidMount() {
+    // load all rooms
     fetch(`${process.env.API_URL}api/1/rooms`).then(resp => resp.json()).then(resp => this.setState({rooms: resp, loading: false}))
 
-    let knownSensors = []
-    let manifestSensors = []
-    const f1 = fetch(`${process.env.API_URL}api/1/sensors/manifest`)
+    // figure out how many sensors haven't been configured yet
+    fetch(`${process.env.API_URL}api/1/sensors?type=door`)
       .then(resp => resp.json())
-      .then(resp => manifestSensors = Object.keys(resp).filter(id => resp[id].startsWith('door/')))
-    const f2 = fetch(`${process.env.API_URL}api/1/sensors?type=door`)
-      .then(resp => resp.json())
-      .then(resp => knownSensors = resp.map(s => s.id))
+      .then(resp => this.setState({missingSensors: resp.filter(s => s.room_id === null).length}))
 
-    Promise.all([f1, f2]).then(() => {
-      const missingSensors = manifestSensors.filter(id => !knownSensors.includes(id))
-      this.setState({missingSensors: missingSensors.length})
-    })
-
-    const client = connect(`ws://${window.location.host}:1884`)
-    client.on('connect', () => client.subscribe('hiome/1/sensor/#', {qos: 1}))
-    client.on('message', function(t, m, p) {
-      if (m == null) return
-      const message = JSON.parse(m.toString())
-      if (message['meta']['type'] === 'occupancy' && message['meta']['source'] === 'gateway') {
-        const rooms = this.state.rooms
+    // subscribe to live updates
+    HomeStream.subscribe('hs/1/com.hiome/+/occupancy', function(m) {
+      this.setState((prevState, props) => {
+        const rooms = prevState.rooms
         for (let r of rooms) {
-          if (r.id === message['meta']['room']) {
-            r.occupancy_count = message['val']
-            this.setState({rooms})
+          if (r.id === m.object_id) {
+            r.occupancy_count = m.val
             break
           }
         }
-      }
+        return ({rooms})
+      })
     }.bind(this))
-  }
-
-  roomRow(room) {
-    return (
-      <Link key={room.id} to={`/rooms?id=${room.id}`}
-        className={`room ${room.occupancy_count > 0 ? 'active' : ''}`}
-        title={room.name}
-      >
-        <div style={{fontSize: `70px`, flexGrow: 2}}>{ room.occupancy_count }</div>
-        { room.name }
-      </Link>
-    )
   }
 
   addRoomRow() {
     return (
-      <Link key='add_sensor' to='sensors/add' className='room active' title='Add New Sensor'>
-        <div style={{fontSize: `70px`, flexGrow: 2}}><Icon type="plus" /></div>
-        Add {this.state.missingSensors} Door{this.state.missingSensors === 1 ? '' : 's'}
+      <Link key='add_sensor' to='/sensors/add' className='room active' title='Add New Sensor'>
+        <Button icon="plus" shape="circle" ghost
+          style={{marginRight: '10px', verticalAlign: 'middle', color: '#000'}}
+        /> Add {this.state.missingSensors} Door{this.state.missingSensors === 1 ? '' : 's'}
       </Link>
     )
   }
@@ -74,24 +52,22 @@ class IndexPage extends Component {
   renderRooms() {
     if (this.state.loading) {
       return <div style={{textAlign: `center`, marginTop: `10em`}}>
-        <Spin size="large" indicator={<Icon type="loading" style={{color: "#fff"}}/>} />
+        <Spin size="large" indicator={<Icon type="loading" />} />
       </div>
     } else if (this.state.rooms.length > 0) {
-      const arr = []
-      for (let r of this.state.rooms) {
-        arr.push(this.roomRow(r))
-      }
+      const arr = this.state.rooms.sort((a,b) => {
+        if (a.occupancy_count === b.occupancy_count) {
+          return a.name.localeCompare(b.name)
+        }
+        if (a.occupancy_count < b.occupancy_count) return 1
+        if (a.occupancy_count > b.occupancy_count) return -1
+        return 0
+      }).map(r => <RoomRow key={r.id} id={r.id} name={r.name} occupancy_count={r.occupancy_count} />)
       if (this.state.missingSensors > 0)
         arr.push(this.addRoomRow())
-      arr.push(
-        <div key="view_logs_link" style={{textAlign: 'center', padding: '30px', fontSize: '2em'}}>
-          <Link to="/hs" style={{color: '#fff'}}>View Logs &#x2192;</Link>
-        </div>
-      )
       return arr
     } else {
       return <Result
-        className="addNew"
         icon={<span role="img" aria-label="hurray" style={{fontSize: `5em`}}>🎉</span>}
         title="Welcome to Hiome!"
         subTitle={<p>This will be your dashboard, but it's a little empty right now. Let's add a door.</p>}
@@ -107,8 +83,7 @@ class IndexPage extends Component {
   }
 
   render() {
-    return <Layout>
-      <SEO title="Rooms" />
+    return <Layout title="Rooms">
       { this.headline() }
     </Layout>
   }

@@ -6,6 +6,8 @@ const mqttClient = () => connect(`ws://${window.location.host}:1884`)
 /* everything (EXCEPT EXPORT) below is identical to nodejs version */
 
 const mqttPub = (t, m, o) => {
+  if (o) o['qos'] = 1
+  else o = {qos: 1}
   const client = mqttClient()
   client.on('connect', () => client.publish(t, m, o, () => client.end()))
 }

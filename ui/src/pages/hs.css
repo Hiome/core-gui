@@ -1,0 +1,28 @@
+.pagination {
+  margin-top: 60px;
+}
+
+button.hidden {
+  visibility: hidden;
+}
+button.newer {
+  float: left;
+  z-index: 2;
+}
+button.older {
+  float: right;
+  z-index: 2;
+}
+
+@media only screen and (max-width: 500px) {
+  button.newer {
+    display: block;
+    float: none;
+    margin: 10px auto;
+  }
+  button.older {
+    display: block;
+    float: none;
+    margin: 10px auto;
+  }
+}

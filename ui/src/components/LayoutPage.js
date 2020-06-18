@@ -4,9 +4,9 @@ import PropTypes from "prop-types"
 import Header from "./header"
 import "./layout.css"
 
-const LayoutPage = ({ children, headline, goBack, menuOptions, menuCallback }) => (
+const LayoutPage = ({ children, headline, title, menuOptions, menuCallback }) => (
   <div id="wrapper">
-    <Header goBack={goBack} menuOptions={menuOptions} menuCallback={menuCallback} />
+    <Header title={title} menuOptions={menuOptions} menuCallback={menuCallback} />
     {headline}
     <main className="page">
       {children}
@@ -18,13 +18,12 @@ const LayoutPage = ({ children, headline, goBack, menuOptions, menuCallback }) =
 LayoutPage.propTypes = {
   children: PropTypes.node.isRequired,
   headline: PropTypes.node,
-  goBack: PropTypes.bool,
+  title: PropTypes.string.isRequired,
   menuOptions: PropTypes.arrayOf(PropTypes.node),
   menuCallback: PropTypes.func
 }
 
 LayoutPage.defaultProps = {
-  goBack: false,
   headline: null,
   menuOptions: [],
   menuCallback: undefined

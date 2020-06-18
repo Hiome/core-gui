@@ -7,6 +7,9 @@ body {
   margin: 0;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  color: #000;
+  max-width: 900px;
+  margin: 0 auto;
 }
 article,
 aside,
@@ -195,7 +198,6 @@ html {
   box-sizing: inherit;
 }
 body {
-  color: #fff;
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
     Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
   font-weight: normal;
@@ -415,7 +417,6 @@ table {
   padding-right: 0;
   padding-top: 0;
   margin-bottom: 1.45rem;
-  font-size: 1rem;
   line-height: 1.45rem;
   border-collapse: collapse;
   width: 100%;
@@ -489,10 +490,7 @@ address {
   padding-top: 0;
   margin-bottom: 1.45rem;
 }
-b {
-  font-weight: bold;
-}
-strong {
+b, strong {
   font-weight: bold;
 }
 dt {
@@ -559,26 +557,11 @@ code {
   border-radius: 3px;
   font-family: "SFMono-Regular", Consolas, "Roboto Mono", "Droid Sans Mono",
     "Liberation Mono", Menlo, Courier, monospace;
-  padding: 0;
-  padding-top: 0.2em;
-  padding-bottom: 0.2em;
+  padding: 0.2em 5px;
 }
 pre code {
   background: none;
   line-height: 1.42;
-}
-code:before,
-code:after,
-tt:before,
-tt:after {
-  letter-spacing: -0.2em;
-  content: " ";
-}
-pre code:before,
-pre code:after,
-pre tt:before,
-pre tt:after {
-  content: "";
 }
 @media only screen and (max-width: 480px) {
   html {
@@ -586,37 +569,18 @@ pre tt:after {
   }
 }
 
-body {
-  background-color: #6F3CD1;
-  background-image: linear-gradient(45deg, #6F3CD1, #6F3CD1 50%, #5429A9);
-  background-attachment: fixed;
+header a:hover path, header .hoverable:hover, header .hoverable:hover path {
+  fill: #6F3CD1;
+  color: #6F3CD1;
 }
-
-header a:hover path, header .hoverable:hover path {
-  fill: #fff;
+main {
+  padding: 20px;
 }
-
-#wrapper {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-}
-
-.page {
-  width: 100%;
-  flex-grow: 10;
-  background-color: #fff;
-  border-top-right-radius: 30px;
-  border-top-left-radius: 30px;
-  color: #0e0e0e;
-  padding: 2em;
-}
-
 footer {
   text-align: center;
   font-size: 0.7em;
-  margin: 100px auto 0 auto;
+  margin-top: 50px;
+  color: #7B8B9A;
 }
 
 /* ANTD DESIGN OVERRIDES */
@@ -632,4 +596,12 @@ ul.ant-menu-horizontal {
 
 .clear {
   clear: both;
+}
+
+.explainer {
+  background-color: #000;
+  color: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 3em;
 }

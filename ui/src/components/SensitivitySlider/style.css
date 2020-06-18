@@ -1,6 +1,7 @@
 .icon-wrapper {
   position: relative;
   padding: 0px 30px;
+  margin: 30px;
 }
 
 .icon-wrapper .anticon {

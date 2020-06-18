@@ -17,4 +17,11 @@ exports.onCreatePage = async ({ page, actions }) => {
     // Update the page.
     createPage(page)
   }
+  else if (page.path.match(/^\/settings\/door/)) {
+    // page.matchPath is a special key that's used for matching pages
+    // with corresponding routes only on the client.
+    page.matchPath = "/settings/door/*"
+    // Update the page.
+    createPage(page)
+  }
 }

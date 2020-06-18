@@ -3,8 +3,7 @@ import React, { Component } from 'react'
 import { connect } from 'mqtt/dist/mqtt'
 
 import SettingsMenu from "../../components/SettingsMenu"
-import LayoutPage from "../../components/LayoutPage"
-import SEO from "../../components/seo"
+import Layout from "../../components/Layout"
 
 const { confirm } = Modal
 
@@ -67,9 +66,7 @@ class AdancedSettingsPage extends Component {
 
   render() {
     return (
-      <LayoutPage goBack={true}>
-        <SEO title="Settings" />
-        <h1>Settings</h1>
+      <Layout title="Settings">
         <SettingsMenu page="advanced" />
 
         <Alert message="Advanced Settings" description="These settings can cause permanent data loss. You should not mess with them unless directed by support!" type="warning" showIcon />
@@ -101,7 +98,7 @@ class AdancedSettingsPage extends Component {
         <br/><br/>
         <Button type="danger" onClick={this.factoryReset} key="resetHomekit">Factory Reset</Button>
         </p>
-      </LayoutPage>
+      </Layout>
     )
   }
 }

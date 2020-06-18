@@ -1,6 +1,6 @@
 import { Link, navigate } from "gatsby"
 import PropTypes from "prop-types"
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import useSWR, { mutate } from 'swr'
 import { Avatar, Button, Empty, Spin, Tag, message } from 'antd'
 
@@ -48,20 +48,15 @@ const smartTrim = (input) => {
   return input.substring(0, 9)
 }
 
-const trim = input => {
-  if (input.length < 20) return input
-  return input.substring(0, 15) + '...'
-}
-
 const renderLog = (row, objects, debug) => {
   if (!row || !objects || !row.confidence) return null
   const o = objects['com.hiome/'+row.sensor_id] || {}
   if (!o.name) return null
   let template = null
   if (row.entered && objects['com.hiome/' + row.entered] && objects['com.hiome/' + row.entered].name) {
-    template = `Somebody walked into ${objects['com.hiome/' + row.entered].name.val}.`
+    template = `Did somebody walk into ${objects['com.hiome/' + row.entered].name.val}?`
   } else if (row.exited && objects['com.hiome/' + row.exited] && objects['com.hiome/' + row.exited].name) {
-    template = `Somebody walked out of ${objects['com.hiome/' + row.exited].name.val}.`
+    template = `Did somebody walk out of ${objects['com.hiome/' + row.exited].name.val}?`
   }
   if (template === null) return null
   return (
@@ -82,10 +77,10 @@ const renderLog = (row, objects, debug) => {
             </span>
           </div>
           <div className="log-content">
-            <p className={row.is_valid ? 'valid-entry' : 'invalid-entry'} style={{color: `rgba(0, 0, 0, ${row.is_valid ? 1 : row.confidence})`}}>{ template }</p>
-            <div className={row.is_valid ? 'valid-confidence' : 'invalid-confidence'}>
-              {row.is_valid ? 'Counted with' : 'Ignored due to'} {Math.floor(row.confidence*100)}% confidence.
-            </div>
+            <p>
+              <span className={row.is_valid ? 'valid-entry' : 'invalid-entry'}>{ template }</span>
+              <span className={row.is_valid ? 'valid-confidence' : 'invalid-confidence'}>{Math.floor(row.confidence*100)}% confident</span>
+            </p>
             <RevertLink sensorId={row.sensor_id} isValid={row.is_valid} corrected={row.corrected} ts={row.ts} />
             { debug ? <Collapsible><pre>{ JSON.stringify(row, null, 2) }</pre></Collapsible> : null }
           </div>
@@ -95,23 +90,27 @@ const renderLog = (row, objects, debug) => {
   )
 }
 
-const RevertLink = (props) => {
-  if (props.corrected) {
-    return <p>Manually marked as {props.is_valid ? 'correct' : 'invalid'}.</p>
+const correctEntry = (v, props, setLoading) => {
+  if (!props.corrected || props.isValid !== v) {
+    setLoading(true)
+    HomeStream.write(`com.hiome/gui/to/com.hiome/${props.sensorId}/entry`, {val: v, 'entry_ts': props.ts})
+    message.success(`Thanks, I'll learn from this next time!`)
   }
+}
 
-  const btnIcon = props.isValid ?
-    <svg ariaLabel="warning" height='0.7em' width='0.7em' style={{marginRight: '5px'}} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 847 847" x="0px" y="0px" fillRule="evenodd" clipRule="evenodd"><g><polygon fill="#ec4c47" points="423,304 707,20 827,140 543,423 827,707 707,827 423,543 140,827 20,707 304,423 20,140 140,20 "></polygon></g></svg> :
-    <svg ariaLabel="good" height='1em' width='1em' style={{marginBottom: '-1px', marginRight: '5px'}} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 847 847" x="0px" y="0px" fillRule="evenodd" clipRule="evenodd"><g><path fill="#47b881" d="M299 522l396 -396c18,-18 47,-18 65,0l51 51c18,18 18,47 0,64l-479 480c-18,18 -47,18 -65,0l-232 -232c-17,-17 -17,-46 0,-64l52 -51c17,-18 46,-18 64,0l148 148z"></path></g></svg>
-
-  return <p style={{marginLeft:'-15px'}}>
-    <Button type="link" title="Revert this entry" onClick={() => {
-      HomeStream.write(`com.hiome/gui/to/com.hiome/${props.sensorId}/entry`, {val: 'revert', 'entry_ts': props.ts})
-      message.success(`Thanks, I'll learn from this next time!`)
-    }}>
-      {btnIcon} { props.isValid ? 'Not a valid entry, ignore it' : 'Valid entry, count it' }.
-    </Button>
-  </p>
+const RevertLink = (props) => {
+  const [loading, setLoading] = useState(false)
+  useEffect(() => setLoading(false), [props.isValid, props.corrected])
+  return (
+    <>
+      <Button style={{margin: '0 10px 30px 0'}} size="large" icon="like" loading={loading}
+        type={props.corrected && props.isValid ? "primary" : "dashed"} onClick={() => correctEntry(true, props, setLoading)}
+      >Yes</Button>
+      <Button style={{margin: '0 0 30px 10px'}} size="large" icon="dislike" loading={loading}
+        type={props.corrected && !props.isValid ? "danger" : "dashed"} onClick={() => correctEntry(false, props, setLoading)}
+      >No</Button>
+    </>
+  )
 }
 
 RevertLink.propTypes = {
@@ -124,9 +123,11 @@ RevertLink.propTypes = {
 const renderFilterBtn = (filter, objects) => {
   if (filter === '') return null
   const uuid = 'com.hiome/' + filter
-  const txt = objects && uuid in objects ? `Entries are filtered to ${trim(objects[uuid].name.val)}` : 'Entries are filtered'
+  const txt = objects && uuid in objects ? `Filtered to ${objects[uuid].name.val}` : 'Filtered'
   return <div style={{marginBottom: '20px'}}>
-    <Tag closable={true} onClose={() => navigate('/door')}>{txt}</Tag>
+    <Tag style={{maxWidth: '100%', textOverflow: 'ellipsis', overflow: 'hidden'}} closable={true} onClose={() => navigate('/door')}>
+      <span style={{display: 'inline-block', maxWidth: '95%', textOverflow: 'ellipsis', overflow: 'hidden'}}>{txt}</span>
+    </Tag>
   </div>
 }
 
@@ -139,7 +140,7 @@ const EntryViewer = (props) => {
     const f = props.filter === '' ? '+' : props.filter
     const client = HomeStream.subscribe('hs/1/com.hiome/' + f + '/entry', function(m) {
       if (m.retain) return
-      if (m.val === 'reverted') {
+      if (m.val === 'reverted' || m.val === 'validated') {
         mutate(`${process.env.API_URL}api/1/entries/${props.filter}`)
       } else {
         const p = {sensor_id: m.object_id, corrected: false, ...m.payload}

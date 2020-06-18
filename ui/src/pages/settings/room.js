@@ -1,10 +1,9 @@
 import { navigate } from "gatsby"
-import { Modal, Icon, Switch, Button, PageHeader, Tooltip, List, Empty, message } from "antd"
+import { Modal, Icon, Switch, Button, PageHeader, Tooltip, Spin, Empty, message } from "antd"
 import React, { Component } from 'react'
 
 import SettingsMenu from "../../components/SettingsMenu"
-import LayoutPage from "../../components/LayoutPage"
-import SEO from "../../components/seo"
+import Layout from "../../components/Layout"
 
 const { confirm } = Modal
 
@@ -42,12 +41,12 @@ class RoomSettingsPage extends Component {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({hidden: checked, occupancy_count: 0})
-    }).then(resp => resp.json()).then(resp => this.setState({hidden: resp.hidden}))
+    }).then(() => this.setState({hidden: checked}))
   }
 
   deleteRoom = () => {
     confirm({
-      title: `Are you sure you want to delete the ${this.state.name}?`,
+      title: `Are you sure you want to delete ${this.state.name}?`,
       content: 'This cannot be undone.',
       onOk: () => {
         fetch(`${process.env.API_URL}api/1/rooms/${this.state.id}`, {
@@ -81,18 +80,6 @@ class RoomSettingsPage extends Component {
     }
   }
 
-  renderVersion(sensor) {
-    if (sensor.version)
-      return (
-        <em style={{fontSize: `0.8em`, marginRight: `10px`}}>Hiome Door { sensor.version }</em>
-      )
-  }
-
-  renderDoorName(sensor) {
-    const names = sensor.name.split(' <-> ')
-    return names[0].trim() === this.state.name ? names[1].trim() : names[0].trim()
-  }
-
   renderDoor() {
     return (
       <svg width="52px" height="64px" viewBox="0 0 52 64" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink">
@@ -110,22 +97,11 @@ class RoomSettingsPage extends Component {
   }
 
   renderSensors() {
-    if (this.state.loading || this.state.sensors.length > 0) {
-      return (
-        <List
-          size="small"
-          style={{marginLeft: `20px`}}
-          loading={this.state.loading}
-          dataSource={this.state.sensors}
-          rowKey={item => `sensor${item.id}`}
-          renderItem={sensor => <List.Item>
-            <List.Item.Meta
-              title={ this.renderDoorName(sensor) }
-              description={this.renderVersion(sensor)}
-            />
-          </List.Item>}
-        />
-      )
+    if (this.state.loading) {
+      return <div style={{textAlign: 'center'}}><Spin size="large" indicator={<Icon type="loading" />} /></div>
+    }
+    else if (this.state.sensors.length > 0) {
+      return <ul style={{marginLeft: '3em', marginTop: '1em'}}>{ this.state.sensors.map(sensor => <li key={`sensor${sensor.id}`}>{sensor.name}</li>) }</ul>
     } else {
       return (
         <Empty image={this.renderDoor()} imageStyle={{height: 80}} description={"No doors found."}>
@@ -186,20 +162,18 @@ class RoomSettingsPage extends Component {
 
   render() {
     return (
-      <LayoutPage goBack={true}>
-        <SEO title="Settings" />
-        <h1>Settings</h1>
+      <Layout title="Settings">
         <SettingsMenu page="rooms" />
 
-        <PageHeader title={this.state.name} onBack={() => window.history.go(-1)}
-          subTitle={this.state.sensors.length > 0 ? `has ${this.state.sensors.length} door${this.state.sensors.length !== 1 ? 's' : ''}` : ``} />
+        <PageHeader title={this.state.name} onBack={() => navigate("/settings/rooms")}
+          subTitle={this.state.sensors.length > 0 ? `has ${this.state.sensors.length} door${this.state.sensors.length !== 1 ? 's' : ''}.` : ``} />
 
         { this.renderSensors() }
 
         { this.renderHiddenToggle() }
 
         { this.renderOptions() }
-      </LayoutPage>
+      </Layout>
     )
   }
 }

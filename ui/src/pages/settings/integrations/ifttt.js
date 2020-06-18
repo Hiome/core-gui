@@ -3,8 +3,7 @@ import React, { Component } from 'react'
 import { connect } from 'mqtt/dist/mqtt'
 
 import SettingsMenu from "../../../components/SettingsMenu"
-import LayoutPage from "../../../components/LayoutPage"
-import SEO from "../../../components/seo"
+import Layout from "../../../components/Layout"
 
 import IftttKey from "../../../components/Images/IftttKey"
 
@@ -76,7 +75,7 @@ class IftttSettingsPage extends Component {
   }
 
   sanitizeName(name) {
-    return name.replace(/[^\w\s_-]/g, "").trim().replace(/\s+/g, "_").toLowerCase()
+    return name.replace(/[^\w\s_]/g, "").trim().replace(/\s+/g, "_").toLowerCase()
   }
 
   renderRoomEventNames() {
@@ -103,13 +102,10 @@ class IftttSettingsPage extends Component {
 
     const arr = []
     for (let d of this.state.doors) {
-      const r1 = d.name.split(" <-> ")[0]
-      const r2 = d.name.split(" <-> ")[1]
-      const r1_san = this.sanitizeName(r1)
-      const r2_san = this.sanitizeName(r2)
-      arr.push(<li><strong>hiome_{r1_san}_{r2_san}_door_opened</strong> &#x2192; {r1} to {r2} door is opened</li>)
-      arr.push(<li><strong>hiome_{r1_san}_{r2_san}_door_closed</strong> &#x2192; {r1} to {r2} door is closed</li>)
-      arr.push(<li><strong>hiome_{r1_san}_{r2_san}_door_ajar</strong> &#x2192; {r1} to {r2} door is ajar</li>)
+      const san_name = this.sanitizeName(d.name)
+      arr.push(<li><strong>hiome_{san_name}_door_opened</strong> &#x2192; {d.name} is opened</li>)
+      arr.push(<li><strong>hiome_{san_name}_door_closed</strong> &#x2192; {d.name} is closed</li>)
+      arr.push(<li><strong>hiome_{san_name}_door_ajar</strong> &#x2192; {d.name} is ajar</li>)
     }
 
     return arr
@@ -128,14 +124,12 @@ class IftttSettingsPage extends Component {
 
   render() {
     return (
-      <LayoutPage goBack={true}>
-        <SEO title="Settings" />
-        <h1>Settings</h1>
+      <Layout title="Settings">
         <SettingsMenu page="ifttt" />
 
         {this.renderTokenInput()}
         {this.renderPage()}
-      </LayoutPage>
+      </Layout>
     )
   }
 }

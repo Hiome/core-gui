@@ -3,8 +3,7 @@ import React, { Component } from 'react'
 import { connect } from 'mqtt/dist/mqtt'
 
 import SettingsMenu from "../../../components/SettingsMenu"
-import LayoutPage from "../../../components/LayoutPage"
-import SEO from "../../../components/seo"
+import Layout from "../../../components/Layout"
 
 class HueSettingsPage extends Component {
   state = {
@@ -147,13 +146,11 @@ class HueSettingsPage extends Component {
 
   render() {
     return (
-      <LayoutPage goBack={true}>
-        <SEO title="Settings" />
-        <h1>Settings</h1>
+      <Layout title="Settings">
         <SettingsMenu page="hue" />
 
         {this.renderPage()}
-      </LayoutPage>
+      </Layout>
     )
   }
 }

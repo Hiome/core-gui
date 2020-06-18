@@ -1,11 +1,11 @@
 const { Client } = require('pg')
 
 /**
- * @api {get} /:topic/:from   Read events from this topic's log, starting from the given time
+ * @api {get} /:topic/:from   Read events from topic's log
  * @apiVersion 1.0.0
  * @apiName Index
  * @apiGroup Events
- * @apiDescription Read log from any valid HomeStream v1 topic
+ * @apiDescription Read log from any valid HomeStream topic, starting from the given time.
  * These follow the format of hs/1/:namespace:object_id/:attribute or hs/1/:namespace:object_id/to/:to_namespace/:to_object_id/:to_attribute
  *
  * For example, to see historical occupancy changes in room 2 since 1589686339565,
@@ -115,7 +115,7 @@ function index_commands(req, res, next) {
 }
 
 /**
- * @api {get} /:topic   Read latest state of topic(s)
+ * @api {get} /:topic   Read latest state of topic
  * @apiVersion 1.0.0
  * @apiName Latest
  * @apiGroup Events

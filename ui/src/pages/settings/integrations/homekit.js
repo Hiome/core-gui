@@ -3,8 +3,7 @@ import React, { Component } from 'react'
 import { connect } from 'mqtt/dist/mqtt'
 
 import SettingsMenu from "../../../components/SettingsMenu"
-import LayoutPage from "../../../components/LayoutPage"
-import SEO from "../../../components/seo"
+import Layout from "../../../components/Layout"
 
 const { confirm } = Modal
 
@@ -25,9 +24,7 @@ class HomekitSettingsPage extends Component {
 
   render() {
     return (
-      <LayoutPage goBack={true}>
-        <SEO title="Settings" />
-        <h1>Settings</h1>
+      <Layout title="Settings">
         <SettingsMenu page="homekit" />
 
         <p>To add Hiome to HomeKit, follow these steps:</p>
@@ -41,7 +38,7 @@ class HomekitSettingsPage extends Component {
         <p>You should now see your Hiome sensors in your HomeKit!</p>
         <Divider />
         <Button type="danger" onClick={this.disconnectHomekit} key="disconnect">Reset HomeKit Connection</Button>
-      </LayoutPage>
+      </Layout>
     )
   }
 }

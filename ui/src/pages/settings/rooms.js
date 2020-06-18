@@ -1,10 +1,9 @@
 import { Link, navigate } from "gatsby"
-import { Icon, Card, List, Empty, message } from "antd"
+import { Icon, Spin, Empty, message } from "antd"
 import React, { Component } from 'react'
 
 import SettingsMenu from "../../components/SettingsMenu"
-import LayoutPage from "../../components/LayoutPage"
-import SEO from "../../components/seo"
+import Layout from "../../components/Layout"
 
 class RoomsSettingsPage extends Component {
   state = {
@@ -22,7 +21,9 @@ class RoomsSettingsPage extends Component {
     }
 
     this.setState({loading: true})
-    fetch(`${process.env.API_URL}api/1/rooms?include_hidden=true`).then(resp => resp.json()).then(resp => this.setState({rooms: resp, loading: false}))
+    fetch(`${process.env.API_URL}api/1/rooms?include_hidden=true`)
+      .then(resp => resp.json())
+      .then(resp => this.setState({rooms: resp, loading: false}))
   }
 
   renderEmptyRoom() {
@@ -32,36 +33,12 @@ class RoomsSettingsPage extends Component {
   }
 
   renderRooms() {
-    if (this.state.loading || this.state.rooms.length > 0) {
-      return (
-        <List
-          dataSource={this.state.rooms}
-          rowKey={item => `room${item.id}`}
-          loading={this.state.loading}
-          grid={{
-            gutter: 25,
-            xs: 1,
-            sm: 2,
-            md: 2,
-            lg: 3,
-            xl: 4,
-            xxl: 5,
-          }}
-          renderItem={room => <List.Item>
-              <Card style={{textAlign: `center`, minWidth: `200px`}} hoverable={true}
-                onClick={() => navigate(`/settings/room?id=${room.id}`)} actions={[
-                <Link to={`/settings/room?id=${room.id}`}><Icon type="edit" /> Edit</Link>
-              ]}>
-                <div style={{
-                  textOverflow: `ellipsis`, overflow: `hidden`, whiteSpace: `nowrap`
-                }}>
-                  {room.name}
-                </div>
-              </Card>
-            </List.Item>
-          }
-        />
-      )
+    if (this.state.loading) {
+      return <div style={{textAlign: 'center'}}><Spin size="large" indicator={<Icon type="loading" />} /></div>
+    } else if (this.state.rooms.length > 0) {
+      return this.state.rooms.map(room => <Link to={`/settings/room?id=${room.id}`}
+              className={`room ${room.hidden ? '' : 'active'}`} key={`room${room.id}`}
+              title={room.name}>{ room.name }</Link>)
     } else {
       return (
         <Empty image={this.renderEmptyRoom()} imageStyle={{height: 80}} description={"No rooms found."} />
@@ -71,13 +48,11 @@ class RoomsSettingsPage extends Component {
 
   render() {
     return (
-      <LayoutPage goBack={true}>
-        <SEO title="Settings" />
-        <h1>Settings</h1>
+      <Layout title="Settings">
         <SettingsMenu page="rooms" />
 
         { this.renderRooms() }
-      </LayoutPage>
+      </Layout>
     )
   }
 }

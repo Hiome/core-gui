@@ -35,8 +35,8 @@ class SensitivitySlider extends Component {
 
   render() {
     return (
-      <div style={{marginTop: `30px`}}>
-        <strong>Sensitivity</strong>
+      <div style={{margin: `40px 0 60px 0`}}>
+        <p><strong>Sensitivity</strong></p>
         <div className="icon-wrapper">
           <Icon component={this.babyIcon} />
           <Slider min={0} max={2} step={0.1} tipFormatter={null} value={this.state.value} onChange={this.handleChange} marks={{

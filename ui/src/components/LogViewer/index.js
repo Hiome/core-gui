@@ -2,7 +2,7 @@ import { Link, navigate } from "gatsby"
 import PropTypes from "prop-types"
 import React, { useEffect, useRef } from 'react'
 import useSWR, { mutate } from 'swr'
-import { Avatar, Button, Empty, Spin, Tag } from 'antd'
+import { Avatar, Button, Empty, Spin, Tag, Menu, Dropdown, Icon } from 'antd'
 
 import Battery from '../Battery'
 import TimeAgo from "../TimeAgo"
@@ -159,6 +159,28 @@ const addLinksToText = (txt, objects) => {
   })
 }
 
+const menuClick = (key, sensor_id) => {
+  if (key === 'door') navigate('/door/'+sensor_id)
+  else if (key === 'settings') navigate('/settings/door/'+sensor_id)
+}
+
+const doorMenu = (sensor_id, attr) => {
+  if (attr === 'entry' || attr === 'door') {
+    const menu = <Menu onClick={({key}) => menuClick(key, sensor_id)}>
+        <Menu.Item key="door">
+          <Icon type="like" /> Calibrate Door
+        </Menu.Item>
+        <Menu.Item key="settings">
+          <Icon type="setting" /> Settings
+        </Menu.Item>
+      </Menu>
+    return (<Dropdown overlay={menu} placement="bottomRight" trigger={["click", "hover"]}>
+      <Button icon="ellipsis" size="small" shape="circle" ghost style={{color: '#000', marginRight: '0.5em'}} />
+    </Dropdown>)
+  }
+  return null
+}
+
 const colorize = (input) => {
   const stringHexNumber = (
     parseInt(parseInt(input, 36).toExponential().slice(2,-5), 10) & 0xFFFFFF
@@ -170,11 +192,6 @@ const smartTrim = (input) => {
   if (input.length < 9) return input
   input = input.split(" ")[0]
   return input.substring(0, 9)
-}
-
-const trim = input => {
-  if (input.length < 20) return input
-  return input.substring(0, 15) + '...'
 }
 
 const batteryStatus = (battery) => {
@@ -214,6 +231,7 @@ const renderLog = (row, objects, debug) => {
             <span className="log-time">
               <TimeAgo time={row.ts} />
             </span>
+            {doorMenu(row.object_id, row.attribute)}
             <span className="log-battery">
               {batteryStatus(o.battery)}
             </span>
@@ -221,8 +239,6 @@ const renderLog = (row, objects, debug) => {
           <div className="log-content">
             <p>
               { template ? addLinksToText(renderTemplate(template, {...row, ...row.data}, o), objects) : row.topic.substr(5) }
-              { row.attribute === 'entry' && row.data.val !== 'reverted' ?
-                <Button icon="history" shape="circle" type="link" onClick={() => navigate(`/door/${row.object_id}`)} /> : null }
             </p>
             { debug ? <Collapsible><pre>{ JSON.stringify(row.data, null, 2) }</pre></Collapsible> : null }
           </div>
@@ -274,9 +290,11 @@ const renderFilterBtn = (topic, objects) => {
   if (!topic || topic.startsWith('~/~/~')) return null
   let uuid = topic.split('/')
   uuid = uuid[0] + '/' + uuid[1]
-  const txt = objects && uuid in objects ? `Logs are filtered to ${trim(objects[uuid].name.val)}` : 'Logs are filtered'
+  const txt = objects && uuid in objects ? `Filtered to ${objects[uuid].name.val}` : 'Filtered'
   return <div style={{marginBottom: '20px'}}>
-    <Tag closable={true} onClose={() => navigate('/hs/1/~/~/~~')}>{txt}</Tag>
+    <Tag style={{maxWidth: '100%', textOverflow: 'ellipsis', overflow: 'hidden'}} closable={true} onClose={() => navigate('/hs/1/~/~/~~')}>
+      <span style={{display: 'inline-block', maxWidth: '95%', textOverflow: 'ellipsis', overflow: 'hidden'}}>{txt}</span>
+    </Tag>
   </div>
 }
 
