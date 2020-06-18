@@ -5,9 +5,9 @@ import PropTypes from "prop-types"
 
 import HomeStream from './homestream'
 
-const resetCount = (v, id, name) => {
+const resetCount = (v, id, name, count) => {
   v = parseInt(v)
-  if (!isNaN(v)) {
+  if (!isNaN(v) && v !== count && v >= 0) {
     HomeStream.write(`com.hiome/gui/to/com.hiome/${id}/occupancy`, v)
     message.success(`Updated ${name}'s occupancy to ${v}`)
   }
@@ -42,8 +42,9 @@ const RoomRow = ({ id, occupancy_count, name }) => {
           max={99}
           autoFocus
           value={occupancy_count}
-          onChange={v => resetCount(v, id, name)}
+          onChange={v => resetCount(v, id, name, occupancy_count)}
           size="large"
+          type="number"
         />
       </div>
       <p><Link to="/door"><Icon type="like" /> Calibrate Hiome</Link></p>
