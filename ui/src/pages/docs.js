@@ -249,8 +249,6 @@ client.publish(hs/1/local/test/connected, JSON.stringify(payload), {retain: true
         Hiome Core's <a href="/hs">dashboard</a> shows your HomeStream logs. Currently, those logs are limited to messages
         written by Hiome, but we plan to open the templating system so your other events can appear in the logs in a
         friendly format too. If you're interested in this feature, <a href="mailto:support@hiome.com">let us know</a> for early access!
-        You can also visit <a href="/hs?debug=true">http://{props.location.host}/hs?debug=true</a> to view the logs in debug mode, which
-        will show all raw JSON payloads.
       </p>
 
       <a id="mqtt-context" /><h4>Context</h4>
