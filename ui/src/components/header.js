@@ -1,7 +1,7 @@
 import { navigate } from "gatsby"
 import React, { PureComponent } from "react"
 import PropTypes from "prop-types"
-import { Button, Menu, Dropdown, Icon, Modal, Result, Alert } from 'antd'
+import { Button, Menu, Dropdown, Icon, Modal, Result, Alert, message } from 'antd'
 
 import HomeStream from './homestream'
 
@@ -13,8 +13,12 @@ class Header extends PureComponent {
 
   componentDidMount() {
     window.addEventListener('helpMe', this.openModal)
-    HomeStream.subscribe('hs/1/com.hiome/updater/updating', function(m) {
-      this.setState({updating: m.val})
+    HomeStream.subscribe(['hs/1/com.hiome/updater/updating', 'hs/1/com.hiome/+/connected'], function(m) {
+      if (m.attribute === 'updating') {
+        this.setState({updating: m.val})
+      } else if (!m.retain && m.tmpl === 'new_device') {
+        message.success("A new sensor just connected!", 10)
+      }
     }.bind(this))
   }
 

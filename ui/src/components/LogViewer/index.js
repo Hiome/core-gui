@@ -139,6 +139,8 @@ const templates = (msg) => {
         return "Help, I haven't been seen in a while. I think I'm disconnected!"
       case 'reconnected':
         return "I'm online! It feels good to be back."
+      case 'new_device':
+        return "I just connected for the first time! You have a nice home."
       default:
         return null
     }
