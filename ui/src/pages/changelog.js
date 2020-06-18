@@ -6,7 +6,7 @@ import Layout from '../components/Layout'
 const ChangelogPage = () => (
   <Layout title="What's New">
     <h2 className="changelog-date">&#9733; June 2020</h2>
-    <p>Hiome has a major update!</p>
+    <p>Hiome has a major update! A lot has changed and been added, but here are some highlights...</p>
     <ul>
       <li><span role="img" aria-label="design">🎨</span> Redesigned dashboard</li>
       <li><span role="img" aria-label="book">📖</span> More detailed logs of what's happening in your home</li>
