@@ -1,5 +1,5 @@
 import { Button, Divider, Modal, Alert } from "antd"
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { connect } from 'mqtt/dist/mqtt'
 
 import SettingsMenu from "../../components/SettingsMenu"
@@ -7,7 +7,7 @@ import Layout from "../../components/Layout"
 
 const { confirm } = Modal
 
-class AdancedSettingsPage extends Component {
+class AdancedSettingsPage extends PureComponent {
   disconnectHomekit = () => {
     confirm({
       title: `Are you sure you want to reset HomeKit?`,

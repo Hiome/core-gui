@@ -1,10 +1,10 @@
 import { Slider, Icon } from "antd"
-import React, { Component } from "react"
+import React, { PureComponent } from "react"
 import PropTypes from "prop-types"
 
 import "./style.css"
 
-class SensitivitySlider extends Component {
+class SensitivitySlider extends PureComponent {
   state = {
     value: 0
   }

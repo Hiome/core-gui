@@ -1,5 +1,5 @@
 import { navigate } from "gatsby"
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { Button, Icon, Card, List, Steps, Alert, Result, Switch, message } from "antd"
 
 import Layout from "../../components/Layout"
@@ -7,7 +7,7 @@ import HomeStream from "../../components/homestream"
 
 const { Step } = Steps
 
-class AddSensorPage extends Component {
+class AddSensorPage extends PureComponent {
   state = {
     id: null,
     name: '',

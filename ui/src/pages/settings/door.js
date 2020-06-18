@@ -1,6 +1,6 @@
 import { navigate } from 'gatsby'
 import { Button, Icon, Input, Spin, PageHeader, message, Modal } from "antd"
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 
 import SensitivitySlider from "../../components/SensitivitySlider"
 import SettingsMenu from "../../components/SettingsMenu"
@@ -9,7 +9,7 @@ import HomeStream from "../../components/homestream"
 
 const { confirm } = Modal
 
-class DevicesSettingsPage extends Component {
+class DevicesSettingsPage extends PureComponent {
   state = {
     sensor: {},
     loading: true

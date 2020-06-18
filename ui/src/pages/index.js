@@ -1,5 +1,5 @@
 import { Link, navigate } from "gatsby"
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { Result, Button, Icon, Spin } from 'antd'
 
 import Layout from "../components/Layout"
@@ -8,7 +8,7 @@ import RoomRow from '../components/RoomRow'
 
 import "./rooms.css"
 
-class IndexPage extends Component {
+class IndexPage extends PureComponent {
   state = {
     rooms: [],
     loading: true,
@@ -76,15 +76,9 @@ class IndexPage extends Component {
     }
   }
 
-  headline() {
-    return <div className="roomContainer">
-      { this.renderRooms() }
-    </div>
-  }
-
   render() {
     return <Layout title="Rooms">
-      { this.headline() }
+      { this.renderRooms() }
     </Layout>
   }
 }
