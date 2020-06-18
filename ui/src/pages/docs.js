@@ -28,7 +28,7 @@ const renderFilteredEvents = (topics, f) => {
   </div>)
 }
 
-const DocsPage = () => {
+const DocsPage = (props) => {
   const { data } = useSwr(`${process.env.API_URL}api/1/rooms`, url => fetch(url).then(r => r.json()))
   const room = data && data.length ? data[0] : {id: 'room_43432590', name: 'Bedroom', occupancy_count: 0}
 
@@ -105,13 +105,13 @@ const DocsPage = () => {
       <a id="mqtt" /><h2>MQTT</h2>
 
       <p>
-        <strong>TL;DR &rarr;</strong> Connect to <code>{window.location.host}:1883</code> and subscribe to <code>hs/1/com.hiome/+/+</code> to get started.
+        <strong>TL;DR &rarr;</strong> Connect to <code>{props.location.host}:1883</code> and subscribe to <code>hs/1/com.hiome/+/+</code> to get started.
       </p>
 
       <p>
         <abbr title="Message Queuing Telemetry Transport">MQTT</abbr> is a lightweight pub-sub protocol for embedded IoT devices to communicate with each other. It's a widely adopted standard, meaning you can find client libraries for any language.
         At a high level, devices connect to a <em>broker</em>, which handles routing all messages, subscribe to <em>topics</em> to tell the broker which messages they're interested in, or publish their own messages to a topic.
-        Hiome Core is the broker, so there's nothing to setup. You can just connect to <code>{window.location.host}</code> on port <code>1883</code> as long as you're on the same network.
+        Hiome Core is the broker, so there's nothing to setup. You can just connect to <code>{props.location.host}</code> on port <code>1883</code> as long as you're on the same network.
       </p>
 
       <p>We'll use the excellent <a href="https://www.github.com/mqttjs/MQTT.js">mqtt.js library</a> for our examples, but the approach will be the same for any language.</p>
@@ -119,7 +119,7 @@ const DocsPage = () => {
       <SyntaxHighlighter language="javascript" style={docco}>
         {`// connect to Hiome Core
 const mqtt = require("mqtt")
-const client = mqtt.connect("mqtt://${window.location.host}:1883")`}
+const client = mqtt.connect("mqtt://${props.location.host}:1883")`}
       </SyntaxHighlighter>
 
       <a id="mqtt-topics" /><h3>Topics</h3>
@@ -168,7 +168,7 @@ client.on("connect", function() {
       <SyntaxHighlighter language="javascript" style={docco} showLineNumbers={true}>
         {`// connect to Hiome Core
 const mqtt = require("mqtt")
-const client = mqtt.connect("mqtt://${window.location.host}:1883")
+const client = mqtt.connect("mqtt://${props.location.host}:1883")
 
 // subscribe to a topic
 client.on("connect", function() {
@@ -215,7 +215,7 @@ client.on("message", function(topic, msg, packet) {
       <p>
         MQTT is great for getting notified when a new event occurs, but if you want to read older events from the log, you'll need to use the Events API.
         Simply issue a GET request to <code>/api/1/{'<mqtt topic>'}/{'<from timestamp>'}</code>.
-        For example, try visiting <a href={`/api/1/hs/1/com.hiome/${room.id}/occupancy/${new Date().getTime() - 86400000}`}>http://{window.location.host}/api/1/hs/1/com.hiome/{room.id}/occupancy/{new Date().getTime() - 86400000}</a> for
+        For example, try visiting <a href={`/api/1/hs/1/com.hiome/${room.id}/occupancy/${new Date().getTime() - 86400000}`}>http://{props.location.host}/api/1/hs/1/com.hiome/{room.id}/occupancy/{new Date().getTime() - 86400000}</a> for
         all occupancy changes in {room.name} in the last 24 hours. You can <a href="/api/docs/#api-Events-Index">read more about the endpoint here</a>.
       </p>
 
@@ -249,7 +249,7 @@ client.publish(hs/1/local/test/connected, JSON.stringify(payload), {retain: true
         Hiome Core's <a href="/hs">dashboard</a> shows your HomeStream logs. Currently, those logs are limited to messages
         written by Hiome, but we plan to open the templating system so your other events can appear in the logs in a
         friendly format too. If you're interested in this feature, <a href="mailto:support@hiome.com">let us know</a> for early access!
-        You can also visit <a href="/hs?debug=true">http://{window.location.host}/hs?debug=true</a> to view the logs in debug mode, which
+        You can also visit <a href="/hs?debug=true">http://{props.location.host}/hs?debug=true</a> to view the logs in debug mode, which
         will show all raw JSON payloads.
       </p>
 
