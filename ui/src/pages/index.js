@@ -1,5 +1,5 @@
 import { Link, navigate } from "gatsby"
-import React, { PureComponent } from 'react'
+import React, { Component } from 'react'
 import { Result, Button, Icon, Spin } from 'antd'
 
 import Layout from "../components/Layout"
@@ -8,7 +8,7 @@ import RoomRow from '../components/RoomRow'
 
 import "./rooms.css"
 
-class IndexPage extends PureComponent {
+class IndexPage extends Component {
   state = {
     rooms: [],
     loading: true,

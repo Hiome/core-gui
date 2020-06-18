@@ -38,19 +38,11 @@ class Header extends PureComponent {
     else if (key === 'docs') navigate('/docs')
     else if (key === 'changelog') navigate('/changelog')
     else if (key === 'help') this.openModal()
-    else if (this.props.menuCallback) this.props.menuCallback(key)
-  }
-
-  renderDivider() {
-    if (this.props.menuOptions.length > 0)
-      return <Menu.Divider />
   }
 
   renderMenu() {
     const menu = (
       <Menu onClick={this.menuClick}>
-        { this.props.menuOptions }
-        { this.renderDivider() }
         <Menu.Item key="rooms">
           <Icon type="home" /> Rooms
         </Menu.Item>
@@ -244,14 +236,7 @@ class Header extends PureComponent {
 }
 
 Header.propTypes = {
-  title: PropTypes.string.isRequired,
-  menuOptions: PropTypes.arrayOf(PropTypes.node),
-  menuCallback: PropTypes.func
-}
-
-Header.defaultProps = {
-  menuOptions: [],
-  menuCallback: undefined
+  title: PropTypes.string.isRequired
 }
 
 export default Header

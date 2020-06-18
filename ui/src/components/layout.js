@@ -5,10 +5,10 @@ import SEO from './seo'
 import Header from "./header"
 import "./layout.css"
 
-const Layout = ({ children, title, menuOptions, menuCallback }) => (
+const Layout = ({ children, title }) => (
   <>
     <SEO title={title} />
-    <Header title={title} menuOptions={menuOptions} menuCallback={menuCallback} />
+    <Header title={title} />
     <main>
       {children}
       <footer>Powered by Hiome.</footer>
@@ -18,14 +18,7 @@ const Layout = ({ children, title, menuOptions, menuCallback }) => (
 
 Layout.propTypes = {
   children: PropTypes.node.isRequired,
-  title: PropTypes.string.isRequired,
-  menuOptions: PropTypes.arrayOf(PropTypes.node),
-  menuCallback: PropTypes.func
-}
-
-Layout.defaultProps = {
-  menuOptions: [],
-  menuCallback: undefined
+  title: PropTypes.string.isRequired
 }
 
 export default Layout

@@ -1,11 +1,11 @@
 import { Link, navigate } from "gatsby"
 import { Icon, Spin, Empty, message } from "antd"
-import React, { PureComponent } from 'react'
+import React, { Component } from 'react'
 
 import SettingsMenu from "../../components/SettingsMenu"
 import Layout from "../../components/Layout"
 
-class RoomsSettingsPage extends PureComponent {
+class RoomsSettingsPage extends Component {
   state = {
     rooms: [],
     loading: true

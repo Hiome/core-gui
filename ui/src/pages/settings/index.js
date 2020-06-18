@@ -1,13 +1,13 @@
 import { navigate, Link } from 'gatsby'
 import { Button, Icon, Spin, Empty, message } from 'antd'
-import React, { PureComponent } from 'react'
+import React, { Component } from 'react'
 
 import SettingsMenu from "../../components/SettingsMenu"
 import Layout from "../../components/Layout"
 
 import "../rooms.css"
 
-class DoorIndexPage extends PureComponent {
+class DoorIndexPage extends Component {
   state = {
     sensors: [],
     loading: true

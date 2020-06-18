@@ -1,5 +1,5 @@
 import { Result, Input } from "antd"
-import React, { PureComponent } from 'react'
+import React, { Component } from 'react'
 import { connect } from 'mqtt/dist/mqtt'
 
 import SettingsMenu from "../../../components/SettingsMenu"
@@ -7,7 +7,7 @@ import Layout from "../../../components/Layout"
 
 import IftttKey from "../../../components/Images/IftttKey"
 
-class IftttSettingsPage extends PureComponent {
+class IftttSettingsPage extends Component {
   state = {
     token: null,
     rooms: [],

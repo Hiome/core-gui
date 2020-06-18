@@ -1,13 +1,13 @@
 import { navigate } from "gatsby"
 import { Modal, Icon, Switch, Button, PageHeader, Tooltip, Spin, Empty, message } from "antd"
-import React, { PureComponent } from 'react'
+import React, { Component } from 'react'
 
 import SettingsMenu from "../../components/SettingsMenu"
 import Layout from "../../components/Layout"
 
 const { confirm } = Modal
 
-class RoomSettingsPage extends PureComponent {
+class RoomSettingsPage extends Component {
   state = {
     id: null,
     loading: true,
