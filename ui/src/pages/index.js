@@ -51,7 +51,9 @@ class IndexPage extends Component {
 
   renderRooms() {
     if (this.state.loading) {
-      return <Spin size="large" indicator={<Icon type="loading" />} style={{textAlign: `center`, margin: `10em 0`, display: `block`}} />
+      return <div key={`spinner-container`}>
+        <Spin size="large" indicator={<Icon type="loading" />} style={{textAlign: `center`, margin: `10em 0`, display: `block`}} />
+      </div>
     } else if (this.state.rooms.length > 0) {
       const arr = this.state.rooms.sort((a,b) => {
         if (a.occupancy_count === b.occupancy_count) {
@@ -76,7 +78,6 @@ class IndexPage extends Component {
 
   render() {
     return <Layout title="Rooms">
-      <noscript>{/* hack to workaround gatsby's shoddy dynamic routing implementation */}</noscript>
       { this.renderRooms() }
     </Layout>
   }
