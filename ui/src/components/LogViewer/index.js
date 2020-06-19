@@ -133,6 +133,13 @@ const templates = (msg) => {
       default:
         return null
     }
+  } else if (msg.attribute === 'battery') {
+    switch(msg.data.tmpl) {
+      case 'done_charging':
+        return "I am done recharging!"
+      default:
+        return null
+    }
   } else if (msg.attribute === 'connected') {
     switch(msg.data.tmpl) {
       case 'disconnected':
