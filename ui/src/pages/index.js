@@ -50,10 +50,8 @@ class IndexPage extends Component {
   }
 
   renderRooms() {
-    if (this.state.loading) {
-      return <><div style={{textAlign: `center`, marginTop: `10em`}}>
-        <Spin size="large" indicator={<Icon type="loading" />} />
-      </div></>
+    if (this.state.loading || true) {
+      return <Spin size="large" indicator={<Icon type="loading" />} style={{textAlign: `center`, margin: `10em 0`, display: `block`}} />
     } else if (this.state.rooms.length > 0) {
       const arr = this.state.rooms.sort((a,b) => {
         if (a.occupancy_count === b.occupancy_count) {
