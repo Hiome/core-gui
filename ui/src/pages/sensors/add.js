@@ -120,9 +120,11 @@ class AddSensorPage extends Component {
     if (roomId === 'external') return
 
     const room_sensors = this.state.sensors.map(s => {
-      const sId = s.room_id.split("::")
-      if (sId[0] === roomId) return this.state.rooms.find(r => r.id === sId[0])
-      if (sId[1] === roomId) return this.state.rooms.find(r => r.id === sId[1])
+      if (s.room_id) {
+        const sId = s.room_id.split("::")
+        if (sId[0] === roomId) return this.state.rooms.find(r => r.id === sId[0])
+        if (sId[1] === roomId) return this.state.rooms.find(r => r.id === sId[1])
+      }
       return null
     }).filter(x => x).map(x => x.name)
     const sensor_list = room_sensors.length === 0 ? `a door to` :
