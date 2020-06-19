@@ -51,7 +51,7 @@ class IndexPage extends Component {
 
   renderRooms() {
     if (this.state.loading) {
-      return <div style={{textAlign: `center`, marginTop: `10em`}}>
+      return <div style={{textAlign: `center`, marginTop: `10em`}} key="index-loader">
         <Spin size="large" indicator={<Icon type="loading" />} />
       </div>
     } else if (this.state.rooms.length > 0) {
