@@ -21,10 +21,10 @@ const index = require('./api/1/routes')
 app.use('/api/1', index)
 
 // serve static files from public
+app.use('/hs', express.static('public/hs'))
+app.use('/door', express.static('public/door'))
+app.use('/settings/door', express.static('public/settings/door'))
 app.use(express.static('public'))
-app.use('/hs/*', express.static('public/hs'))
-app.use('/door/*', express.static('public/door'))
-app.use('/settings/door/*', express.static('public/settings/door'))
 
 app.use(function (req, res, next) {
   if (req.path.startsWith('/api/'))
