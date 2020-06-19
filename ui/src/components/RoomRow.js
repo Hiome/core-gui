@@ -43,7 +43,6 @@ const RoomRow = ({ id, occupancy_count, name }) => {
           autoFocus
           value={occupancy_count}
           onChange={v => resetCount(v, id, name, occupancy_count)}
-          onPressEnter={() => setVisible(false)}
           size="large"
           type="number"
         />
