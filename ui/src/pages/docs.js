@@ -37,12 +37,12 @@ const DocsPage = (props) => {
 
   useEffect(() => {
     const client = HomeStream.subscribe('hs/1/#', function(m) {
-      if (m.attribute !== 'to') {
-        console.log("topic: " + m.topic)
-        console.log(m.data)
-        console.log(`${m.namespace}/${m.object_id} ${m.attribute} is ${m.val}`)
-        console.log("")
-      }
+      // if (m.attribute !== 'to') {
+      //   console.log("topic: " + m.topic)
+      //   console.log(m.data)
+      //   console.log(`${m.namespace}/${m.object_id} ${m.attribute} is ${m.val}`)
+      //   console.log("")
+      // }
       setEvents(e => [m, ...e.slice(0, 100)])
       setTopics(t => {
         t[m.topic] = m
@@ -192,7 +192,7 @@ client.on("message", function(topic, msg, packet) {
 })`}
       </SyntaxHighlighter>
 
-      <p>By the way, try opening your browser's dev console and walking through a door to see this code in action <span role="img" aria-label="wink">😉</span></p>
+      <p>That's it!</p>
 
       <a id="mqtt-sub" /><h3>Subscribing</h3>
 
