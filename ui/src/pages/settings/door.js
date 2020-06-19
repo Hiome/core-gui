@@ -85,7 +85,7 @@ class DevicesSettingsPage extends Component {
         <SettingsMenu page="doors" />
         <PageHeader title={this.state.sensor.name} onBack={() => navigate('/settings')}
           subTitle={['open', 'ajar', 'closed'].indexOf(this.state.sensor.data) !== -1 ? `is ${this.state.sensor.data}.` : ''} />
-        { this.state.loading ? <div style={{textAlign: 'center'}}><Spin size="large" indicator={<Icon type="loading" />} /></div> : this.renderContent() }
+        { this.state.loading ? <Spin size="large" indicator={<Icon type="loading" />} style={{textAlign: `center`, display: `block`}} /> : this.renderContent() }
       </Layout>
     )
   }

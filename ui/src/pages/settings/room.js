@@ -98,7 +98,7 @@ class RoomSettingsPage extends Component {
 
   renderSensors() {
     if (this.state.loading) {
-      return <div style={{textAlign: 'center'}}><Spin size="large" indicator={<Icon type="loading" />} /></div>
+      return <Spin size="large" indicator={<Icon type="loading" />} style={{textAlign: `center`, display: `block`}} />
     }
     else if (this.state.sensors.length > 0) {
       return <ul style={{marginLeft: '3em', marginTop: '1em'}}>{ this.state.sensors.map(sensor => <li key={`sensor${sensor.id}`}>{sensor.name}</li>) }</ul>

@@ -34,7 +34,7 @@ class RoomsSettingsPage extends Component {
 
   renderRooms() {
     if (this.state.loading) {
-      return <div style={{textAlign: 'center'}}><Spin size="large" indicator={<Icon type="loading" />} /></div>
+      return <Spin size="large" indicator={<Icon type="loading" />} style={{textAlign: `center`, display: `block`}} />
     } else if (this.state.rooms.length > 0) {
       return this.state.rooms.map(room => <Link to={`/settings/room?id=${room.id}`}
               className={`room ${room.hidden ? '' : 'active'}`} key={`room${room.id}`}

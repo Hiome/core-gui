@@ -403,7 +403,7 @@ const LogViewer = (props) => {
           <div ref={$loadMoreButton}><Button icon="reload" onClick={loadMore} type="primary">Load More</Button></div>
       }
 
-      { isLoading ? <div style={{textAlign: `center`,marginTop:'20px'}}><Spin size="large" /></div> : null }
+      { isLoading ? <Spin size="large" style={{textAlign: `center`, marginTop: `20px`, display: `block`}} /> : null }
     </>
   )
 }

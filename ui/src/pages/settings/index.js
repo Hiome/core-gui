@@ -46,7 +46,7 @@ class DoorIndexPage extends Component {
 
   renderSensors() {
     if (this.state.loading) {
-      return <div style={{textAlign: 'center'}}><Spin size="large" indicator={<Icon type="loading" />} /></div>
+      return <Spin size="large" indicator={<Icon type="loading" />} style={{textAlign: `center`, display: `block`}} />
     } else if (this.state.sensors.length > 0) {
       return this.state.sensors.map(sensor => <Link to={`/settings/door/${sensor.id}`}
               className='room active' key={`sensor${sensor.id}`}

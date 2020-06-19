@@ -75,11 +75,6 @@ class IndexPage extends Component {
   }
 
   render() {
-    if (this.props.location.pathname.length > 1) {
-      // work around gatsby's shoddy dynamic routing
-      return <Spin size="large" indicator={<Icon type="loading" />} style={{textAlign: `center`, marginTop: `10em`, display: `block`}} />
-    }
-
     return <Layout title="Rooms">
       { this.renderRooms() }
     </Layout>

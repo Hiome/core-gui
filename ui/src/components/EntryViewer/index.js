@@ -153,7 +153,7 @@ const EntryViewer = (props) => {
   return (<>
       { renderFilterBtn(props.filter, objectAttrs.data) }
 
-      { !data || !objectAttrs.data ? <div style={{textAlign: `center`,marginTop:'20px'}}><Spin size="large" /></div> :
+      { !data || !objectAttrs.data ? <Spin size="large" style={{textAlign: `center`, marginTop: `20px`, display: `block`}} /> :
         (data.length === 0 ? <Empty description="Nothing to see here!" /> : 
           data.map(d => renderLog(d, objectAttrs.data, props.debug))) }
     </>
