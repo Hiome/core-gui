@@ -76,8 +76,8 @@ class AddSensorPage extends Component {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({hidden: checked, occupancy_count: 0})
-    }).then(resp => resp.json()).then(resp =>
-      roomId === this.state.room1 ? this.setState({room1_hidden: resp.hidden, loadingButton: false}) : this.setState({room2_hidden: resp.hidden, loadingButton: false}))
+    }).then(resp =>
+      roomId === this.state.room1 ? this.setState({room1_hidden: checked, loadingButton: false}) : this.setState({room2_hidden: checked, loadingButton: false}))
   }
 
   saveSensor() {
