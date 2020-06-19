@@ -122,8 +122,8 @@ class AddSensorPage extends Component {
     const room_sensors = this.state.sensors.map(s => {
       if (s.room_id) {
         const sId = s.room_id.split("::")
-        if (sId[0] === roomId) return this.state.rooms.find(r => r.id === sId[0])
-        if (sId[1] === roomId) return this.state.rooms.find(r => r.id === sId[1])
+        if (sId[0] === roomId) return this.state.rooms.find(r => r.id === sId[1])
+        if (sId[1] === roomId) return this.state.rooms.find(r => r.id === sId[0])
       }
       return null
     }).filter(x => x).map(x => x.name)
