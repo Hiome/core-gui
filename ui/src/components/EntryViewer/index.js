@@ -78,7 +78,7 @@ const renderLog = (row, objects, debug) => {
           </div>
           <div className="log-content">
             <p>
-              <span className={row.is_valid ? 'valid-entry' : 'invalid-entry'}>{ template }</span>
+              { template }
               <span className={row.is_valid ? 'valid-confidence' : 'invalid-confidence'}>{Math.floor(row.confidence*100)}% confident</span>
             </p>
             <RevertLink sensorId={row.sensor_id} isValid={row.is_valid} corrected={row.corrected} ts={row.ts} />
