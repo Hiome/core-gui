@@ -41,7 +41,7 @@ const HomeStreamPage = (props) => {
           &#x2190; &nbsp; {strftime('%A, %B %e%t', new Date(day - 86400000))}
         </Button>
 
-        <Button type="link" onClick={() => setDay(day - 86400000)} className={`older ${day >= new Date().setHours(0,0,0,0) ? 'hidden' : ''}`}>
+        <Button type="link" onClick={() => setDay(day + 86400000)} className={`older ${day >= new Date().setHours(0,0,0,0) ? 'hidden' : ''}`}>
           {strftime('%A, %B %e%t', new Date(day + 86400000))} &nbsp; &#x2192;
         </Button>
         <div className="clear"></div>
