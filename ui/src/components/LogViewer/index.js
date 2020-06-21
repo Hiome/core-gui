@@ -351,16 +351,18 @@ const LogViewer = (props) => {
 
   // mqtt live updates
   useEffect(() => {
-    const client = HomeStream.subscribe('hs/1/' + props.topic.replace(/~~/g, '#').replace(/~/g,'+'), function(m) {
-      if (m.retain || m.ts < new Date().setHours(0,0,0,0)) return
-      // m.uuid = m.namespace + '/' + m.object_id
-      events.mutate()
-      if (m.attribute !== 'to') {
-        objectAttrs.mutate()
-      }
-    })
-    return () => client.end()
-  }, [props.topic])
+    if (props.day >= new Date().setHours(0,0,0,0)) {
+      const client = HomeStream.subscribe('hs/1/' + props.topic.replace(/~~/g, '#').replace(/~/g,'+'), function(m) {
+        if (m.retain) return
+        // m.uuid = m.namespace + '/' + m.object_id
+        events.mutate()
+        // if (m.attribute !== 'to') {
+        //   objectAttrs.mutate()
+        // }
+      })
+      return () => client.end()
+    }
+  }, [props.topic, props.day])
 
   const isEmpty = !data.some(x => renderable(x, objectAttrs.data, props.debug))
   const isLoadingMore = !events.data || typeof events.data[events.page - 1] === "undefined" || (isEmpty && !objectAttrs.data)
