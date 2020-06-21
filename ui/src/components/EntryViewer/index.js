@@ -7,6 +7,7 @@ import { Avatar, Button, Empty, Spin, Tag, message } from 'antd'
 import TimeAgo from '../TimeAgo'
 import HomeStream from '../homestream'
 import Collapsible from '../Collapsible'
+import ScrollableList from '../ScrollableList'
 
 import '../LogViewer/style.css'
 import './style.css'
@@ -155,7 +156,7 @@ const EntryViewer = (props) => {
 
       { !data || !objectAttrs.data ? <Spin size="large" style={{textAlign: `center`, marginTop: `20px`, display: `block`}} /> :
         (data.length === 0 ? <Empty description="Nothing to see here!" /> : 
-          data.map(d => renderLog(d, objectAttrs.data, props.debug))) }
+          <ScrollableList items={data} renderItem={d => renderLog(d, objectAttrs.data, props.debug)} /> ) }
     </>
   )
 }

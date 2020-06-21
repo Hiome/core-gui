@@ -1,15 +1,15 @@
 import { Link, navigate } from "gatsby"
 import PropTypes from "prop-types"
 import React, { useEffect, useRef } from 'react'
-import useSWR, { mutate } from 'swr'
+import useSWR from 'swr'
 import { Avatar, Button, Empty, Spin, Tag, Menu, Dropdown, Icon } from 'antd'
 
 import Battery from '../Battery'
 import TimeAgo from "../TimeAgo"
 import HomeStream from '../homestream'
 import Collapsible from '../Collapsible'
+import { useSWRInfinite } from './use-swr-infinite'
 
-import useSWRPages from './use-swr-pages'
 import './style.css'
 
 // object attribute reducer
@@ -309,20 +309,17 @@ const renderFilterBtn = (topic, objects) => {
 
 const LogViewer = (props) => {
   const objectAttrs = useSWR(`${process.env.API_URL}api/1/hs/1/~/~/~`, url => fetcher(url).then(updateObjects))
-  const {
-    pages,
-    pageSWRs,
-    isLoadingMore,
-    isReachingEnd,
-    loadMore
-  } = useSWRPages(
-    `${props.topic}/${props.day}`, // key of this page
-    ({ offset, withSWR }) => {
-      const {data} = withSWR(
-        useSWR(`${process.env.API_URL}api/1/hs/1/${props.topic}/${props.day}?limit=300&reverse=true&until=${offset || (props.day + 86399999)}`, fetcher)
-      )
-      if (!data) return null
-      return data.reduce(([i,contexts], x) => {
+  const events = useSWRInfinite(
+    (index, prevData) => {
+      if (prevData && prevData < 300) return null
+      const offset = prevData ? (prevData[prevData.length - 1].ts - 1) : (props.day + 86399999)
+      return `${process.env.API_URL}api/1/hs/1/${props.topic}/${props.day}?limit=300&reverse=true&until=${offset}`
+    },
+    fetcher,
+    {revalidateAllPages: true}
+  )
+
+  const data = events.data ? events.data.flat().reduce(([i,contexts], x) => {
         i.push(x)
         contexts[x.topic + '/' + x.ts] = []
         return [i, contexts]
@@ -350,60 +347,54 @@ const LogViewer = (props) => {
           })
         }
         return i
-      }, []).map(i => renderLog(i, objectAttrs.data, props.debug))
-    },
-    swr => swr.data.length >= 300 ? (swr.data[swr.data.length - 1].ts - 1) : null,
-    [props.topic, props.day, props.debug, objectAttrs.data && Object.keys(objectAttrs.data).length]
-  )
+      }, []) : []
 
   // mqtt live updates
   useEffect(() => {
-    if (props.day >= new Date().setHours(0,0,0,0)) {
-      const client = HomeStream.subscribe('hs/1/' + props.topic.replace(/~~/g, '#').replace(/~/g,'+'), function(m) {
-        if (m.retain || m.ts < props.day) return
-        m.uuid = m.namespace + '/' + m.object_id
-        mutate(`${process.env.API_URL}api/1/hs/1/${props.topic}/${props.day}?limit=300&reverse=true&until=${props.day + 86399999}`,
-          async h => ([m, ...h]), templates(m))
-        if (m.attribute !== 'to') mutate(`${process.env.API_URL}api/1/hs/1/~/~/~`, async attrs => updateObjects(m, attrs), false)
-      })
-      return () => client.end()
-    }
-  }, [props.topic, props.day])
+    const client = HomeStream.subscribe('hs/1/' + props.topic.replace(/~~/g, '#').replace(/~/g,'+'), function(m) {
+      if (m.retain || m.ts < new Date().setHours(0,0,0,0)) return
+      // m.uuid = m.namespace + '/' + m.object_id
+      events.mutate()
+      if (m.attribute !== 'to') {
+        objectAttrs.mutate()
+      }
+    })
+    return () => client.end()
+  }, [props.topic])
 
-  const hasItems = pageSWRs.some(p => p.data ? p.data.some(x => renderable(x, objectAttrs.data, props.debug)) : false)
-  // const hasItems = useMemo(() => (
-  // ), [props.topic, props.day, props.debug, pageSWRs.length, objectAttrs.data && Object.keys(objectAttrs.data).length])
-  const isLoading = isLoadingMore || pageSWRs.length === 0 || (!hasItems && objectAttrs.isValidating)
+  const isEmpty = !data.some(x => renderable(x, objectAttrs.data, props.debug))
+  const isLoadingMore = !events.data || typeof events.data[events.page - 1] === "undefined" || (isEmpty && !objectAttrs.data)
+  const isReachingEnd = events.data && events.data[events.data.length - 1] && events.data[events.data.length - 1].length < 300
 
-  if (!hasItems && !isReachingEnd && !isLoading) loadMore()
+  if (isEmpty && !isReachingEnd && !isLoadingMore) events.setPage(p => p + 1)
 
   // infinite scroll
-  const $loadMoreButton = useRef(null);
+  const $loadMoreButton = useRef(null)
   useEffect(() => {
     if ($loadMoreButton.current) {
       const observer = new IntersectionObserver(([entry]) => {
-        if (entry.isIntersecting) loadMore()
-      }, { rootMargin: '200px' })
+        if (entry.isIntersecting) events.setPage(p => p + 1)
+      }, { rootMargin: '2000px' })
       const btn = $loadMoreButton.current
       observer.observe(btn)
       return () => {
         observer.unobserve(btn)
       }
     }
-  }, [$loadMoreButton.current, loadMore])
+  }, [$loadMoreButton.current, events.setPage])
 
   return (<>
       { renderFilterBtn(props.topic, objectAttrs.data) }
 
-      { pages }
+      { data.map(i => renderLog(i, objectAttrs.data, props.debug)) }
 
-      { !isLoading && !hasItems ? <Empty description="Nothing to see here!" /> : null }
+      { isEmpty && !isLoadingMore ? <Empty description="Nothing to see here!" /> : null }
 
-      { isLoading || !hasItems || isReachingEnd ? null :
-          <div ref={$loadMoreButton}><Button icon="reload" onClick={loadMore} type="primary">Load More</Button></div>
+      { isLoadingMore || isEmpty || isReachingEnd ? null :
+          <div ref={$loadMoreButton}><Button icon="reload" onClick={() => events.setPage(p => p + 1)} type="primary">Load More</Button></div>
       }
 
-      { isLoading ? <Spin size="large" style={{textAlign: `center`, marginTop: `20px`, display: `block`}} /> : null }
+      { isLoadingMore ? <Spin size="large" style={{textAlign: `center`, marginTop: `20px`, display: `block`}} /> : null }
     </>
   )
 }
