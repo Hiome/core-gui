@@ -190,22 +190,24 @@ const doorMenu = (sensor_id, attr) => {
   return null
 }
 
+const colorizedCache = {}
+
 const colorize = (input) => {
-  const stringHexNumber = (
-    parseInt(parseInt(input, 36).toExponential().slice(2,-5), 10) & 0xFFFFFF
-  ).toString(16).toUpperCase()
-  return '#' + ('000000' + stringHexNumber).slice(-6)
+  let c = colorizedCache[input]
+  if (!c) {
+    const stringHexNumber = (
+      parseInt(parseInt(input, 36).toExponential().slice(2,-5), 10) & 0xFFFFFF
+    ).toString(16).toUpperCase()
+    c = '#' + ('000000' + stringHexNumber).slice(-6)
+    colorizedCache[input] = c
+  }
+  return c
 }
 
 const smartTrim = (input) => {
   if (input.length < 9) return input
   input = input.split(" ")[0]
   return input.substring(0, 9)
-}
-
-const batteryStatus = (battery) => {
-  if (!battery) return null
-  return <Battery label={battery.label} />
 }
 
 const renderable = (row, objects, debug) => {
@@ -242,7 +244,7 @@ const renderLog = (row, objects, debug) => {
             </span>
             {doorMenu(row.object_id, row.attribute)}
             <span className="log-battery">
-              {batteryStatus(o.battery)}
+              { o.battery ? <Battery label={o.battery.label} /> : null }
             </span>
           </div>
           <div className="log-content">
