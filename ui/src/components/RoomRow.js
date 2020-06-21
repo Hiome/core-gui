@@ -60,4 +60,4 @@ RoomRow.propTypes = {
   name: PropTypes.string.isRequired
 }
 
-export default RoomRow
+export default React.memo(RoomRow)

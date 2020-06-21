@@ -27,4 +27,4 @@ SettingsMenu.propTypes = {
   page: PropTypes.string.isRequired
 }
 
-export default SettingsMenu
+export default React.memo(SettingsMenu)
