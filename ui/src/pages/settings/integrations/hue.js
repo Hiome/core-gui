@@ -1,9 +1,9 @@
 import { Icon, Button, Result, Switch } from "antd"
 import React, { PureComponent } from 'react'
-import { connect } from 'mqtt/dist/mqtt'
 
 import SettingsMenu from "../../../components/SettingsMenu"
 import Layout from "../../../components/Layout"
+import HomeStream from "../../../components/homestream"
 
 class HueSettingsPage extends PureComponent {
   state = {
@@ -12,47 +12,33 @@ class HueSettingsPage extends PureComponent {
   }
 
   componentDidMount() {
-    const client = connect(`ws://${window.location.host}:1884`)
-    client.on('connect', () => {
-      client.subscribe('_hiome/integrate/hue', {qos: 1})
-      client.subscribe('_hiome/integrate/hue/settings/onlyControlAtNight', {qos: 1})
-    })
-    client.on('message', function(t, m, p) {
-      if (m == null || m.toString() === 'connect' || m.toString() === 'disconnect') return
-
-      if (t === '_hiome/integrate/hue/settings/onlyControlAtNight') {
-        this.setState({onlyControlAtNight: m.toString() === 'true'})
-        return
-      }
-
-      const message = JSON.parse(m.toString())
-      this.setState({status: message.status})
-      if (message.status === 'no_link_pushed') {
-        // try again in 20 seconds
-        setTimeout(() => { client.publish('_hiome/integrate/hue', 'connect') }, 20000)
+    HomeStream.subscribe('hs/1/com.hiome/hue/+', function(m) {
+      if (m.attribute === 'night_only') {
+        this.setState({onlyControlAtNight: m.val})
+      } else if (m.attribute === 'connected') {
+        this.setState({status: m.val})
+        if (m.val === 'no_link_pushed') {
+          // try again in 20 seconds
+          setTimeout(() => { HomeStream.write('com.hiome/gui/to/com.hiome/hue/scan', true) }, 20000)
+        }
       }
     }.bind(this))
   }
 
   scanForBridge = () => {
     this.setState({status: 'start'})
-    const client = connect(`ws://${window.location.host}:1884`)
-    client.on('connect', () => client.publish('_hiome/integrate/hue', 'connect', () => client.end()))
+    HomeStream.write('com.hiome/gui/to/com.hiome/hue/scan', true)
   }
 
   disconnectHue = () => {
     this.setState({status: 'start'})
-    const client = connect(`ws://${window.location.host}:1884`)
-    client.on('connect', () => client.publish('_hiome/integrate/hue', 'disconnect', () => {
-      setTimeout(() => { client.publish('_hiome/integrate/hue', 'connect', () => client.end()) }, 1000)
-    }))
+    HomeStream.write('com.hiome/gui/to/com.hiome/hue/scan', false)
+    setTimeout(() => { HomeStream.write('com.hiome/gui/to/com.hiome/hue/scan', true) }, 1000)
   }
 
   controlAtNightToggle = (checked, e) => {
     this.setState({onlyControlAtNight: checked})
-    const client = connect(`ws://${window.location.host}:1884`)
-    client.on('connect', () => client.publish(
-      '_hiome/integrate/hue/settings/onlyControlAtNight', checked ? 'true' : 'false', {retain: true}, () => client.end()))
+    HomeStream.write('com.hiome/hue/night_only', checked, {retain: true})
   }
 
   renderHueButton() {
