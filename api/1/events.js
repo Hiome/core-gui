@@ -148,7 +148,7 @@ function latest(req, res, next) {
     args.push(req.params.attr)
     attr_filter = `attribute = $${args.length}`
   } else {
-    attr_filter = "attribute <> 'to'"
+    attr_filter = "(attribute = 'name' OR attribute = 'battery')"
   }
   if (req.params.namespace !== '~') {
     args.push(req.params.namespace)
