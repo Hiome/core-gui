@@ -100,8 +100,7 @@ class Header extends PureComponent {
       centered={true}
       onCancel={() => this.setState({supportVisible: false})}
     >
-      <Result icon={this.chatImg()} title="Need Help? Just Ask!" subTitle="You can reach us by SMS or email." extra={[
-        <Button icon="message" type="primary" href="sms:+13126246245">Text (312) 624-6245</Button>,
+      <Result icon={this.chatImg()} title="Need Help? Just Ask!" extra={[
         <Button icon="mail" href="mailto:support@hiome.com">Email support@hiome.com</Button>
       ]}/>
     </Modal>
