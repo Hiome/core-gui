@@ -39,7 +39,7 @@
 .log-message {
   display: inline-block;
   margin-left: 1em;
-  overflow: scroll;
+  overflow: auto;
 }
 .log-meta {
   margin-bottom: 5px;
